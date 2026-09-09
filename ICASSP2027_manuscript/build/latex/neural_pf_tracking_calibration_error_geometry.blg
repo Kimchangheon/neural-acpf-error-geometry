@@ -1,0 +1,46 @@
+This is BibTeX, Version 0.99d (TeX Live 2025)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: neural_pf_tracking_calibration_error_geometry.aux
+The style file: IEEEbib.bst
+Database file #1: neural_pf_tracking_calibration_error_geometry.bib
+You've used 22 entries,
+            1838 wiz_defined-function locations,
+            579 strings with 9133 characters,
+and the built_in function-call counts, 5370 in all, are:
+= -- 393
+> -- 398
+< -- 0
++ -- 141
+- -- 119
+* -- 507
+:= -- 951
+add.period$ -- 22
+call.type$ -- 22
+change.case$ -- 22
+chr.to.int$ -- 0
+cite$ -- 22
+duplicate$ -- 182
+empty$ -- 461
+format.name$ -- 119
+if$ -- 1119
+int.to.chr$ -- 0
+int.to.str$ -- 22
+missing$ -- 20
+newline$ -- 116
+num.names$ -- 22
+pop$ -- 50
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 46
+stack$ -- 0
+substring$ -- 282
+swap$ -- 24
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 0
+while$ -- 41
+width$ -- 24
+write$ -- 244

@@ -1,0 +1,92 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\citation{decarne2024storage}
+\citation{titz2024congestion}
+\citation{newbery2024curtailment}
+\citation{belz2024redispatch}
+\citation{conrad2025data}
+\citation{weibelzahl2017nodal}
+\citation{karimi2019loadflow}
+\citation{oz2026dpf}
+\citation{monticelli2000state}
+\citation{pacaud2027scopf}
+\citation{lin2024powerflownet}
+\citation{arowolo2026hhmpnn}
+\citation{piloto2024canos}
+\citation{wen2026pigat}
+\citation{kim2026pignn}
+\citation{nguyen2025fsnet}
+\citation{yang2026gridsfm}
+\citation{gridfmgraphkit2026}
+\citation{puech2026genco}
+\citation{li2026lumina}
+\citation{lin2024powerflownet}
+\citation{wen2026pigat}
+\citation{kim2026pignn}
+\citation{jiang2025upinn}
+\citation{wen2026pigat}
+\citation{puech2026genco}
+\@writefile{toc}{\contentsline {section}{\numberline {1} Introduction}{1}{section.1}\protected@file@percent }
+\newlabel{sec:introduction}{{1}{1}{Introduction}{section.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Neural AC-PF surrogates can achieve small voltage errors while retaining large physics violations. Bias calibration and solution-subspace projection jointly suppress systematic and off-subspace errors, improving both voltage accuracy and AC power-balance consistency.}}{1}{figure.1}\protected@file@percent }
+\newlabel{fig:graphical_abstract}{{1}{1}{Neural AC-PF surrogates can achieve small voltage errors while retaining large physics violations. Bias calibration and solution-subspace projection jointly suppress systematic and off-subspace errors, improving both voltage accuracy and AC power-balance consistency}{figure.1}{}}
+\citation{park2024compact}
+\@writefile{toc}{\contentsline {section}{\numberline {2} Error Geometry and Calibrated Subspace Projection}{2}{section.2}\protected@file@percent }
+\newlabel{sec:method}{{2}{2}{Error Geometry and Calibrated Subspace Projection}{section.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1} AC consistency and train-only calibration}{2}{subsection.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2} Error geometry in a training-derived solution subspace}{2}{subsection.2.2}\protected@file@percent }
+\newlabel{eq:error_decomposition}{{2}{2}{Error geometry in a training-derived solution subspace}{equation.2}{}}
+\newlabel{eq:local_residual}{{3}{2}{Error geometry in a training-derived solution subspace}{equation.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3} Calibrated solution-subspace projection}{2}{subsection.2.3}\protected@file@percent }
+\newlabel{eq:csp}{{4}{2}{Calibrated solution-subspace projection}{equation.4}{}}
+\citation{kim2026pignn}
+\citation{yang2026gridsfm}
+\citation{gridfmgraphkit2026}
+\citation{li2026lumina}
+\citation{yang2026gridsfm}
+\@writefile{toc}{\contentsline {section}{\numberline {3} Experiments and Results}{3}{section.3}\protected@file@percent }
+\newlabel{sec:experiments}{{3}{3}{Experiments and Results}{section.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1} Experimental setup}{3}{subsection.3.1}\protected@file@percent }
+\newlabel{sec:setup}{{3.1}{3}{Experimental setup}{subsection.3.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2} GBnetwork: Error Direction and Calibrated Subspace Projection}{3}{subsection.3.2}\protected@file@percent }
+\newlabel{sec:gb_mechanism}{{3.2}{3}{GBnetwork: Error Direction and Calibrated Subspace Projection}{subsection.3.2}{}}
+\newlabel{eq:controlled_geometry}{{6}{3}{GBnetwork: Error Direction and Calibrated Subspace Projection}{equation.6}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces  Fixed-norm directional intervention on GBnetwork. Each curve is normalized by its $\alpha =1$ Mean PB. Suppressing off-subspace error reduces PB, whereas suppressing in-subspace error produces the complementary increase. }}{3}{figure.2}\protected@file@percent }
+\newlabel{fig:error_geometry}{{2}{3}{Fixed-norm directional intervention on GBnetwork. Each curve is normalized by its $\alpha =1$ Mean PB. Suppressing off-subspace error reduces PB, whereas suppressing in-subspace error produces the complementary increase}{figure.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3} Cross-grid breadth and distribution shift}{3}{subsection.3.3}\protected@file@percent }
+\newlabel{sec:breadth_shift}{{3.3}{3}{Cross-grid breadth and distribution shift}{subsection.3.3}{}}
+\bibstyle{IEEEbib}
+\bibdata{neural_pf_tracking_calibration_error_geometry}
+\bibcite{decarne2024storage}{1}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces  GBnetwork results at $k=16$ over three seeds (mean $\pm $ standard deviation). $C$ denotes calibration, $P_{16}$ projection, and CSP$_{16}$ their composition. $a_{\mathrm  {w}}=1$ is ideal. The per-bus mean baseline uses training-set means. }}{4}{table.1}\protected@file@percent }
+\newlabel{tab:intervention}{{1}{4}{GBnetwork results at $k=16$ over three seeds (mean $\pm $ standard deviation). $C$ denotes calibration, $P_{16}$ projection, and CSP$_{16}$ their composition. $a_{\mathrm {w}}=1$ is ideal. The per-bus mean baseline uses training-set means}{table.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces  Grid-by-grid physical consistency of GridSFM before and after CSP$_{16}$ across 31 systems ordered by bus count. Mean PB is shown on a logarithmic scale. }}{4}{figure.3}\protected@file@percent }
+\newlabel{fig:crossgrid_csp}{{3}{4}{Grid-by-grid physical consistency of GridSFM before and after CSP$_{16}$ across 31 systems ordered by bus count. Mean PB is shown on a logarithmic scale}{figure.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces  Fixed-rank CSP$_{16}$ under topology and spatial distribution shifts. It uses seperate condition sets from model training; PB means and quntiles are pooled over all bus-scenario pairs. }}{4}{table.2}\protected@file@percent }
+\newlabel{tab:shift}{{2}{4}{Fixed-rank CSP$_{16}$ under topology and spatial distribution shifts. It uses seperate condition sets from model training; PB means and quntiles are pooled over all bus-scenario pairs}{table.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4} CONCLUSION}{4}{section.4}\protected@file@percent }
+\bibcite{titz2024congestion}{2}
+\bibcite{newbery2024curtailment}{3}
+\bibcite{belz2024redispatch}{4}
+\bibcite{conrad2025data}{5}
+\bibcite{weibelzahl2017nodal}{6}
+\bibcite{karimi2019loadflow}{7}
+\bibcite{oz2026dpf}{8}
+\bibcite{monticelli2000state}{9}
+\bibcite{pacaud2027scopf}{10}
+\bibcite{lin2024powerflownet}{11}
+\bibcite{arowolo2026hhmpnn}{12}
+\bibcite{piloto2024canos}{13}
+\bibcite{wen2026pigat}{14}
+\bibcite{kim2026pignn}{15}
+\bibcite{nguyen2025fsnet}{16}
+\bibcite{yang2026gridsfm}{17}
+\bibcite{gridfmgraphkit2026}{18}
+\bibcite{puech2026genco}{19}
+\bibcite{li2026lumina}{20}
+\bibcite{jiang2025upinn}{21}
+\bibcite{park2024compact}{22}
+\@writefile{toc}{\contentsline {section}{\numberline {5} References}{5}{section.5}\protected@file@percent }
+\gdef \@abspage@last{5}

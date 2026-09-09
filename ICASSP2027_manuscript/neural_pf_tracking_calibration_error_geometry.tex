@@ -1,0 +1,771 @@
+% ICASSP 2027 manuscript. The supplied Template.tex is intentionally preserved.
+\documentclass{article}
+\usepackage{spconf,amsmath,amssymb,amsthm,graphicx,booktabs,multirow}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc,fit,backgrounds}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{microtype,balance}
+\usepackage[hidelinks]{hyperref}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\newtheorem{proposition}{Proposition}
+\newcommand{\Rpool}{R^2_{\mathrm{pool}}}
+\newcommand{\Rbus}{R^2_{\mathrm{within}}}
+\newcommand{\Sbus}{S_{\mathrm{bus}}}
+\newcommand{\dP}{\Delta P}
+\newcommand{\dQ}{\Delta Q}
+\newcommand{\Vmag}{|V|}
+\newcommand{\Pcal}{\mathcal{C}}
+\newcommand{\Pproj}{\mathcal{P}}
+
+\title{PHYSICS-INFORMED BUT NOT PHYSICS-CONSISTENT:\\
+ERROR GEOMETRY AND SUBSPACE PROJECTION FOR NEURAL AC POWER FLOW}
+
+\name{\begin{tabular}{c}
+Changhun Kim$^{1}$, Timon Conrad$^{2}$, Redwanul Karim$^{1}$, Karan Pahlajani$^{1}$, Julian Oelhaf$^{1}$, David Riebesel$^{2}$\\
+Tom\'as Arias-Vergara$^{1}$, Andreas Maier$^{1}$, Johann J\"ager$^{2}$, Siming Bayer$^{1}$
+\end{tabular}%
+\thanks{Corresponding author: changhun.kim@fau.de. This work was conducted within the scope of the research project GridAssist and was supported through the ``OptiNetD'' funding initiative by the German Federal Ministry for Economic Affairs and Energy (BMWE) as part of the 8th Energy Research Programme.}}
+\address{$^{1}$Pattern Recognition Lab, Friedrich-Alexander-Universit\"at Erlangen-N\"urnberg, Germany\\
+$^{2}$Institute of Electrical Energy Systems, Friedrich-Alexander-Universit\"at Erlangen-N\"urnberg, Germany}
+
+\begin{document}
+\ninept
+\maketitle
+
+\begin{abstract}
+Recent neural power-flow solvers, including emerging foundation models,
+achieve accurate voltage predictions, yet such accuracy does not
+necessarily imply physically consistent solutions.
+Even small voltage errors can yield large AC power-balance residuals,
+particularly on large-scale grids.
+We study this accuracy--consistency gap across PIGNN, GridSFM, GridFM-GraphKit, and LUMINA on realistic 2224-bus GBnetwork scenarios, with cross-grid evaluation of GridSFM over 31 systems.
+Using an SVD basis fitted to training AC power-flow solutions, we find that neural prediction errors contain substantial components outside the dominant solution subspace.
+To address this mismatch,
+calibrated solution-subspace projection (CSP) removes off-subspace prediction components,
+substantially reducing mean power-balance residual from 0.3159 to 0.0550 p.u. for PIGNN-GC and
+from 0.2687 to 0.0514 p.u. for GridSFM.
+These results highlight output-error geometry as a critical factor in physics-consistent neural AC power flow.
+\end{abstract}
+
+
+
+
+
+
+
+\begin{keywords}
+AC power flow, neural surrogate, physics violation, error geometry, calibration, distribution shift
+\end{keywords}
+
+\section{Introduction}
+\label{sec:introduction}
+
+Modern power-system operation increasingly requires evaluating large ensembles of
+operating conditions. Variable renewable generation, electrification, storage, and
+spatially concentrated loads increase the variability of power injections and demand
+\cite{decarne2024storage}, while finite transmission capacity makes congestion,
+curtailment, and corrective redispatch increasingly consequential
+\cite{titz2024congestion,newbery2024curtailment}.
+In Germany, Redispatch~2.0 uses load-flow-based grid-security analysis to anticipate
+bottlenecks and coordinate corrective actions across transmission and distribution
+systems \cite{belz2024redispatch}. Related studies also highlight the growing
+computational demands placed on load-flow analysis under increasingly diverse operating
+conditions \cite{conrad2025data}.
+In nodal electricity markets, transmission constraints shape locational prices and
+therefore affect both operational and commercial decisions
+\cite{weibelzahl2017nodal}.
+AC power flow (AC-PF) is consequently a fundamental nonlinear computational
+primitive, mapping injections and network conditions to bus voltages and
+network flows needed for system assessment \cite{karimi2019loadflow}.
+Repeated AC-PF evaluations arise in time-series and contingency studies
+\cite{oz2026dpf}, while the same nonlinear AC network equations also underlie
+optimal power flow and state estimation \cite{monticelli2000state}, where they define operational
+constraints and nonlinear measurement mappings, respectively.
+\cite{pacaud2027scopf}.
+%\begin{figure}[t]
+%    \centering
+%    \includegraphics[width=\columnwidth]
+%    {Graphical_abstract.png}
+%    \label{fig:graphical_abstract}
+%    \caption{Neural AC-PF surrogates can achieve small voltage errors while retaining large physics violations. Bias calibration and solution-subspace projection jointly suppress systematic and off-subspace errors, improving both voltage accuracy and AC power-balance consistency.}
+%\end{figure}
+%\begin{figure}[t]
+%    \centering
+%    % Native TikZ version of the graphical abstract.  The Inkscape export is
+%    % kept in Graphical_abstract.pdf_tex; to go back to it, replace the
+%    % \resizebox line with
+%    %   \def\svgwidth{\columnwidth}\input{Graphical_abstract.pdf_tex}
+%    \resizebox{\columnwidth}{!}{\input{Graphical_abstract_tikz}}
+%    \caption{Neural AC-PF surrogates can achieve small voltage errors while retaining large physics violations. Bias calibration and solution-subspace projection jointly suppress systematic and off-subspace errors, improving both voltage accuracy and AC power-balance consistency.}
+%    \label{fig:graphical_abstract}
+%\end{figure}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\columnwidth]
+    {csp_diagram_finished_x.pdf}
+    \caption{Neural AC-PF surrogates can achieve small voltage errors while retaining large physics violations. Bias calibration and solution-subspace projection jointly suppress systematic and off-subspace errors, improving both voltage accuracy and AC power-balance consistency.}
+    \label{fig:graphical_abstract}
+\end{figure}
+
+The computational demands of repeated grid analysis have motivated learned
+surrogates that amortize the cost of conventional solvers over many operating
+points \cite{lin2024powerflownet}.
+Learned grid solvers span different levels of constraint enforcement:
+direct regression prioritizes fast inference \cite{arowolo2026hhmpnn},
+physics- or constraint-aware objectives penalize violations during training
+\cite{piloto2024canos,wen2026pigat},
+while iterative correction and feasibility-seeking mechanisms refine
+predictions more directly toward physically consistent or feasible states
+\cite{kim2026pignn,nguyen2025fsnet}.
+More recent cross-grid and foundation-model efforts---including GridSFM
+\cite{yang2026gridsfm}, GridFM-GraphKit and GENCO
+\cite{gridfmgraphkit2026,puech2026genco}, and LUMINA
+\cite{li2026lumina}---extend this direction with global context and rich
+heterogeneous, topology-aware representations designed to operate across
+diverse grids and operating conditions.
+
+Despite this progress, physical consistency remains distinct from state
+prediction accuracy. Learning-based AC-PF methods commonly regress toward
+reference solutions obtained from numerical power-flow solvers
+\cite{lin2024powerflownet}, while physics-informed variants additionally
+penalize AC power-balance residuals during training \cite{wen2026pigat}.
+Some formulations go further and optimize the governing residuals directly
+without reference states \cite{kim2026pignn,jiang2025upinn}.
+Modern evaluations accordingly report both voltage-state errors and reconstructed
+AC power-balance residuals \cite{wen2026pigat,puech2026genco}.
+However, incorporating residuals into the objective does not enforce the AC
+equations as hard constraints: non-negligible power-balance violations can remain
+even when state errors are small and residuals are explicitly minimized.
+The central question is therefore why such inconsistency persists after both
+accurate state fitting and physics-aware training.
+We argue that the missing factor lies in the geometry of the remaining voltage-error pattern across buses.
+
+We investigate this \emph{accuracy--consistency gap} across PIGNN, GridSFM,
+GridFM-GraphKit, and LUMINA using realistic 2224-bus GBnetwork scenarios and
+cross-grid evaluation over 31 systems of diverse sizes.
+Detailed analysis of PIGNN-GC and GridSFM first shows that train-only calibration
+substantially improves voltage accuracy while leaving non-negligible AC
+power-balance residuals, indicating that persistent bias alone cannot explain the gap.
+To characterize the remaining error, we construct an SVD basis exclusively from
+training AC power-flow solutions and examine how voltage-error patterns align with
+the resulting training-supported solution subspace.
+While related PCA-based subspaces have previously been used to compress AC-OPF
+learning outputs \cite{park2024compact}, we instead use the subspace as a coordinate
+system for diagnosing voltage-prediction error relative to training-supported solution
+variation.
+We find that substantial error can extend outside this dominant solution subspace,
+and that the off-subspace component is strongly associated with AC power-balance
+violation.
+Motivated by this finding, we introduce \emph{calibrated solution-subspace
+projection} (CSP), which first removes train-estimated bias and then removes
+prediction components outside the dominant training-supported solution directions.
+CSP improves voltage accuracy and AC power balance simultaneously, while controlled
+distribution shifts show that the useful solution geometry is low-dimensional yet
+conditioned on the operating distribution.
+Together, these results identify voltage-error geometry across buses as a key link
+between state accuracy and physical consistency.
+
+Code: \href{http://github.com/Kimchangheon/neural-acpf-error-geometry}{github.com/Kimchangheon/neural-acpf-error-geometry}
+
+\section{Error Geometry and Calibrated Subspace Projection}
+\label{sec:method}
+
+\subsection{AC consistency and train-only calibration}
+
+We represent the grid as a directed graph
+$\mathcal{G}=(\mathcal{V},\mathcal{E})$ with $N=|\mathcal{V}|$ buses.
+Each branch follows the standard $\pi$-equivalent model with transformer
+tap ratios and phase shifts, yielding direction-dependent branch admittances
+and an asymmetric bus-admittance matrix
+$\underline{Y}\in\mathbb{C}^{N\times N}$.
+The voltage state is
+$x=[V,\,\theta]\in\mathbb{R}^{2N}$, where
+$V=|\underline{V}|$ and
+$\underline{V}=V\odot e^{\jmath\theta}$.
+Given an operating condition $u$, comprising nodal setpoints and
+$\pi$-model branch parameters, a neural surrogate predicts
+$\hat{x}=f_\phi(u)$.
+Currents are $\underline{I}=\underline{Y}\underline{V}$ and complex powers are
+$\underline{S}=\underline{V}\odot\underline{I}^*$, giving
+$P=\Re\{\underline{S}\}$ and $Q=\Im\{\underline{S}\}$.
+For setpoints $(P^{\mathrm{set}},Q^{\mathrm{set}})$, define residuals
+\[
+\Delta P=P^{\mathrm{set}}-P,
+\qquad
+\Delta Q=Q^{\mathrm{set}}-Q.
+\]
+The AC power-flow residual and corresponding nodal power-balance magnitude are
+\[
+r(\hat{x};u)=
+\begin{bmatrix}
+\Delta P\\
+\Delta Q
+\end{bmatrix},
+\qquad
+\mathrm{Power~Balance~(PB)}
+=
+\sqrt{\Delta P^2+\Delta Q^2}.
+\]
+PB is evaluated bus-wise using the standard slack/PV/PQ conventions,
+and its mean and maximum over buses and scenarios are reported as
+Mean PB and Max PB.
+Accordingly, we define AC consistency as satisfaction of the AC power-balance
+equations, quantified by PB.
+All residuals are recomputed from the final predicted voltage state.
+
+Before analyzing error geometry, we apply a train-only calibration that removes
+post-training bias.
+For training scenario $s$, let $\hat{x}_s$ and $x_s^\star$ denote the model
+prediction and reference solution, respectively.
+The bias is estimated after training and frozen for unseen test scenarios:
+\[
+    \hat b
+    =
+    \mathbb{E}_{s\in\mathrm{tr}}
+    \left[\hat x_s-x^\star_s\right],
+    \qquad
+    \hat x^C=\hat x-\hat b.
+\]
+For phase angles, offsets are estimated using circular differences after
+consistent gauge alignment.
+This calibration corrects persistent output bias but does not constrain the
+directions in which the remaining error varies across buses.
+\subsection{Error geometry in a training-derived solution subspace}
+To characterize the remaining error, we construct a low-dimensional basis
+from Newton--Raphson solutions in the training set.
+Let $\bar x_{\mathrm{tr}}$ denote the training-solution mean and define
+\begin{equation}
+X=
+\begin{bmatrix}
+x_1^\star-\bar x_{\mathrm{tr}} & \cdots &
+x_{N_{\mathrm{tr}}}^\star-\bar x_{\mathrm{tr}}
+\end{bmatrix}
+=
+W\Sigma U^\top,\;
+P_k=W_kW_k^\top
+\end{equation}
+where $P_k$ denotes the block-diagonal projection onto the dominant rank-$k$
+magnitude and gauge-aligned angle subspaces identified from the training data.
+These subspaces capture dominant solution variation under the training
+distribution and are therefore distribution dependent.
+We use them to characterize the geometry of the model's prediction error.
+For $e=\hat x-x^\star$, we decompose
+\begin{equation}
+    e^{\parallel}=P_k e,
+    \qquad
+    e^{\perp}=(I-P_k)e ,
+    \label{eq:error_decomposition}
+\end{equation}
+where $e^{\parallel}$ lies along the dominant training-solution directions
+and $e^{\perp}$ captures error outside them.
+
+%This decomposition is relevant to physical consistency because the AC
+%residual is locally sensitive not only to the magnitude of the voltage
+%error but also to its direction. Around a solved state $x^\star$,
+%\begin{equation}
+%    r(x^\star+e;u)
+%    =
+%    J(x^\star;u)e+\mathcal{O}(\|e\|^2),
+%    \label{eq:local_residual}
+%\end{equation}
+%where $J$ is the AC residual Jacobian.
+To relate this error decomposition to physical consistency, we use a
+first-order Taylor expansion of the AC residual around a converged
+power-flow solution $x^\star$:
+\begin{equation}
+    r(x^\star+e;u)
+    =
+    \underbrace{r(x^\star;u)}_{=0}
+    +
+    \underbrace{J(x^\star;u)e}_{\text{first-order term}}
+    +
+    \underbrace{\mathcal{O}(\|e\|^2)}_{\text{higher-order terms}},
+    \label{eq:local_residual}
+\end{equation}
+where $J$ is the AC residual Jacobian.
+Thus, the Jacobian determines how a given voltage error is translated
+into power-balance residual: errors aligned with directions of larger
+Jacobian gain can produce substantially larger residuals even when their
+magnitudes are similar.
+This motivates testing whether AC power balance changes when the voltage
+error is rotated toward or away from the training-derived solution
+subspace while its magnitude is held fixed.
+
+\subsection{Calibrated solution-subspace projection}
+
+This motivates a direct intervention: suppress prediction components
+outside the dominant training-solution directions while preserving the
+variation supported by the data. Because systematic bias and directional
+error are distinct, we first apply the post-training calibration and then
+project the calibrated prediction:
+\begin{equation}
+    \boxed{
+    \hat x^{\mathrm{CSP}}
+    =
+    \bar x_{\mathrm{tr}}
+    +
+    P_k
+    \left(
+        \hat x-\hat b-\bar x_{\mathrm{tr}}
+    \right)
+    }
+    \label{eq:csp}
+\end{equation}
+where $\hat b$ is estimated from the trained model's predictions on the
+training set and frozen at test time, while $\bar x_{\mathrm{tr}}$ and
+$P_k$ are obtained solely from the training reference solutions.
+Calibration removes systematic output bias, whereas projection removes
+components outside the dominant training-solution directions. The two
+operations are complementary: projection alone can retain the component
+of the bias lying inside the subspace, whereas CSP removes the bias before
+restricting the remaining prediction.
+
+CSP is a data-driven output correction rather than a projection onto the
+nonlinear AC-feasible set, and therefore does not guarantee exact
+satisfaction of the AC equations or operational constraints. Instead, it
+provides a direct test of whether removing off-subspace prediction
+components improves both voltage accuracy and recomputed AC power-balance
+residuals. All calibration statistics, subspace bases, and rank-selection
+criteria are determined without using test-set residuals.
+
+\section{Experiments and Results}
+\label{sec:experiments}
+
+\subsection{Experimental setup}
+\label{sec:setup}
+
+Our primary case study is the 2224-bus GBnetwork with 37,022 converged
+Newton--Raphson operating points, split approximately 1:1:1 into training,
+validation, and test sets.
+The data vary system-wide load/generation levels together with bus-level
+$P/Q$ demand, generator active power, and PV voltage setpoints.
+We evaluate PIGNN-GC, a global-context extension of
+PIGNN-Attn-LS~\cite{kim2026pignn}, GridSFM~\cite{yang2026gridsfm},
+GridFM-GraphKit~\cite{gridfmgraphkit2026}, and
+LUMINA~\cite{li2026lumina}; cross-grid breadth is additionally evaluated
+with GridSFM over 31 systems.
+
+All calibration statistics and solution bases are fitted on training data
+only. From $k\in\{4,8,16,32,64\}$, validation Mean PB selects
+$k^\star=16$ without degrading calibrated voltage RMSE; this rank is then
+frozen for all test and distribution-shift experiments.
+
+Voltage RMSE alone can be small even when a model largely predicts a
+static per-bus profile rather than following scenario-dependent voltage
+variation~\cite{yang2026gridsfm}. To isolate this scenario-dependent
+response, we center each bus as
+$\tilde{V}_{is}=V_{is}-\bar{V}_i$ and
+$\tilde{\hat{V}}_{is}=\hat{V}_{is}-\bar{\hat{V}}_i$, and report
+\begin{equation}
+R_{\mathrm{w}}^2
+=
+\operatorname{corr}^2
+\left(\tilde{V}_{is},\tilde{\hat{V}}_{is}\right),
+\qquad
+a_{\mathrm{w}}
+=
+\frac{\operatorname{Cov}
+\left(\tilde{V}_{is},\tilde{\hat{V}}_{is}\right)}
+{\operatorname{Var}\left(\tilde{V}_{is}\right)} .
+\end{equation}
+$R_{\mathrm{w}}^2$ measures whether the model follows the
+scenario-to-scenario voltage pattern, while $a_{\mathrm{w}}$ measures
+how much of the true voltage variation it reproduces.
+A per-bus constant predictor gives
+$R_{\mathrm{w}}^2=a_{\mathrm{w}}=0$ under our convention,
+while per-bus calibration leaves both metrics unchanged
+because the offset vanishes after centering.
+
+\subsection{GBnetwork: Error Direction and Calibrated Subspace Projection}
+\label{sec:gb_mechanism}
+
+\noindent\textit{Fixed-norm directional intervention.}
+We vary the orientation of the voltage-magnitude error relative to the
+training-derived solution subspace while holding its $\ell_2$ norm fixed,
+thereby isolating direction from error magnitude.
+Starting from the calibrated prediction, let
+\begin{equation}
+\small
+\tilde e_{\perp}(\alpha)
+=\|e_V\|_2
+\frac{e_V^\parallel+\alpha e_V^\perp}
+{\|e_V^\parallel+\alpha e_V^\perp\|_2},
+\quad
+\tilde e_{\parallel}(\alpha)
+=\|e_V\|_2
+\frac{\alpha e_V^\parallel+e_V^\perp}
+{\|\alpha e_V^\parallel+e_V^\perp\|_2}.
+\label{eq:controlled_geometry}
+\end{equation}
+By construction,
+$\|\tilde e_{\perp}(\alpha)\|_2
+=\|\tilde e_{\parallel}(\alpha)\|_2
+=\|e_V\|_2$.
+The calibrated phase angle is
+held fixed, so this experiment changes only the direction of the
+voltage-magnitude error. We reconstruct
+\begin{equation}
+\tilde{\underline{V}}(\alpha)
+=
+\left(V^\star+\tilde e(\alpha)\right)\odot e^{\jmath\hat\theta^C}
+\end{equation}
+and report
+\begin{equation}
+\mathrm{Relative~PB}(\alpha)
+=
+\frac{\mathrm{Mean~PB}(\alpha)}
+     {\mathrm{Mean~PB}(1)} .
+\end{equation}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\columnwidth]
+    {figure1_controlled_error_geometry_exact.pdf}
+    \caption{
+    Fixed-norm directional intervention on GBnetwork. Each curve is
+    normalized by its $\alpha=1$ Mean PB. Suppressing off-subspace error
+    reduces PB, whereas suppressing in-subspace error produces the
+    complementary increase.
+    }
+    \label{fig:error_geometry}
+\end{figure}
+
+Figure~\ref{fig:error_geometry} directly confirms that residual magnitude depends on error
+orientation. At $\alpha=0$, off-subspace suppression lowers Relative
+Mean PB to 0.586 for PIGNN-GC and 0.476 for GridSFM, whereas suppressing
+the in-subspace component raises it to 1.832 and 1.316, respectively.
+GridFM-GraphKit and LUMINA show weaker off-subspace reductions
+(0.954 and 0.997), but the control intervention again moves PB upward
+(1.349 and 1.206). Since the voltage-error norm is held fixed, the observed
+changes isolate the effect of error direction on physical consistency.
+
+\noindent\textit{Post-training CSP correction.}
+The controlled experiment above requires the reference solution and is
+used to isolate the role of error direction. We now evaluate CSP directly
+on the frozen model outputs. Table~3 compares the raw prediction,
+post-training calibration ($C$), projection ($P_{16}$), and their
+composition, CSP$_{16}$. CSP projects both voltage magnitude and
+gauge-aligned phase angle using separate bases derived from the training
+solutions.
+\begin{table*}[t]
+\centering
+\caption{
+GBnetwork results at $k=16$ over three seeds (mean $\pm$ standard deviation).
+$C$ denotes calibration, $P_{16}$ projection, and CSP$_{16}$ their composition.
+$a_{\mathrm{w}}=1$ is ideal. The per-bus mean baseline uses training-set means.
+}
+\label{tab:intervention}
+\setlength{\tabcolsep}{4.2pt}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{llrrrrrr}
+\toprule
+Model & Output &
+$|V|$ RMSE $\downarrow$ &
+Angle RMSE ($^\circ$) $\downarrow$ &
+$R_{\mathrm{w}}^2 \uparrow$ &
+$a_{\mathrm{w}}$ &
+Mean PB $\downarrow$ &
+Max PB $\downarrow$ \\
+\midrule
+Per-bus mean
+& Baseline
+& .02341
+& 6.847
+& .000
+& .000
+& .12084
+& 5.88 \\
+\midrule
+PIGNN-GC
+& Raw
+& $.02850 \pm .00232$
+& $1.108 \pm .175$
+& $.671 \pm .050$
+& $.546 \pm .072$
+& $.31592 \pm .03240$
+& $195.89 \pm 52.54$ \\
+& $C$
+& $.01393 \pm .00105$
+& $\mathbf{.777 \pm .161}$
+& $.671 \pm .050$
+& $.546 \pm .072$
+& $.16661 \pm .02352$
+& $190.00 \pm 37.53$ \\
+& $P_{16}$
+& $.01624 \pm .00254$
+& $1.091 \pm .166$
+& $.829 \pm .045$
+& $.541 \pm .071$
+& $.07594 \pm .00422$
+& $5.07 \pm .85$ \\
+& CSP$_{16}$
+& $\mathbf{.01222 \pm .00134}$
+& $.835 \pm .141$
+& $.829 \pm .045$
+& $.541 \pm .071$
+& $\mathbf{.05497 \pm .00257}$
+& $\mathbf{3.93 \pm .07}$ \\
+\midrule
+GridSFM
+& Raw
+& $.02868 \pm .01652$
+& $2.294 \pm .302$
+& $.768 \pm .151$
+& $.724 \pm .149$
+& $.26867 \pm .13004$
+& $9.10 \pm 4.02$ \\
+& $C$
+& $.01086 \pm .00403$
+& $\mathbf{1.781 \pm .055}$
+& $.768 \pm .151$
+& $.724 \pm .149$
+& $.08251 \pm .01093$
+& $7.29 \pm 3.53$ \\
+& $P_{16}$
+& $.01814 \pm .01145$
+& $2.244 \pm .325$
+& $.936 \pm .032$
+& $.724 \pm .149$
+& $.07630 \pm .01942$
+& $5.08 \pm .49$ \\
+& CSP$_{16}$
+& $\mathbf{.00782 \pm .00307}$
+& $1.807 \pm .053$
+& $.936 \pm .032$
+& $.724 \pm .149$
+& $\mathbf{.05136 \pm .00143}$
+& $\mathbf{4.94 \pm .42}$ \\
+\midrule
+GridFM-GraphKit
+& Raw
+& $.03695 \pm .00162$
+& $5.431 \pm .632$
+& $.208 \pm .085$
+& $.151 \pm .040$
+& $2.20492 \pm .41713$
+& $4651.17 \pm 1620.49$ \\
+& $C$
+& $.02107 \pm .00090$
+& $3.108 \pm .503$
+& $.208 \pm .085$
+& $.151 \pm .040$
+& $1.39869 \pm .36963$
+& $4853.45 \pm 1595.78$ \\
+& $P_{16}$
+& $.02702 \pm .00102$
+& $3.111 \pm .582$
+& $.591 \pm .128$
+& $.147 \pm .040$
+& $.12340 \pm .01484$
+& $6.68 \pm .32$ \\
+& CSP$_{16}$
+& $\mathbf{.02016 \pm .00092}$
+& $\mathbf{2.055 \pm .431}$
+& $.591 \pm .128$
+& $.147 \pm .040$
+& $\mathbf{.07598 \pm .00290}$
+& $\mathbf{4.83 \pm .36}$ \\
+\midrule
+LUMINA
+& Raw
+& $.04355 \pm .00094$
+& $17.068 \pm .106$
+& $.059 \pm .043$
+& $.047 \pm .035$
+& $138.813 \pm 12.092$
+& $24178.96 \pm 6886.75$ \\
+& $C$
+& $.02273 \pm .00050$
+& $6.424 \pm .097$
+& $.059 \pm .043$
+& $.047 \pm .035$
+& $2.09892 \pm .52156$
+& $4063.46 \pm 2201.01$ \\
+& $P_{16}$
+& $.02959 \pm .00078$
+& $13.414 \pm .318$
+& $.445 \pm .034$
+& $.045 \pm .033$
+& $.25953 \pm .02210$
+& $12.88 \pm .22$ \\
+& CSP$_{16}$
+& $\mathbf{.02240 \pm .00075}$
+& $\mathbf{6.147 \pm .172}$
+& $.445 \pm .034$
+& $.045 \pm .033$
+& $\mathbf{.10101 \pm .00359}$
+& $\mathbf{5.45 \pm .15}$ \\
+\bottomrule
+\end{tabular}
+}
+\end{table*}
+
+Calibration substantially reduces voltage RMSE but leaves
+$R_{\mathrm{w}}^2$ and $a_{\mathrm{w}}$ unchanged, as expected for a
+per-bus translation. Projection acts on a different component: for
+PIGNN-GC, CSP$_{16}$ reduces Mean PB from $0.3159$ to $0.0550$ and Max PB
+from $195.9$ to $3.93$, while improving $|V|$ RMSE from $0.0285$ to
+$0.0122$. GridSFM shows the same pattern, with Mean PB decreasing from
+$0.2687$ to $0.0514$ and $|V|$ RMSE from $0.0287$ to $0.0078$.
+GridFM-GraphKit and LUMINA also exhibit large PB reductions, but their much
+smaller tracking scores show why low PB alone is insufficient to establish
+a useful scenario-dependent surrogate. The per-bus mean provides the same
+caution from the opposite direction: it has no scenario tracking
+($R_{\mathrm{w}}^2=a_{\mathrm{w}}=0$) despite a moderate Mean PB.
+
+\subsection{Cross-grid breadth and distribution shift}
+\label{sec:breadth_shift}
+
+\noindent\textit{Cross-grid breadth.}
+Fig.~\ref{fig:crossgrid_csp} reports GridSFM Mean PB before and after CSP$_{16}$ on 31 systems.
+The benchmark spans 4--9,241 buses and sub-kV to 750-kV voltage levels,
+and consists of 28 pandapower/PYPOWER-format systems from IEEE, PEGASE,
+RTE, and GB benchmark families, plus three Common Information Model
+(CIM)-based network models; full details are provided in the project repository.
+CSP$_{16}$ consistently reduces Mean PB across the full range
+of network sizes, showing that its benefit is not confined to GBnetwork.
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\columnwidth]
+    {gridsfm_raw_vs_csp16_discrete3.pdf}
+    \caption{
+    Grid-by-grid physical consistency of GridSFM before and after
+    CSP$_{16}$ across 31 systems ordered by bus count. Mean PB is shown
+    on a logarithmic scale.
+    }
+    \label{fig:crossgrid_csp}
+\end{figure}
+
+\noindent\textit{Topology and spatial shifts.}
+We next keep a PIGNN-GC checkpoint and $k=16$ fixed while changing the
+evaluation distribution. For $N$--1 and $N$--2, the control basis is
+transferred without modification to unseen line-outage topologies. GBcorr
+instead redistributes load across connected zones using a GB-derived spatial
+covariance while preserving total system load. We evaluate both direct transfer
+of the control calibration and solution basis
+and condition-matched refitting using GBcorr training data only; model weights
+and rank remain unchanged.
+
+\begin{table}[t]
+\centering
+
+
+
+\caption{
+Fixed-rank CSP$_{16}$ under topology and spatial distribution shifts.
+It uses seperate condition sets from model training; PB means and quntiles are pooled over all bus-scenario pairs.
+}
+\label{tab:shift}
+\setlength{\tabcolsep}{1.8pt}
+\footnotesize
+\begin{tabular}{lrrrrrrrr}
+\toprule
+Condition &
+RMSE$_V$ &
+$R_{\mathrm{w}}^2 \uparrow$ &
+$a_{\mathrm{w}}$ &
+Mean &
+Median &
+p95 &
+p99 &
+Max \\
+\midrule
+Control
+& .01281
+& .8476
+& .4866
+& .0581
+& .0131
+& .2665
+& .5462
+& 3.58 \\
+\midrule
+$N$--1 (T)
+& .01314
+& .8391
+& .4750
+& .0603
+& .0131
+& .2713
+& .5632
+& 33.16 \\
+$N$--2 (T)
+& .01288
+& .8458
+& .4870
+& .0617
+& .0132
+& .2713
+& .5721
+& 27.45 \\
+\midrule
+GBcorr (T)
+& .01966
+& .4819
+& .4025
+& .1003
+& .0231
+& .4512
+& .9746
+& 7.00 \\
+GBcorr (R)
+& \textbf{.01620}
+& .5150
+& .4247
+& \textbf{.0680}
+& .0174
+& .3031
+& \textbf{.6415}
+& \textbf{4.99} \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.2em}
+\parbox{\columnwidth}{\scriptsize
+T: transfer of the control basis; R: basis refitted using shifted
+training solutions only.}
+\end{table}
+
+Table~\ref{tab:shift} reveals two qualitatively different failure modes.
+Under $N$--1 and $N$--2 outages, voltage-magnitude tracking remains close
+to control ($R_{\mathrm{w}}^2\approx0.84$), and the bulk of the PB
+distribution changes little: Mean PB rises from $0.0581$ to $0.0603$ and
+$0.0617$, while p99 moves only from $0.5462$ to $0.5632$ and $0.5721$.
+The maxima, however, increase sharply to $33.16$ and $27.45$,
+while the bulk statistics remain close to control, indicating that
+topology shift primarily introduces isolated extreme violations.
+
+GBcorr produces a broad rather than tail-dominated shift.
+$R_{\mathrm{w}}^2$ drops from $0.8476$ to $0.4819$, while Mean PB rises
+to $0.1003$ and p99 to $0.9746$; the median and p95 increase as well.
+Condition-matched recalibration and subspace refitting reduces
+Mean PB to $0.0680$ and p99 to $0.6415$, while improving $|V|$ RMSE.
+Tracking recovers only partially ($R_{\mathrm{w}}^2=0.5150$),
+indicating that basis adaptation can improve physical consistency,
+whereas recovering scenario-dependent tracking under this shift may
+require updating the surrogate parameters using data from the shifted
+operating distribution.
+
+\section{CONCLUSION}
+
+This work advances the understanding of neural AC power-flow surrogates by
+identifying output-error geometry as a key source of the gap between
+voltage accuracy and physical consistency. Across physics-informed and
+foundation-model approaches, we show that small voltage errors can contain
+off-subspace components that induce large AC power-balance violations. Building on this insight,
+calibrated solution-subspace projection removes
+off-subspace prediction components, reducing both voltage error and AC
+power-balance residuals across diverse grids.
+These results motivate extending physics-consistent neural surrogates toward
+broader power-system analysis, estimation, and optimization.
+
+
+
+\bibliographystyle{IEEEbib}
+\bibliography{neural_pf_tracking_calibration_error_geometry}
+
+
+\end{document}

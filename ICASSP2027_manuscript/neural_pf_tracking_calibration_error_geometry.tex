@@ -199,6 +199,7 @@ For phase angles, offsets are estimated using circular differences after
 consistent gauge alignment.
 This calibration corrects persistent output bias but does not constrain the
 directions in which the remaining error varies across buses.
+
 \subsection{Error geometry in a training-derived solution subspace}
 To characterize the remaining error, we construct a low-dimensional basis
 from Newton--Raphson solutions in the training set.
@@ -213,8 +214,10 @@ x_{N_{\mathrm{tr}}}^\star-\bar x_{\mathrm{tr}}
 W\Sigma U^\top,\;
 P_k=W_kW_k^\top
 \end{equation}
-where $P_k$ denotes the block-diagonal projection onto the dominant rank-$k$
-magnitude and gauge-aligned angle subspaces identified from the training data.
+where $W_k=\operatorname{diag}(W_{V,k},W_{\theta,k})$ contains the leading
+$k$ SVD directions fitted separately to centered voltage magnitudes and
+gauge-aligned angles; $k$ applies to each channel and is capped by the
+available SVD components on smaller systems.
 These subspaces capture dominant solution variation under the training
 distribution and are therefore distribution dependent.
 We use them to characterize the geometry of the model's prediction error.
@@ -264,8 +267,8 @@ subspace while its magnitude is held fixed.
 
 This motivates a direct intervention: suppress prediction components
 outside the dominant training-solution directions while preserving the
-variation supported by the data. Because systematic bias and directional
-error are distinct, we first apply the post-training calibration and then
+variation supported by the data. Because systematic bias and off-subspace
+error are distinct, we first apply post-training calibration and then
 project the calibrated prediction:
 \begin{equation}
     \boxed{
@@ -283,19 +286,25 @@ project the calibrated prediction:
 where $\hat b$ is estimated from the trained model's predictions on the
 training set and frozen at test time, while $\bar x_{\mathrm{tr}}$ and
 $P_k$ are obtained solely from the training reference solutions.
-Calibration removes systematic output bias, whereas projection removes
-components outside the dominant training-solution directions. The two
-operations are complementary: projection alone can retain the component
-of the bias lying inside the subspace, whereas CSP removes the bias before
-restricting the remaining prediction.
+
+Let $e^C=\hat x^C-x^\star$. Since $P_k$ is orthogonal,
+\begin{equation}
+\|e^{\mathrm{CSP}}\|_2^2-\|e^C\|_2^2
+=
+\|(I-P_k)(x^\star-\bar x_{\mathrm{tr}})\|_2^2
+-\|(I-P_k)e^C\|_2^2 .
+\label{eq:tradeoff}
+\end{equation}
+Thus, CSP improves state accuracy when the removed off-subspace prediction
+error exceeds the valid reference variation discarded by the projection.
 
 CSP is a data-driven output correction rather than a projection onto the
 nonlinear AC-feasible set, and therefore does not guarantee exact
 satisfaction of the AC equations or operational constraints. Instead, it
-provides a direct test of whether removing off-subspace prediction
-components improves both voltage accuracy and recomputed AC power-balance
-residuals. All calibration statistics, subspace bases, and rank-selection
-criteria are determined without using test-set residuals.
+tests whether suppressing off-subspace prediction components improves
+voltage-magnitude accuracy and recomputed AC power-balance residuals.
+All calibration statistics, subspace bases, and rank-selection criteria
+are determined without using test-set residuals.
 
 \section{Experiments and Results}
 \label{sec:experiments}
@@ -303,16 +312,18 @@ criteria are determined without using test-set residuals.
 \subsection{Experimental setup}
 \label{sec:setup}
 
-Our primary case study is the 2224-bus GBnetwork with 37,022 converged
-Newton--Raphson operating points, split approximately 1:1:1 into training,
-validation, and test sets.
-The data vary system-wide load/generation levels together with bus-level
-$P/Q$ demand, generator active power, and PV voltage setpoints.
-We evaluate PIGNN-GC, a global-context extension of
-PIGNN-Attn-LS~\cite{kim2026pignn}, GridSFM~\cite{yang2026gridsfm},
-GridFM-GraphKit~\cite{gridfmgraphkit2026}, and
-LUMINA~\cite{li2026lumina}; cross-grid breadth is additionally evaluated
-with GridSFM over 31 systems.
+Our primary study uses 37,022 converged pandapower Newton--Raphson
+operating points on the 2224-bus GBnetwork, split 1:1:1
+for training/validation/test and varying load, generation, and PV setpoints.
+We evaluate PIGNN-GC~\cite{kim2026pignn}, GridSFM~\cite{yang2026gridsfm},
+GridFM-GraphKit~\cite{gridfmgraphkit2026}, and LUMINA~\cite{li2026lumina},
+with GridSFM additionally tested on 31 systems.
+All models are trained from random initialization. GridSFM and LUMINA use
+the released architectures/configurations, but not the AC-OPF checkpoints,
+and are adapted to AC-PF by fixing generator dispatch and evaluating only
+the voltage-state outputs; their OPF decision heads are unused.
+For all models, electrical inputs, admittance, and evaluation use the same
+pandapower internal PPC.
 
 All calibration statistics and solution bases are fitted on training data
 only. From $k\in\{4,8,16,32,64\}$, validation Mean PB selects
@@ -337,13 +348,13 @@ a_{\mathrm{w}}
 \left(\tilde{V}_{is},\tilde{\hat{V}}_{is}\right)}
 {\operatorname{Var}\left(\tilde{V}_{is}\right)} .
 \end{equation}
-$R_{\mathrm{w}}^2$ measures whether the model follows the
-scenario-to-scenario voltage pattern, while $a_{\mathrm{w}}$ measures
-how much of the true voltage variation it reproduces.
-A per-bus constant predictor gives
-$R_{\mathrm{w}}^2=a_{\mathrm{w}}=0$ under our convention,
-while per-bus calibration leaves both metrics unchanged
-because the offset vanishes after centering.
+$R_{\mathrm{w}}^2$ is the squared correlation between the centered
+prediction and reference, while $a_{\mathrm{w}}$ measures the magnitude
+of the predicted variation relative to the true variation.
+% A per-bus constant predictor gives
+% $R_{\mathrm{w}}^2=a_{\mathrm{w}}=0$ under our convention,
+% while per-bus calibration leaves both metrics unchanged
+% because the offset vanishes after centering.
 
 
 \subsection{Fixed-norm directional intervention.}
@@ -404,9 +415,11 @@ $a_{\mathrm{w}}$. In contrast, all three controls degrade scenario tracking
 and substantially increase AC residuals. Thus, the CSP gain cannot be
 explained by low dimensionality or spatial smoothing alone, but depends on
 the orientation of the training-solution subspace.
-A validation-tuned isotropic shrinkage control likewise selects no
-shrinkage when calibrated voltage accuracy is preserved; stronger shrinkage
-reduces PB only at substantial cost to state accuracy and response amplitude.
+% To further rule out simple contraction toward the training mean, a
+% validation-tuned isotropic shrinkage baseline selects $\lambda=1$, i.e.,
+% no shrinkage, when calibrated voltage accuracy is preserved; stronger
+% shrinkage reduces PB only at substantial cost to state accuracy and
+% scenario-dependent variation.
 
 \begin{table}[t]
 \centering
@@ -470,12 +483,18 @@ post-training calibration ($C$), projection ($P_{16}$), and their
 composition, CSP$_{16}$. CSP projects both voltage magnitude and
 gauge-aligned phase angle using separate bases derived from the training
 solutions.
+Evaluating magnitude and angle projection separately reveals model-dependent
+effects: PIGNN-GC benefits from angle projection for suppressing extreme PB
+(Max PB $112.45\!\rightarrow\!3.92$), whereas GridSFM performs best with
+magnitude-only projection (Mean/Max PB $0.0458/2.90$ vs.\ $0.0514/4.94$).
 \begin{table*}[t]
 \centering
 \caption{
 GBnetwork results at $k=16$ over three seeds (mean $\pm$ standard deviation).
-$C$ denotes calibration, $P_{16}$ projection, and CSP$_{16}$ their composition.
-$a_{\mathrm{w}}=1$ is ideal. The per-bus mean baseline uses training-set means.
+$C$ denotes calibration, $P_{16}$ projection, and CSP$_{16}$ their composition. The per-bus mean baseline uses training-set means. Projection substantially improves $R_{\mathrm{w}}^2$ while leaving
+$a_{\mathrm{w}}$ nearly unchanged, indicating that CSP removes
+unsupported directional components rather than recovering missing
+scenario-response amplitude.
 }
 \label{tab:intervention}
 \setlength{\tabcolsep}{4.2pt}
@@ -625,11 +644,23 @@ LUMINA
 
 Calibration substantially reduces voltage RMSE but leaves
 $R_{\mathrm{w}}^2$ and $a_{\mathrm{w}}$ unchanged, as expected for a
-per-bus translation. Projection acts on a different component: for
-PIGNN-GC, CSP$_{16}$ reduces Mean PB from $0.3159$ to $0.0550$ and Max PB
-from $195.9$ to $3.93$, while improving $|V|$ RMSE from $0.0285$ to
-$0.0122$. GridSFM shows the same pattern, with Mean PB decreasing from
+per-bus translation. Projection substantially improves $R_{\mathrm{w}}^2$
+while nearly preserving $a_{\mathrm{w}}$, unlike isotropic shrinkage,
+which leave $R_{\mathrm{w}}^2$ unchanged and scale $a_{\mathrm{w}}$.
+For PIGNN-GC, CSP$_{16}$ reduces Mean PB from $0.3159$ to $0.0550$ and
+Max PB from $195.9$ to $3.93$, while improving $|V|$ RMSE from $0.0285$
+to $0.0122$. GridSFM shows the same pattern, with Mean PB decreasing from
 $0.2687$ to $0.0514$ and $|V|$ RMSE from $0.0287$ to $0.0078$.
+
+At $k=16$, the magnitude and angle subspaces retain $98.79\%$ and
+$99.68\%$ of held-out reference variation. For the seed-42 diagnostic,
+the removed magnitude-error energy exceeds the discarded reference energy
+by $6.46\times$ for PIGNN-GC and $10.87\times$ for GridSFM, explaining
+the magnitude-error reduction in Eq.~\ref{eq:tradeoff}; for angle, the
+relation reverses, consistent with its slight RMSE degradation.
+Projecting the reference solutions themselves yields $0.00258$ p.u.
+magnitude RMSE, $0.386^\circ$ angle RMSE, and $0.0415$ p.u. Mean PB.
+
 GridFM-GraphKit and LUMINA also exhibit large PB reductions, but their much
 smaller tracking scores show why low PB alone is insufficient to establish
 a useful scenario-dependent surrogate. The per-bus mean provides the same
@@ -638,13 +669,15 @@ caution from the opposite direction: it has no scenario tracking
 
 \subsection{Cross-grid breadth and distribution shift}
 \label{sec:breadth_shift}
-Fig.~\ref{fig:crossgrid_csp} reports GridSFM Mean PB before and after CSP$_{16}$ on 31 systems.
-The benchmark spans 4--9,241 buses and sub-kV to 750-kV voltage levels,
-and consists of 28 pandapower/PYPOWER-format systems from IEEE, PEGASE,
-RTE, and GB benchmark families, plus three Common Information Model
-(CIM)-based network models; full details are provided in the project repository.
-CSP$_{16}$ consistently reduces Mean PB across the full range
-of network sizes, showing that its benefit is not confined to GBnetwork.
+\noindent\textit{Cross-grid breadth.}
+Fig.~\ref{fig:crossgrid_csp} evaluates GridSFM with CSP across 31 systems
+spanning 4--9,241 buses and sub-kV to 750-kV levels.
+For each system, calibration and subspace statistics are fitted from its
+training data, using nominal $k=16$ per channel and the available SVD
+components on smaller systems.
+CSP reduces GridSFM Mean PB across all 31 systems under this
+system-specific fitting protocol.
+
 \begin{figure}[t]
     \centering
     \includegraphics[width=\columnwidth]
@@ -657,17 +690,38 @@ of network sizes, showing that its benefit is not confined to GBnetwork.
     \label{fig:crossgrid_csp}
 \end{figure}
 
-We keep the PIGNN-GC checkpoint and $k=16$ fixed under unseen
-$N$--1/$N$--2 line outages and the spatially redistributed GBcorr
-condition. For GBcorr, we additionally evaluate condition-matched
-recalibration and subspace refitting using shifted training data only,
-while keeping the model weights and rank fixed.
+\vspace{0.35em}
+
+\noindent\textit{Topology and spatial shifts.}
+Under $N$--1/$N$--2 outages, tracking and bulk PB remain close to control,
+with larger maxima indicating isolated topology-induced violations.
+GBcorr causes a broader shift: transferring both control calibration and
+basis gives Mean PB $\approx0.100$ p.u. Refitting calibration alone reduces
+this to $0.0944$, basis alone to $0.0740$, and both to $\approx0.068$.
+The transferred basis retains $93.55\%$ of GBcorr magnitude variation,
+versus $98.53\%$ after refitting, while reference-state projection reduces
+Mean PB from $0.0868$ to $0.0438$ p.u. This shows that GBcorr introduces
+not only calibration drift but also solution-subspace mismatch.
+
+% We evaluate two distribution shifts with fixed model weights and nominal rank:
+% $N$--1/$N$--2 line outages using the unchanged control calibration and
+% subspace statistics, and GBcorr, which spatially redistributes load across
+% 14 fixed synthetic connected zones using a covariance estimated from measured
+% GB zonal demand while preserving total load and generation settings.
+% For GBcorr, we additionally test joint condition-matched recalibration and
+% subspace refitting on shifted training data.
+
+% Topology shifts leave tracking and the bulk PB distribution close
+% to control, but introduce substantially larger far-tail violations.
+% GBcorr causes a broader degradation in tracking and PB; joint refitting reduces PB but only partially restores tracking, suggesting that further surrogate adaptation may be needed.
 
 \begin{table}[t]
 \centering
 \caption{
-Fixed-rank CSP$_{16}$ under topology and spatial distribution shifts.
-It uses seperate condition sets from model training; PB means and quntiles are pooled over all bus-scenario pairs.
+Fixed-rank CSP$_{16}$ under topology and operating-distribution shifts.
+T transfers the control-derived calibration and solution basis, whereas R
+refits both on condition-matched training data. PB statistics are pooled
+over all bus--scenario pairs.
 }
 \label{tab:shift}
 \setlength{\tabcolsep}{1.8pt}
@@ -734,31 +788,11 @@ GBcorr (R)
 \bottomrule
 \end{tabular}
 
-\vspace{0.2em}
-\parbox{\columnwidth}{\scriptsize
-T: transfer of the control basis; R: basis refitted using shifted
-training solutions only.}
+% \vspace{0.2em}
+% \parbox{\columnwidth}{\scriptsize
+% T: transfer of the control basis; R: basis refitted using shifted
+% training solutions only.}
 \end{table}
-
-Under $N$--1 and $N$--2 outages, scenario tracking and the bulk PB
-distribution remain close to control, while the larger maxima indicate
-isolated topology-induced extreme violations.
-Under GBcorr, tracking degrades and PB increases broadly; condition-matched
-refitting substantially improves physical consistency but only partially
-recovers scenario tracking, suggesting that the remaining shift requires
-updating the surrogate parameters using data from the shifted
-operating distribution.
-
-GBcorr produces a broad rather than tail-dominated shift.
-$R_{\mathrm{w}}^2$ drops from $0.8476$ to $0.4819$, while Mean PB rises
-to $0.1003$ and p99 to $0.9746$; the median and p95 increase as well.
-Condition-matched recalibration and subspace refitting reduces
-Mean PB to $0.0680$ and p99 to $0.6415$, while improving $|V|$ RMSE.
-Tracking recovers only partially ($R_{\mathrm{w}}^2=0.5150$),
-indicating that basis adaptation can improve physical consistency,
-whereas recovering scenario-dependent tracking under this shift may
-require updating the surrogate parameters using data from the shifted
-operating distribution.
 
 \section{CONCLUSION}
 

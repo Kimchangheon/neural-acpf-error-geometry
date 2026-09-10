@@ -476,17 +476,12 @@ Spatial LP
 % response amplitude for lower residuals.
 
 \subsection{Post-training CSP correction.}
-The controlled experiment above requires the reference solution and is
-used to isolate the role of error direction. We now evaluate CSP directly
-on the frozen model outputs. Table~3 compares the raw prediction,
+The controlled intervention above requires the reference solution and
+isolates the role of error direction. We now apply CSP directly to frozen
+model outputs. Table~\ref{tab:intervention} compares raw predictions,
 post-training calibration ($C$), projection ($P_{16}$), and their
-composition, CSP$_{16}$. CSP projects both voltage magnitude and
-gauge-aligned phase angle using separate bases derived from the training
-solutions.
-Evaluating magnitude and angle projection separately reveals model-dependent
-effects: PIGNN-GC benefits from angle projection for suppressing extreme PB
-(Max PB $112.45\!\rightarrow\!3.92$), whereas GridSFM performs best with
-magnitude-only projection (Mean/Max PB $0.0458/2.90$ vs.\ $0.0514/4.94$).
+composition, CSP$_{16}$, using separate training-derived bases for voltage
+magnitude and gauge-aligned phase angle.
 \begin{table*}[t]
 \centering
 \caption{
@@ -642,30 +637,28 @@ LUMINA
 }
 \end{table*}
 
-Calibration substantially reduces voltage RMSE but leaves
-$R_{\mathrm{w}}^2$ and $a_{\mathrm{w}}$ unchanged, as expected for a
-per-bus translation. Projection substantially improves $R_{\mathrm{w}}^2$
-while nearly preserving $a_{\mathrm{w}}$, unlike isotropic shrinkage,
-which leave $R_{\mathrm{w}}^2$ unchanged and scale $a_{\mathrm{w}}$.
-For PIGNN-GC, CSP$_{16}$ reduces Mean PB from $0.3159$ to $0.0550$ and
-Max PB from $195.9$ to $3.93$, while improving $|V|$ RMSE from $0.0285$
-to $0.0122$. GridSFM shows the same pattern, with Mean PB decreasing from
-$0.2687$ to $0.0514$ and $|V|$ RMSE from $0.0287$ to $0.0078$.
+Calibration reduces voltage error while leaving $R_{\mathrm{w}}^2$ and
+$a_{\mathrm{w}}$ unchanged, whereas projection substantially increases
+$R_{\mathrm{w}}^2$ while nearly preserving $a_{\mathrm{w}}$.
+CSP$_{16}$ reduces Mean PB from $0.3159$ to $0.0550$ for PIGNN-GC and
+from $0.2687$ to $0.0514$ for GridSFM, while improving $|V|$ RMSE to
+$0.0122$ and $0.0078$, respectively. GridFM-GraphKit and LUMINA also
+show large PB reductions, but their low tracking scores emphasize that
+low PB alone does not imply a useful scenario-dependent surrogate.
+
+Applying magnitude and angle projection separately reveals model-dependent
+behavior. For PIGNN-GC, magnitude-only and angle-only projection yield
+Mean/Max PB of $0.0971/112.45$ and $0.1499/218.12$, respectively, both
+worse than full CSP. For GridSFM, magnitude-only projection performs best
+($0.0458/2.90$), whereas angle-only projection worsens PB to $0.0962/7.94$.
 
 At $k=16$, the magnitude and angle subspaces retain $98.79\%$ and
-$99.68\%$ of held-out reference variation. For the seed-42 diagnostic,
-the removed magnitude-error energy exceeds the discarded reference energy
-by $6.46\times$ for PIGNN-GC and $10.87\times$ for GridSFM, explaining
-the magnitude-error reduction in Eq.~\ref{eq:tradeoff}; for angle, the
-relation reverses, consistent with its slight RMSE degradation.
-Projecting the reference solutions themselves yields $0.00258$ p.u.
-magnitude RMSE, $0.386^\circ$ angle RMSE, and $0.0415$ p.u. Mean PB.
-
-GridFM-GraphKit and LUMINA also exhibit large PB reductions, but their much
-smaller tracking scores show why low PB alone is insufficient to establish
-a useful scenario-dependent surrogate. The per-bus mean provides the same
-caution from the opposite direction: it has no scenario tracking
-($R_{\mathrm{w}}^2=a_{\mathrm{w}}=0$) despite a moderate Mean PB.
+$99.68\%$ of held-out reference variation. In the seed-42 diagnostic,
+the removed magnitude-error energy exceeds the discarded reference
+variation by $6.46\times$ for PIGNN-GC and $10.87\times$ for GridSFM,
+explaining the magnitude improvement through Eq.~\ref{eq:tradeoff};
+for angle, the inequality reverses, consistent with its slight RMSE
+degradation.
 
 \subsection{Cross-grid breadth and distribution shift}
 \label{sec:breadth_shift}

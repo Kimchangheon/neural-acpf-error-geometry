@@ -6,7 +6,8 @@
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
 \usepackage{microtype,balance}
-\usepackage[hidelinks]{hyperref}
+% \usepackage[hidelinks]{hyperref}
+\usepackage{hyperref}
 \usepackage{graphicx}
 \usepackage{xcolor}
 \newtheorem{proposition}{Proposition}
@@ -96,8 +97,8 @@ direct regression prioritizes fast inference \cite{arowolo2026hhmpnn},
 physics- or constraint-aware objectives penalize violations during training
 \cite{piloto2024canos,wen2026pigat},
 while iterative correction and feasibility-seeking mechanisms refine
-predictions more directly toward physically consistent \cite{chzhen2026fab,pan2020deepopf } or feasible states
-\cite{nguyen2025fsnet,donti2021dc3 }.
+predictions more directly toward physically consistent \cite{chzhen2026fab,pan2020deepopf} or feasible states
+\cite{nguyen2025fsnet,donti2021dc3}.
 More recent cross-grid and foundation-model efforts---including GridSFM
 \cite{yang2026gridsfm}, gridfm-graphkit and GENCO
 \cite{gridfmgraphkit2026,puech2026genco}, and LUMINA
@@ -264,8 +265,9 @@ project the calibrated prediction:
     }
     \label{eq:csp}
 \end{equation}
-Here $\hat b$ is train-estimated and frozen, while
-$\bar x_{\mathrm{tr}}$ and $P_k$ use training references only.
+where $\hat b$ is estimated from the trained model's predictions on the
+training set and frozen at test time, while $\bar x_{\mathrm{tr}}$ and
+$P_k$ are obtained solely from the training reference solutions.
 
 The projection removes off-subspace prediction error, but can also discard
 valid reference variation. To characterize this trade-off, let $e^C=\hat x^C-x^\star$. Since $P_k$ is orthogonal,
@@ -283,7 +285,7 @@ CSP is a data-driven output correction rather than a projection onto the
 nonlinear AC-feasible set, and therefore does not guarantee exact
 satisfaction of the AC equations or operational constraints. Instead, it
 tests whether suppressing off-subspace prediction components improves
-voltage-magnitude accuracy and recomputed AC power-balance residuals.
+voltage accuracy and recomputed AC power-balance residuals.
 
 \section{Experiments and Results}
 \label{sec:experiments}
@@ -354,19 +356,14 @@ calibrated prediction, we define
 =
 \|e_V\|_2
 \frac{e_V^\parallel+\alpha e_V^\perp}
-{\|e_V^\parallel+\alpha e_V^\perp\|_2},
+{\|e_V^\parallel+\alpha e_V^\perp\|_2}.
 \label{eq:controlled_geometry}
 \end{equation}
-where decreasing $\alpha$ suppresses the off-subspace component while
-preserving the error norm. The complementary control exchanges
-$e_V^\parallel$ and $e_V^\perp$, thereby suppressing the in-subspace
-component instead. The calibrated phase angle is held fixed, and Mean PB
-is normalized by its value at $\alpha=1$.
-Figure~\ref{fig:error_geometry} confirms that residual magnitude depends on error orientation. At $\alpha=0$, off-subspace suppression lowers
-Relative Mean PB to 0.586 for PIGNN-GC and 0.476 for GridSFM, whereas
-suppressing the in-subspace component raises it to 1.832 and 1.316,
-respectively. Since the error norm is fixed, these changes isolate the
-effect of error direction on physical consistency.
+Decreasing $\alpha$ suppresses off-subspace error; the control exchanges
+$e_V^\parallel$ and $e_V^\perp$. Phase angle is fixed and Mean PB is
+normalized at $\alpha=1$. At $\alpha=0$, off-subspace suppression lowers
+Relative Mean PB to $0.586/0.476$ for PIGNN-GC/GridSFM, whereas the control
+raises it to $1.832/1.316$.
 
 Consistent with the fixed-norm experiment, a complementary local Jacobian
 analysis shows that perturbations outside the training-solution subspace
@@ -404,6 +401,15 @@ $a_{\mathrm{w}}$. In contrast, all three controls degrade scenario tracking
 and substantially increase AC residuals. Thus, the CSP gain cannot be
 explained by low dimensionality or spatial smoothing alone, but depends on
 the orientation of the training-solution subspace.
+
+% Matched random, Laplacian low-frequency, and spatial low-pass projections
+% test whether CSP merely exploits dimensionality reduction or smoothing.
+% Only the solution SVD improves $|V|$ accuracy and PB while raising
+% $R_{\mathrm{w}}^2$ from $.685$ to $.853$ with nearly unchanged
+% $a_{\mathrm{w}}$; all controls degrade tracking and residuals.
+% Thus, the gain depends on basis orientation rather than low dimensionality
+% or smoothing alone.
+
 % To further rule out simple contraction toward the training mean, a
 % validation-tuned isotropic shrinkage baseline selects $\lambda=1$, i.e.,
 % no shrinkage, when calibrated voltage accuracy is preserved; stronger
@@ -471,34 +477,7 @@ model outputs. Table~\ref{tab:intervention} compares raw predictions,
 post-training calibration ($C$), projection ($P_{16}$), and their
 composition, CSP$_{16}$, using separate training-derived bases for voltage
 magnitude and gauge-aligned phase angle.
-확인했습니다. 세 run 모두 오류 없이 epoch 60까지 진행 중이지만, 현재는 수렴했다기보다 validation이 크게 진동하는 상태입니다. 각 epoch가 약 20.3분이라 24시간 제한 안에는 약 68–70 epoch 정도까지만 갈 수 있어, 현재 설정으로는 120 epoch 완료는 불가능합니다. 다만 best checkpoint는 계속 저장되고 있습니다.
-
-기존 G3 seed-42 / 40-epoch 기준의 best validation은 epoch 28에서:
-
-\[
-|V|\text{ RMSE}=.02934,\quad
-\theta\text{ RMSE}=1.079^\circ,\quad
-\overline{|\Delta P|}=.1080,\quad
-\overline{|\Delta Q|}=.2703
-\]
-
-현재 \(10^{-5}\) LR three-seed run의 best validation은 다음입니다.
-
-| Seed | Best epoch | Valid loss | \(|V|\) RMSE | Angle RMSE | mean \(|\Delta P|\) | mean \(|\Delta Q|\) | 기존 대비 |
-|---:|---:|---:|---:|---:|---:|---:|---|
-| 41 | 27 | .01183 | .02898 | .911° | .1179 | .3310 | 전압/각도 소폭 개선, P/Q는 악화 |
-| 42 | 45 | .01312 | .03086 | .974° | .1274 | .2873 | 각도만 개선, 나머지는 악화 |
-| 43 | 57 | .01330 | .03112 | 1.059° | .1413 | .3157 | 각도만 미세 개선, 나머지는 악화 |
-
-따라서 현재까지는 “추가 학습이 기존 G3보다 명확히 좋아졌다”는 증거는 없습니다. seed 41만 \(|V|\) RMSE와 angle에서 약간 좋지만, physics residual은 기존보다 큽니다.
-
-최근 epoch 46–60의 추세도 좋지 않습니다.
-
-- seed 41: best epoch 27 이후 recent valid loss가 .012–.128 범위로 반복적으로 튀었고, epoch 60은 \(|V|\) RMSE .04015.
-- seed 42: best epoch 45 이후 epoch 50–52에 loss .10–.18 수준까지 크게 발산했다가 회복했지만, epoch 60도 best보다 나쁩니다.
-- seed 43: best epoch 57을 잠깐 기록했지만 epoch 58–60에서 다시 악화됐습니다.
-
-즉 NaN이나 프로세스 실패는 없지만, 세 seed 모두 안정적으로 더 낮은 basin으로 내려가는 양상은 아닙니다. 현재의 best checkpoint를 보존한 채 종료까지 두는 것은 안전하지만, 남은 약 8–10 epoch에서 세 run이 기존 기준을 일관되게 넘어설 가능성은 현재 trajectory만 보면 높지 않습니다.Calibration reduces voltage error while leaving $R_{\mathrm{w}}^2$ and
+Calibration reduces voltage error while leaving $R_{\mathrm{w}}^2$ and
 $a_{\mathrm{w}}$ unchanged, whereas projection substantially increases
 $R_{\mathrm{w}}^2$ while nearly preserving $a_{\mathrm{w}}$.
 CSP$_{16}$ reduces Mean PB from $0.3159$ to $0.0550$ for PIGNN-GC and

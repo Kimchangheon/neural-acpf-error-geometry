@@ -1,0 +1,168 @@
+--- /mnt/data/neural_pf_tracking_calibration_error_geometry.tex	2026-09-11 13:15:06.899727409 +0000
++++ /mnt/data/reference_revision/neural_pf_tracking_calibration_error_geometry.tex	2026-09-11 13:27:39.485281086 +0000
+@@ -62,7 +62,7 @@
+ \section{Introduction}
+ \label{sec:introduction}
+ 
+-Modern power-system operation requires repeated AC power-flow (AC-PF) evaluations across increasingly diverse operating conditions driven by renewable generation, electrification, and changing demand \cite{decarne2024storage,conrad2025data}. AC-PF maps network conditions and power injections to bus voltages and flows serving as a fundamental nonlinear primitive in power-system analysis \cite{karimi2019loadflow}. Repeated evaluations arise in time-series and contingency studies \cite{oz2026dpf}, while the same AC network equations underlie optimization and state-estimation tasks \cite{monticelli2000state}.
++Modern power-system operation requires repeated AC power-flow (AC-PF) evaluations across increasingly diverse operating conditions driven by renewable generation, storage, and changing demand \cite{decarne2024storage,rivera2025pfdelta}. AC-PF maps network conditions and power injections to bus voltages and flows and is a fundamental nonlinear primitive in power-system analysis \cite{karimi2019loadflow}. Repeated evaluations arise in time-series and contingency studies \cite{oz2026dpf,rivera2025pfdelta}, while the same AC network equations underlie optimal power flow \cite{nellikkath2022pinn,park2024compact} and state estimation \cite{monticelli2000state}.
+ %\begin{figure}[t]
+ %    \centering
+ %    \includegraphics[width=\columnwidth]
+@@ -90,37 +90,40 @@
+ \end{figure}
+ 
+ The computational demands of repeated grid analysis have motivated learned
+-surrogates that amortize the cost of conventional solvers over many operating
+-points \cite{lin2024powerflownet}.
+-Learned grid solvers span different levels of constraint enforcement:
+-direct regression prioritizes fast inference \cite{arowolo2026hhmpnn},
+-physics- or constraint-aware objectives penalize violations during training
+-\cite{piloto2024canos,wen2026pigat},
+-while iterative correction and feasibility-seeking mechanisms refine
+-predictions more directly toward physically consistent or feasible states
+-\cite{kim2026pignn,nguyen2025fsnet}.
+-More recent cross-grid and foundation-model efforts---including GridSFM
++surrogates that amortize conventional solvers over many operating points
++\cite{lin2024powerflownet,conrad2025data,rivera2025pfdelta}.
++Learned approaches range from direct PF regression \cite{lin2024powerflownet}
++and physics-informed training \cite{nellikkath2022pinn,wen2026pigat}
++to feasibility-oriented mechanisms based on power-flow completion
++\cite{pan2020deepopf}, differentiable completion and correction
++\cite{donti2021dc3}, iterative correction \cite{kim2026pignn,nguyen2025fsnet},
++or learned nonlinear projection \cite{chzhen2026fab}.
++These differ from CSP, which is a linear post-training map fitted to training
++solutions and does not guarantee feasibility.
++Recent scalable and cross-grid architectures include CANOS
++\cite{piloto2024canos}, HH-MPNN \cite{arowolo2026hhmpnn}, GridSFM
+ \cite{yang2026gridsfm}, GridFM-GraphKit and GENCO
+ \cite{gridfmgraphkit2026,puech2026genco}, and LUMINA
+-\cite{li2026lumina}---extend this direction with global context and rich
+-heterogeneous, topology-aware representations designed to operate across
+-diverse grids and operating conditions.
+-
+-Despite this progress, physical consistency remains distinct from state
+-prediction accuracy. Learning-based AC-PF methods commonly regress toward
+-reference solutions obtained from numerical power-flow solvers
+-\cite{lin2024powerflownet}, while physics-informed variants additionally
+-penalize AC power-balance residuals during training \cite{wen2026pigat}.
+-Some formulations go further and optimize the governing residuals directly
+-without reference states \cite{kim2026pignn,jiang2025upinn}.
+-Modern evaluations accordingly report both voltage-state errors and reconstructed
+-AC power-balance residuals \cite{wen2026pigat,puech2026genco}.
+-However, incorporating residuals into the objective does not enforce the AC
+-equations as hard constraints: non-negligible power-balance violations can remain
+-even when state errors are small and residuals are explicitly minimized.
+-The central question is therefore why such inconsistency persists after both
+-accurate state fitting and physics-aware training.
+-We argue that the missing factor lies in the geometry of the remaining voltage-error pattern across buses.
++\cite{li2026lumina}.
++Open resources such as PGLib-OPF, OPFData, and PF$\Delta$ broaden standardized
++evaluation across networks, operating conditions, and topology changes
++\cite{babaeinejadsarookolaee2021pglib,lovett2024opfdata,rivera2025pfdelta}.
++
++Despite this progress, state accuracy and physical consistency remain distinct
++evaluation targets \cite{nellikkath2022pinn,chevalier2022guarantees}.
++Supervised AC-PF surrogates regress toward numerical reference solutions
++\cite{lin2024powerflownet}, physics-informed variants penalize reconstructed
++power-balance residuals \cite{wen2026pigat}, and unsupervised formulations can
++optimize the governing residual directly \cite{jiang2025upinn}.
++PIGNN-Attn-LS instead adds a backtracking line-search correction at inference
++\cite{kim2026pignn}. Modern evaluations therefore report both voltage-state
++errors and reconstructed AC power-balance residuals
++\cite{wen2026pigat,puech2026genco}. Because residual penalties are soft rather
++than hard constraints, non-negligible violations can remain
++\cite{donti2021dc3,nguyen2025fsnet}.
++Recent work has characterized the nonlinear geometry of the AC-PF solution
++manifold \cite{goodwin2026geometry}; here, we study the empirical geometry of
++surrogate errors relative to a linear training-solution subspace.
+ 
+ We investigate this \emph{accuracy--consistency gap} across PIGNN, GridSFM,
+ GridFM-GraphKit, and LUMINA using realistic 2224-bus GBnetwork scenarios and
+@@ -131,10 +134,11 @@
+ To characterize the remaining error, we construct an SVD basis exclusively from
+ training AC power-flow solutions and examine how voltage-error patterns align with
+ the resulting training-supported solution subspace.
+-While related PCA-based subspaces have previously been used to compress AC-OPF
+-learning outputs \cite{park2024compact}, we instead use the subspace as a coordinate
+-system for diagnosing voltage-prediction error relative to training-supported solution
+-variation.
++Park et al. use PCA to compress AC-OPF outputs, learn in the principal-component
++space, reconstruct full outputs, and warm-start an exact solver
++\cite{park2024compact}. In contrast, we use an empirical linear training-solution
++subspace post hoc as a diagnostic coordinate system and correction for frozen
++surrogates, together with separate bias calibration and fixed-norm interventions.
+ We find that substantial error can extend outside this dominant solution subspace,
+ and that the off-subspace component is strongly associated with AC power-balance
+ violation.
+@@ -201,8 +205,9 @@
+ directions in which the remaining error varies across buses.
+ 
+ \subsection{Error geometry in a training-derived solution subspace}
+-To characterize the remaining error, we construct a low-dimensional basis
+-from Newton--Raphson solutions in the training set.
++Unlike formal nonlinear PF-manifold geometry \cite{goodwin2026geometry}, we
++use an empirical linear basis fitted to Newton--Raphson solutions in the
++training set to characterize the remaining error.
+ Let $\bar x_{\mathrm{tr}}$ denote the training-solution mean and define
+ \begin{equation}
+ X=
+@@ -314,19 +319,26 @@
+ \label{sec:setup}
+ 
+ Our primary study uses 37,022 converged pandapower Newton--Raphson
+-operating points on the 2224-bus GBnetwork, split 1:1:1
+-for training/validation/test and varying load, generation, and PV setpoints.
+-We evaluate PIGNN-GC~\cite{kim2026pignn}, GridSFM~\cite{yang2026gridsfm},
+-GridFM-GraphKit~\cite{gridfmgraphkit2026}, and LUMINA~\cite{li2026lumina},
+-with GridSFM additionally tested on 31 systems.
++operating points on the 2224-bus GBnetwork, split 1:1:1 for
++training/validation/test and varying load, generation, and PV setpoints
++\cite{tinney1967powerflow,thurner2018pandapower}.
++We evaluate PIGNN-GC, our global-context extension of PIGNN-Attn-LS
++\cite{kim2026pignn}, GridSFM~\cite{yang2026gridsfm},
++GridFM-GraphKit v0.9.0~\cite{gridfmgraphkit2026}, and
++LUMINA~\cite{li2026lumina}, with GridSFM additionally tested on 31 systems.
+ All models are trained from scratch using model-specific stable
+-weights initialization, and CSP is evaluated within each frozen model.
+-GridSFM, GridFM-GraphKit, and LUMINA use their released
+-architectures/configurations but no pretrained checkpoints,
+-and are adapted to AC-PF by fixing generator dispatch and evaluating only
+-the voltage-state outputs; their OPF decision heads are unused.
++initialization, and CSP is evaluated within each frozen model.
++GridSFM, GridFM-GraphKit, and LUMINA use released architectures/configurations
++but no pretrained checkpoints. GridSFM and LUMINA are adapted from AC-OPF to
++AC-PF by fixing generator dispatch and retaining only voltage-state outputs;
++their OPF decision heads are unused.
+ For all models, electrical inputs, admittance, and evaluation use the same
+-pandapower internal PPC.
++pandapower internal PPC representation
++\cite{thurner2018pandapower,zimmerman2011matpower}.
++This is a post-processing study of selected scratch-trained model outputs,
++not a comprehensive benchmark of learned PF solvers. Its controlled
++single-grid analysis complements PF$\Delta$'s broader coverage of load,
++generation, topology, and near-infeasible variation \cite{rivera2025pfdelta}.
+ 
+ All calibration statistics and solution bases are fitted on training data
+ only. From $k\in\{4,8,16,32,64\}$, validation Mean PB selects
+@@ -666,7 +678,9 @@
+ \label{sec:breadth_shift}
+ \noindent\textit{Cross-grid breadth.}
+ Fig.~\ref{fig:crossgrid_csp} evaluates GridSFM with CSP across 31 systems
+-spanning 4--9,241 buses and sub-kV to 750-kV levels.
++spanning 4--9,241 buses and sub-kV to 750-kV levels. The networks are
++represented through the pandapower/PYPOWER ecosystem
++\cite{thurner2018pandapower,zimmerman2011matpower}.
+ For each system, calibration and subspace statistics are fitted from its
+ training data, using nominal $k=16$ per channel and the available SVD
+ components on smaller systems.
+@@ -689,7 +703,8 @@
+ 
+ \noindent\textit{Topology and spatial shifts.}
+ Under $N$--1/$N$--2 outages, tracking and bulk PB remain close to control,
+-with larger maxima indicating isolated topology-induced violations.
++with larger maxima indicating isolated topology-induced violations and the
++need for worst-case assessment beyond average error \cite{chevalier2022guarantees}.
+ GBcorr causes a broader shift: transferring both control calibration and
+ basis gives Mean PB $\approx0.100$ p.u. Refitting calibration alone reduces
+ this to $0.0944$, basis alone to $0.0740$, and both to $\approx0.068$.

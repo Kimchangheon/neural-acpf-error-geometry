@@ -40,7 +40,7 @@ $^{2}$Institute of Electrical Energy Systems, Friedrich-Alexander-Universit\"at 
 Recent neural power-flow solvers, including emerging foundation models,
 achieve accurate voltage predictions, yet such accuracy does not
 necessarily imply physically consistent solutions.
-Even small voltage errors can yield large AC power-balance residuals.
+Even small complex voltage errors can yield large AC power-balance residuals.
 We study this accuracy--consistency gap across PIGNN-GC, GridSFM,
 gridfm-graphkit, and LUMINA on realistic 2224-bus GBnetwork scenarios,
 with cross-grid evaluation of GridSFM over 31 systems.
@@ -71,10 +71,10 @@ AC power flow, physics-informed neural network, error geometry, calibration, sub
 
 AC power flow (AC-PF) is a fundamental tool for steady-state power-system
 analysis \cite{zimmerman2011matpower}, repeatedly evaluated in time-series
-and contingency studies and underlying optimal power flow (OPF)
-\cite{frank2012opf} and state-estimation workflows
+and contingency studies \cite{bolz2023contingency} and underlying optimal power flow (OPF)
+\cite{frank2012opf, owerko2020opf} and state-estimation workflows
 \cite{cheng2024stateestimation}. This computational burden has motivated
-neural surrogates spanning direct data-driven approximation
+neural surrogates spanning \cite{owerko2024unsupervised,xu2025opformer} direct data-driven approximation
 \cite{donon2020graphsolver, lin2024powerflownet}, physics- or constraint-aware training
 \cite{wen2026pigat,jiang2025upinn}, learned projection-based correction
 \cite{chzhen2026fab}, and feasibility-seeking mechanisms
@@ -82,12 +82,12 @@ neural surrogates spanning direct data-driven approximation
 foundation-model efforts---including GridSFM \cite{yang2026gridsfm},
 gridfm-graphkit and GENCO \cite{gridfmgraphkit2026,puech2026genco},
 and LUMINA \cite{li2026lumina}---extend this direction with global context
-and rich, heterogeneous, topology-aware representations designed to operate
-across diverse grids and operating conditions \cite{dejongh2022physics, karim2026domainadaptation}. However, accurate voltage
+and rich, heterogeneous, topology-aware representations \cite{dejongh2022physics} designed to operate
+across diverse grids and operating conditions \cite{zheng2022glassoformer, karim2026domainadaptation}. However, accurate voltage
 prediction does not necessarily imply AC-consistent output
 \cite{ma2026safepowergraph, shamseldein2026hybrid}. Physics-informed objectives can reduce
 power-flow residuals \cite{nellikkath2022pinn, hu2021physicsguided}, but remain soft training
-objectives and do not by themselves enforce exact satisfaction of the nonlinear AC equations.
+objectives and do not by themselves enforce exact satisfaction of the nonlinear AC equations \cite{kim2026pignn}.
 Consequently, small voltage errors can coexist with non-negligible
 power-balance violations. This raises a question beyond state accuracy:
 which properties of the remaining voltage error govern
@@ -141,9 +141,8 @@ Code: \href{http://github.com/Kimchangheon/neural-acpf-error-geometry}{github.co
 
 For an $N$-bus grid, let $x=[|V|,\theta]\in\mathbb{R}^{2N}$ denote the
 voltage state, with $\underline V=|V|\odot e^{\jmath\theta}$.
-Given operating condition $u$, a surrogate predicts
-$\hat{x}=f_\phi(u)$, from which active and reactive powers $(P,Q)$ are
-recomputed using the network admittance model. For setpoints
+Given operating condition $u$, a surrogate predicts $\hat{x}=f_\phi(u)$, from which $(P,Q)$
+are recomputed using the network admittance model. For setpoints
 $(P^{\mathrm{set}},Q^{\mathrm{set}})$, we define
 \[
 r(\hat x;u)=
@@ -158,10 +157,10 @@ Q^{\mathrm{set}}-Q
 \qquad
 \mathrm{PB}=\sqrt{\Delta P^2+\Delta Q^2}.
 \]
-% PB is evaluated bus-wise under the standard slack/PV/PQ conventions;
-PB uses $\Delta P$ at PV/PQ buses and $\Delta Q$ at PQ buses,
-with other components set to zero; Mean and Max PB are computed over all bus--scenario pairs on a common 100-MVA p.u. base.
-% Mean PB averages all bus–scenario pairs, Max PB takes their maximum, and all PB values use a common 100-MVA p.u. base.
+PB uses $\Delta P$ at PV/PQ and $\Delta Q$ at PQ buses, zero elsewhere;
+prescribed PV/slack magnitudes and the slack angle are restored before
+scoring. Mean/Max PB aggregate all bus--scenario pairs on a common
+100-MVA p.u. base.
 
 Before geometric analysis, we remove train-only prediction bias:
 \[
@@ -169,40 +168,37 @@ Before geometric analysis, we remove train-only prediction bias:
 \qquad
 \hat x^C=\hat x-\hat b,
 \]
-with $\hat b$ frozen at test time. Angle offsets use circular differences
+with $\hat b$ frozen at test time; angle offsets use circular differences
 after gauge alignment.
 
 \subsection{Error geometry in a training solution subspace}
 
-We construct separate rank-$k$ bases from training Newton--Raphson
-solutions. For centered voltage magnitudes $X_V$ and gauge-aligned
-angles $X_\theta$,
+From training Newton--Raphson solutions, we construct separate rank-$k$
+bases for centered magnitudes $X_V$ and gauge-aligned angles $X_\theta$:
 \begin{equation}
 X_V=W_V\Sigma_VU_V^\top,\qquad
 X_\theta=W_\theta\Sigma_\theta U_\theta^\top,\qquad
 P_k=W_kW_k^\top,
 \end{equation}
 where $W_k=\operatorname{diag}(W_{V,k},W_{\theta,k})$ contains the
-leading $k$ directions of each channel; $k=16$ therefore denotes
-16 directions per channel.
-These subspaces capture dominant training-solution variation and define our error coordinates.
-For the calibrated error $e=\hat x^C-x^\star$, we decompose
+leading $k$ directions per channel; $k=16$ denotes 16 per channel.
+These subspaces capture dominant training-solution variation and define the error coordinates.
+For calibrated error $e=\hat x^C-x^\star$,
 \begin{equation}
 e^{\parallel}=P_k e,\qquad
 e^{\perp}=(I-P_k)e,
 \label{eq:error_decomposition}
 \end{equation}
-into components within and outside the leading $k$ solution
-directions. Around a converged state with fixed topology and bus types,
+are its in- and off-subspace components. Around a converged state with
+fixed topology and bus types,
 \begin{equation}
 r(x^\star+e;u)
 =
 J(x^\star;u)e+\mathcal{O}(\|e\|_2^2),
 \label{eq:local_residual}
 \end{equation}
-since $r(x^\star;u)=0$, where $J$ is the AC residual Jacobian.
-Thus, equal-norm errors can produce different residuals depending on
-their orientation.
+where $r(x^\star;u)=0$ and $J$ is the AC residual Jacobian; hence
+equal-norm errors can yield different residuals by orientation.
 
 \subsection{Calibrated solution-subspace projection}
 
@@ -246,8 +242,10 @@ nonlinear AC-feasible set, and therefore does not guarantee exact feasibility.
 \label{sec:setup}
 
 Our primary study uses 37,022 converged pandapower Newton--Raphson
-operating points on the 2224-bus GBnetwork, split 1:1:1
-for training/validation/test with varying load, generation, and PV setpoints~\cite{rivera2025pfdelta}.
+operating points on the 2224-bus GBnetwork, split 1:1:1 for
+training/validation/test. The corpus combines global load/generation
+scaling with independent load $P/Q$ and active-generation perturbations;
+the backbone topology and PV-voltage control schedule remain fixed.
 We evaluate PIGNN-GC, our global-context extension of
 PIGNN-Attn-LS~\cite{kim2026pignn}, GridSFM~\cite{yang2026gridsfm},
 gridfm-graphkit~\cite{gridfmgraphkit2026}, and
@@ -264,9 +262,8 @@ from AC-OPF to AC-PF by fixing generator dispatch and training only for
 voltage-state prediction with PF-specific residuals. LUMINA likewise retains
 its released backbone but uses an enhanced AC-PF configuration with
 known-variable masking, electrical bus features, and stabilized initialization.
-For all models, electrical inputs, admittance, and evaluation use the same
-pandapower internal PPC representation
-\cite{thurner2018pandapower,zimmerman2011matpower}. Training and inference use one NVIDIA H100 96-GB GPU; inference uses
+All models use pre-solution pandapower~\cite{zimmerman2011matpower,thurner2018pandapower} internal PPC-derived inputs and a common PPC-based AC power-balance residual evaluator.
+. Training and inference use one NVIDIA H100 96-GB GPU; inference uses
 the largest fitting batch size. Calibration statistics and solution
 bases use training data only. From $k\in\{4,8,16,32,64\}$, validation
 Mean PB selects $k^\star=16$ without degrading calibrated
@@ -508,10 +505,9 @@ norms, scenarios with larger off-subspace fractions tend to have higher
 Mean PB, with partial Spearman correlations of
 .659/.635/.594/.833 for magnitude and
 .789/.906/.809/.860 for angle (all 95\% CIs exclude zero).
-We next test this directional association directly by varying the
-voltage-magnitude error orientation at fixed $\ell_2$ norm.
-Starting from the
-calibrated prediction, we define
+We next test this directional association with an oracle diagnostic using
+the known reference state, varying the voltage-magnitude error orientation
+at fixed $\ell_2$ norm. We define
 \begin{equation}
 \tilde e(\alpha)
 =
@@ -522,8 +518,8 @@ calibrated prediction, we define
 \end{equation}
 Decreasing $\alpha$ suppresses off-subspace error; the control analogously
 suppresses the in-subspace component by exchanging
-$e_V^\parallel$ and $e_V^\perp$. Phase angles are held fixed and Mean PB
-is normalized at $\alpha=1$. Across all four surrogates, suppressing
+$e_V^\parallel$ and $e_V^\perp$. Phase angles remain at their calibrated predictions, and Mean PB is
+normalized at $\alpha=1$. Across all four surrogates, suppressing
 off-subspace error consistently reduces Relative Mean PB, whereas
 suppressing in-subspace error produces the opposite trend
 (Fig.~\ref{fig:error_geometry}). Although the effect size varies across models, its direction is consistent.
@@ -531,9 +527,9 @@ Because the voltage-magnitude error norm is fixed throughout the intervention,
 these results show that error orientation affects AC power-balance violation
 independently of error magnitude.
 
-Consistent with the fixed-norm experiment, a complementary local Jacobian
-analysis shows that off-subspace perturbations produce larger AC-residual
-changes per unit perturbation norm than in-subspace perturbations.
+Consistent with the fixed-norm experiment, a local Jacobian analysis
+using directional gain $g(d)=\|Jd\|_2/\|d\|_2$ shows that off-subspace
+perturbations have larger gain than in-subspace perturbations.
 In a model-independent audit of 4,096 paired random directions at 128
 held-out operating points, the median paired off-/in-subspace Jacobian
 gain ratio is $1{,}563\times$. The same directional sensitivity is
@@ -549,7 +545,7 @@ residual-change ratios between $0.996$ and $1.009$ across all four models.
 \begin{figure}[t]
     \centering
     \includegraphics[width=\columnwidth]
-    {figure1_controlled_error_geometry_updated.pdf}
+    {figure1_controlled_error_geometry_axis_labels_fixed.pdf}
     \caption{
     Fixed-norm directional intervention on GBnetwork, with Relative Mean PB
     normalized at $\alpha=1$.
@@ -646,17 +642,15 @@ Projection improves $R_w^2$ with little change in $a_w$; angle
 accuracy is model dependent. Raw and CSP16 inference times are
 comparable.
 
-Comparing magnitude-only, angle-only, and full projection reveals that
-the contribution of angle projection is model dependent. For PIGNN-GC,
-full CSP gives the lowest PB among the projection variants, whereas
-GridSFM achieves its lowest PB with magnitude-only projection.
-For gridfm-graphkit, adding angle projection to the magnitude-only
-correction reduces Mean/Max PB from $.0612/18.23$ to $.0457/5.08$,
-but increases angle RMSE from $.367^\circ$ to $.496^\circ$.
-For LUMINA, the same addition reduces Mean/Max PB from $.1939/38.53$
-to $.0660/4.51$ while also improving angle RMSE from $1.374^\circ$
-to $1.215^\circ$. Thus, improved physical consistency from angle projection does not
-necessarily coincide with improved angle accuracy.
+Magnitude-only, angle-only, and full projection show model-dependent effects of
+angle projection. PIGNN-GC achieves the lowest PB with full CSP, whereas
+GridSFM performs best with magnitude-only projection. For gridfm-graphkit,
+adding angle projection reduces Mean/Max PB from $.0612/18.23$ to $.0457/5.08$,
+but increases angle RMSE from $.367^\circ$ to $.496^\circ$. For LUMINA, it
+reduces Mean/Max PB from $.1939/38.53$ to $.0660/4.51$ while improving angle RMSE
+from $1.374^\circ$ to $1.215^\circ$. Thus, better physical consistency from
+angle projection need not imply better angle accuracy.
+
 
 These model-dependent accuracy changes are explained by
 Eq.~\eqref{eq:tradeoff}. For magnitude, the removed off-subspace
@@ -762,7 +756,8 @@ LUMINA
 Fig.~\ref{fig:crossgrid_csp} evaluates GridSFM with CSP across 31 systems
 spanning 4--9,241 buses and sub-kV to 750-kV levels: 28
 pandapower/PYPOWER-format systems from IEEE, PEGASE, RTE, and GB benchmark
-families, plus three Common Information Model (CIM)-based networks.
+families, plus three Common Information Model (CIM)-based networks. PV-voltage setpoints vary for most cross-grid systems, but remain fixed
+for GBnetwork and grids with conflicting controllers.
 For each system, calibration and subspace statistics are fitted from its
 training data, using nominal $k=16$ per channel and the available SVD
 components on smaller systems. CSP reduces GridSFM Mean PB across all
@@ -771,19 +766,19 @@ components on smaller systems. CSP reduces GridSFM Mean PB across all
 \vspace{0.35em}
 
 \noindent\textit{Topology and spatial shifts.}
-Under $N$--1/$N$--2 outages, tracking and bulk PB remain close to control,
-with larger maxima indicating isolated topology-induced violations and the
-need for worst-case assessment beyond average error
-\cite{piloto2024canos}.
-GBcorr, which applies correlated, spatially varying load-scaling factors
-across 14 zones while preserving total demand and generation settings,
-causes a broader shift: transferring both control calibration and
-basis gives Mean PB $\approx0.100$ p.u. Refitting calibration alone reduces
-this to $0.0944$, basis alone to $0.0740$, and both to $\approx0.068$.
-The transferred basis retains $93.55\%$ of GBcorr magnitude variation,
-versus $98.53\%$ after refitting, while reference-state projection reduces
-Mean PB from $0.0868$ to $0.0438$ p.u. This shows that GBcorr introduces
-not only calibration drift but also solution-subspace mismatch.
+Under $N$--1/$N$--2 outages, tracking and
+bulk PB remain close to control, with larger maxima indicating isolated
+topology-induced violations and the need for worst-case assessment beyond
+average error~\cite{piloto2024canos}. GBcorr, which applies correlated,
+spatially varying load-scaling factors across 14 zones while preserving
+total demand and generation settings, causes a broader shift: transferring
+both control calibration and basis gives Mean PB $\approx 0.100$ p.u.
+Refitting calibration alone reduces this to $0.0944$, basis alone to
+$0.0740$, and both to $\approx 0.068$. The transferred/refitted bases retain $93.55\%/98.53\%$ of GBcorr magnitude
+variation; however, even on converged GBcorr references, they yield Mean PBs of
+$0.0868/0.0438$ p.u., respectively. This reference-only diagnostic isolates
+subspace mismatch from surrogate error, supporting its role in GBcorr
+degradation and the benefit of basis refitting.
 
 \begin{table}[t]
 \centering

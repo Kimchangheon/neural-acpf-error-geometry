@@ -500,26 +500,27 @@ LUMINA
 
 
 \subsection{Off-subspace error and directional sensitivity.}
-% We vary the orientation of the voltage-magnitude error relative to the
-% training-derived solution subspace while holding its $\ell_2$ norm fixed,
-% thereby isolating direction from error magnitude.
+
 \noindent\textit{Off-subspace error.}
-Although the rank-16 basis explains 98.8\%/99.7\% of training
+Off-subspace error is substantial across models and is positively associated
+with Mean PB. Although the rank-16 basis explains 98.8\%/99.7\% of training
 voltage-magnitude/angle variation, the median fractions of total squared
 error lying outside the respective subspaces are
 26.3/55.0/56.8/27.1\% for magnitude and
 10.3/2.7/39.6/31.7\% for angle, for
 PIGNN-GC/GridSFM/gridfm-graphkit/LUMINA, respectively.
-Even after accounting for differences in the corresponding total error
-norms, scenarios with larger off-subspace fractions tend to have higher
-Mean PB, with partial Spearman correlations of
-.659/.635/.594/.833 for magnitude and
+After accounting for differences in total error norms, scenarios with larger
+off-subspace fractions have higher Mean PB, with partial Spearman correlations
+of .659/.635/.594/.833 for magnitude and
 .789/.906/.809/.860 for angle (all 95\% CIs exclude zero).
 
 \noindent\textit{Fixed-norm intervention.}
-We next test this directional association with an oracle diagnostic using
-the known reference state, varying the voltage-magnitude error orientation
-at fixed $\ell_2$ norm. We define
+At fixed error norm, suppressing off-subspace error consistently lowers
+Relative Mean PB across all four surrogates, whereas suppressing in-subspace
+error has the opposite effect (Fig.~\ref{fig:error_geometry}), isolating
+error orientation from error magnitude. We test this with an oracle
+diagnostic using the known reference state, varying the voltage-magnitude
+error orientation at fixed $\ell_2$ norm:
 \begin{equation}
 \tilde e(\alpha)
 =
@@ -530,30 +531,22 @@ at fixed $\ell_2$ norm. We define
 \end{equation}
 Decreasing $\alpha$ suppresses off-subspace error; the control analogously
 suppresses the in-subspace component by exchanging
-$e_V^\parallel$ and $e_V^\perp$. Phase angles remain at their calibrated predictions, and Mean PB is
-normalized at $\alpha=1$. Across all four surrogates, suppressing
-off-subspace error consistently reduces Relative Mean PB, whereas
-suppressing in-subspace error produces the opposite trend
-(Fig.~\ref{fig:error_geometry}). Although the effect size varies across models, its direction is consistent.
-Because the voltage-magnitude error norm is fixed throughout the intervention,
-these results show that error orientation affects AC power-balance violation
-independently of error magnitude.
+$e_V^\parallel$ and $e_V^\perp$. Phase angles remain at their calibrated
+predictions, and Mean PB is normalized at $\alpha=1$.
 
 \noindent\textit{Jacobian sensitivity.}
-Consistent with the fixed-norm experiment, a local Jacobian analysis
-using directional gain $g(d)=\|Jd\|_2/\|d\|_2$ shows that off-subspace
-perturbations have larger gain than in-subspace perturbations.
-Using 32 random direction pairs at each of 128 held-out operating points,
-the median paired off-/in-subspace gain ratio is $1{,}563\times$.
-The same gain contrast appears in the actual calibrated prediction errors:
-the ratios of median off- to in-subspace gains are $22.81\times$,
-$575.83\times$, $4.69\times$, and $6.51\times$ for PIGNN-GC, GridSFM,
-gridfm-graphkit, and LUMINA, respectively. The observed error regime is
-consistent with the first-order expansion in Eq.~\eqref{eq:local_residual},
-with median linearized-to-nonlinear residual-change ratios between
-$0.996$ and $1.009$ across all four models.
-
-
+Off-subspace directions are substantially more residual-sensitive than
+in-subspace directions under the local AC Jacobian, consistent with the
+fixed-norm intervention. Using directional gain
+$g(d)=\|Jd\|_2/\|d\|_2$, 32 random direction pairs at each of 128 held-out
+operating points yield a median paired off-/in-subspace gain ratio of
+$1{,}563\times$. The same gain contrast appears in the actual calibrated
+prediction errors: the ratios of median off- to in-subspace gains are
+$22.81\times$, $575.83\times$, $4.69\times$, and $6.51\times$ for
+PIGNN-GC, GridSFM, gridfm-graphkit, and LUMINA, respectively.
+The observed error regime is consistent with the first-order expansion in
+Eq.~\eqref{eq:local_residual}, with median linearized-to-nonlinear
+residual-change ratios between $0.996$ and $1.009$ across all four models.
 
 \begin{figure}[t]
     \centering
@@ -566,19 +559,18 @@ $0.996$ and $1.009$ across all four models.
     \label{fig:error_geometry}
 \end{figure}
 
-
-
 \subsection{Solution subspace specificity.}
-To test whether CSP benefits merely from preserving most reference-state
-variation, we compare SVD$_{16}$ with graph-Laplacian and spatial low-pass
-controls. Using training references only, each control is tuned to retain
-the same amount of $V/\theta$ variation as SVD$_{16}$.
-On the test set, all three therefore preserve nearly identical reference
-variation (Table~\ref{tab:basis_control}), yet the controls produce
-substantially larger PB for both projected references and corrected
-predictions. Thus, preserving the amount of state variation alone is
-insufficient; physical consistency also depends on which state-space
-directions are retained.
+Our matched-control experiments show that preserving the same amount of
+reference-state variation is insufficient for low PB, indicating that the
+specific state-space directions retained by the solution subspace matter.
+We compare SVD$_{16}$ with graph-Laplacian and spatial low-pass controls,
+each tuned using training references to match the $V/\theta$ variation
+retained by SVD$_{16}$. On the test set, all three preserve nearly identical
+reference variation (Table~\ref{tab:basis_control}), yet the controls yield
+substantially larger PB for both projected references and corrected predictions.
+
+
+
 % Matched random, graph-Laplacian, and spatial low-pass projections all
 % degrade voltage-magnitude accuracy and scenario tracking and increase
 % AC residuals relative to the solution-SVD basis
@@ -730,17 +722,19 @@ the opposite holds for LUMINA.
 
 \subsection{Complementarity with one-step Newton refinement.}
 
-We test CSP before one Newton update ($\mathrm{NR}_1$) of non-slack angles
-and PQ voltage magnitudes; validation selects $\eta=1$ for all models, with
-no linear-solve failures. CSP initialization further lowers magnitude and
-angle RMSE in all four models and reduces post-update Mean PB by
-$21.1$--$96.4\%$ relative to $C$ initialization (Table~\ref{tab:nr1}).
+CSP provides a consistently better initialization for one-step Newton
+refinement, improving both state accuracy and post-update physical
+consistency across all four models. Starting from $C$ or CSP$_{16}$, we
+apply one Newton update ($\mathrm{NR}_1$) to non-slack angles and PQ voltage
+magnitudes, with validation-selected damping factor; $\eta=1$ is
+selected for all models, with no linear-solve failures. Relative to $C$
+initialization, CSP lowers magnitude and angle RMSE in all models and
+reduces post-update Mean PB by $21.1$--$96.4\%$
+(Table~\ref{tab:nr1}).
 
-For LUMINA, $C+\mathrm{NR}_1$ exhibits a large one-seed overshoot despite
-a successful linear solve, whereas CSP$_{16}$ initialization is consistent
-across all seeds, yielding Mean PB
-$1.653\pm0.036\times10^{-3}$. This further supports CSP as a favorable
-initializer for Newton refinement.
+The benefit is particularly pronounced for LUMINA: $C+\mathrm{NR}_1$
+shows a large one-seed overshoot despite a successful linear solve, whereas
+CSP$_{16}$ initialization remains consistent across seeds.
 
 \begin{table}[t]
 \centering
@@ -809,33 +803,35 @@ LUMINA
 \end{table}
 \subsection{Cross-grid breadth and distribution shift}
 \label{sec:breadth_shift}
+
 \noindent\textit{Cross-grid breadth.}
-Fig.~\ref{fig:crossgrid_csp} evaluates GridSFM with CSP across 31 systems
-spanning 4--9,241 buses and sub-kV to 750-kV levels: 28
-pandapower/PYPOWER-format systems from IEEE, PEGASE, RTE, and GB benchmark
-families, plus three Common Information Model (CIM)-based networks. PV-voltage setpoints vary for most cross-grid systems, but remain fixed
-for GBnetwork and grids with conflicting controllers.
-For each system, calibration and subspace statistics are fitted from its
-training data, using nominal $k=16$ per channel and the available SVD
-components on smaller systems. CSP reduces GridSFM Mean PB across all
-31 systems.
+CSP reduces GridSFM Mean PB across all 31 evaluated systems
+(Fig.~\ref{fig:crossgrid_csp}), spanning 4--9,241 buses and sub-kV to
+750-kV levels. The set includes 28 pandapower/PYPOWER-format systems
+from IEEE, PEGASE, RTE, and GB benchmark families, plus three Common
+Information Model (CIM)-based networks. For each system, calibration and
+subspace statistics are fitted from its training data, using nominal
+$k=16$ per channel and the available SVD components on smaller systems.
+PV-voltage setpoints vary for most systems, but remain fixed for GBnetwork due to conflicting controllers.
 
 \vspace{0.35em}
 
 \noindent\textit{Topology and spatial shifts.}
-Under $N$--1/$N$--2 outages, tracking and
-bulk PB remain close to control, with larger maxima indicating isolated
-topology-induced violations and the need for worst-case assessment beyond
-average error~\cite{piloto2024canos}. GBcorr, which applies correlated,
-spatially varying load-scaling factors across 14 zones while preserving
-total demand and generation settings, causes a broader shift: transferring
-both control calibration and basis gives Mean PB $\approx 0.100$ p.u.
-Refitting calibration alone reduces this to $0.0944$, basis alone to
-$0.0740$, and both to $\approx 0.068$. The transferred/refitted bases retain $93.55\%/98.53\%$ of GBcorr magnitude
-variation; however, even on converged GBcorr references, they yield Mean PBs of
-$0.0868/0.0438$ p.u., respectively. This reference-only diagnostic isolates
-subspace mismatch from surrogate error, supporting its role in GBcorr
-degradation and the benefit of basis refitting.
+CSP remains stable in bulk performance under $N$--1/$N$--2 topology
+shifts, with degradation concentrated in isolated worst-case violations,
+whereas GBcorr causes a broader performance drop.
+Under the topology shifts, voltage accuracy, tracking, and bulk PB remain
+close to control, while larger maxima motivate worst-case assessment beyond
+average error~\cite{piloto2024canos}. GBcorr applies correlated, spatially
+varying load scaling across 14 zones while preserving total demand and
+generation settings. Transferring both calibration and basis gives Mean PB
+$\approx0.100$ p.u.; refitting calibration alone reduces this to $0.0944$,
+basis alone to $0.0740$, and both to $\approx0.068$.
+Although the transferred/refitted bases retain $93.55\%/98.53\%$ of GBcorr
+magnitude variation, projecting converged GBcorr references yields Mean PBs
+of $0.0868/0.0438$ p.u., respectively. This reference-only diagnostic
+isolates the effect of basis transfer from surrogate error and helps explain
+the improvement from basis refitting.
 
 \begin{table}[t]
 \centering
@@ -917,17 +913,7 @@ GBcorr (R)
 
 \section{CONCLUSION}
 
-This work identifies output-error geometry as an important factor in the
-accuracy--consistency gap of neural AC-PF surrogates. Fixed-norm and
-Jacobian analyses reveal strong directional sensitivity of AC residuals,
-while CSP reduces power-balance residuals and improves voltage-magnitude
-accuracy on GBnetwork. After one Newton update, CSP further improves voltage accuracy and mean
-power-balance residuals, supporting its complementary role in refinement. Cross-grid evaluation shows that the power-balance
-improvement extends beyond GBnetwork, whereas distribution-shift experiments
-show that a fixed solution subspace can become mismatched to the shifted
-operating distribution. These results motivate extending physics-consistent
-neural surrogates toward broader power-system analysis, estimation, and
-optimization.
+This work identifies output-error geometry as an important factor in the accuracy--consistency gap of neural AC-PF surrogates. Fixed-norm and Jacobian analyses reveal strong directional sensitivity of AC residuals, while CSP reduces power-balance residuals and improves voltage-magnitude accuracy on GBnetwork. After one Newton update, CSP further improves voltage accuracy and mean power-balance residuals, supporting its complementary role in refinement. Cross-grid evaluation shows that the power-balance improvement extends beyond GBnetwork, whereas distribution-shift experiments show that a fixed solution subspace can become mismatched to the shifted operating distribution. These results motivate extending physics-consistent neural surrogates toward broader power-system analysis, estimation, and optimization.
 
 
 

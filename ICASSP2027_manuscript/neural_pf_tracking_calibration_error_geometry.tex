@@ -42,7 +42,7 @@ achieve accurate voltage predictions, yet such accuracy does not
 necessarily imply physically consistent solutions.
 Even small complex voltage errors can yield large AC power-balance residuals.
 We study this accuracy--consistency gap across PIGNN-GC, GridSFM,
-gridfm-graphkit, and LUMINA on realistic 2224-bus GBnetwork scenarios,
+gridfm-graphkit, and LUMINA on realistic 2224-bus Great Britain network (GBnetwork) scenarios,
 with cross-grid evaluation of GridSFM over 31 systems.
 Using an SVD basis fitted to training AC power-flow solutions, we find
 that neural prediction errors contain substantial components outside the
@@ -56,11 +56,6 @@ These results identify output-error geometry as an important factor in
 physics-consistent neural AC power flow.
 Code: \href{http://github.com/Kimchangheon/neural-acpf-error-geometry}{github.com/Kimchangheon/neural-acpf-error-geometry}
 \end{abstract}
-
-
-
-
-
 
 
 \begin{keywords}
@@ -77,21 +72,27 @@ and contingency studies \cite{bolz2023contingency} and underlying optimal power 
 \cite{cheng2024stateestimation}.
 This computational burden has motivated neural surrogates including direct data-driven approximation~\cite{owerko2024unsupervised,xu2025opformer,donon2020graphsolver, lin2024powerflownet}, physics- or constraint-aware training \cite{wen2026pigat,jiang2025upinn}, learned projection-based correction \cite{chzhen2026fab}, and feasibility-seeking mechanisms \cite{nguyen2025fsnet,donti2021dc3}.
 More recent cross-grid and
-foundation-model efforts---including GridSFM \cite{yang2026gridsfm},
+foundation-model efforts--including GridSFM \cite{yang2026gridsfm},
 gridfm-graphkit and GENCO \cite{gridfmgraphkit2026,puech2026genco},
-and LUMINA \cite{li2026lumina}---extend this direction with global context
+and LUMINA \cite{li2026lumina}--extend this direction with global context
 and topology-aware representations of heterogeneous grid components \cite{dejongh2022physics} designed to operate
-across diverse grids and operating conditions \cite{zheng2022glassoformer, karim2026domainadaptation}. However, accurate voltage
-prediction does not necessarily imply physical consistency
-\cite{ma2026safepowergraph, shamseldein2026hybrid}. Physics-informed objectives can reduce
-power-flow residuals \cite{nellikkath2022pinn, hu2021physicsguided}, but remain soft training
-objectives and do not by themselves enforce exact satisfaction of the nonlinear AC equations \cite{kim2026pignn}.
-Consequently, small voltage errors can coexist with non-negligible
-power-balance violations. This raises a question beyond state accuracy:
-which properties of the remaining voltage error govern
-AC power-balance residuals? We hypothesize that error \emph{direction} is an important factor:
-similarly sized errors can induce very different residuals depending on
-their orientation across buses.
+across diverse grids and operating conditions \cite{zheng2022glassoformer, karim2026domainadaptation}.
+
+However, accurate voltage prediction does not necessarily imply physical
+consistency \cite{ma2026safepowergraph,shamseldein2026hybrid}.
+Physics-informed objectives can reduce power-flow residuals
+\cite{nellikkath2022pinn,hu2021physicsguided}, but remain soft training
+objectives and do not by themselves enforce exact satisfaction of the nonlinear
+AC equations \cite{kim2026pignn}. Consequently, neural surrogates with small
+voltage errors can still exhibit non-negligible power-balance violations.
+We study this discrepancy as the \emph{accuracy--consistency gap} and ask
+which properties of the remaining prediction error govern its physical impact.
+We hypothesize that error \emph{direction}, rather than magnitude alone, is
+an important factor: similarly sized voltage errors can induce substantially
+different AC residuals depending on their orientation across buses. This
+motivates studying the \emph{geometry} of neural-surrogate errors in the
+voltage-state space.
+
 
 \begin{figure}[t]
     \centering
@@ -102,30 +103,33 @@ their orientation across buses.
 \end{figure}
 
 Goodwin et al.~\cite{goodwin2026geometry} characterized the differential
-geometry and linear approximations of the AC-PF solution manifold. We study neural-surrogate error geometry empirically, asking
-whether error orientation relative to a training-derived subspace
-explains the remaining physical inconsistency. This also differs from
-Park et al.~\cite{park2024compact}, who use a principal component analysis based output space during training and to warm-start an exact solver, whereas we use a training-solution subspace to analyze and post-process frozen AC-PF predictions.
+geometry and linear approximations of the AC-PF solution manifold, while
+Park et al.~\cite{park2024compact} empirically showed that AC-OPF solutions
+are highly compressible in a low-dimensional principal-component
+representation. Motivated by this evidence of low-dimensional solution
+structure, we ask whether neural prediction errors relative to a
+ \emph{training solution subspace} help explain physical inconsistency,
+and whether this structure can be exploited to reduce power-balance
+violations.
 
-We evaluate PIGNN-GC, GridSFM, gridfm-graphkit, and LUMINA on realistic
-2224-bus GBnetwork scenarios. Using training solutions only, we construct
-separate singular value decomposition (SVD) subspaces for voltage magnitude and angle and decompose
-calibrated prediction errors into in- and off-subspace components.
-Fixed-norm interventions and local Jacobian analysis show that
-off-subspace errors are systematically more residual-sensitive.
-Motivated by this observation, we introduce \emph{calibrated
-solution-subspace projection} (CSP), which combines train-only bias
-correction with projection onto the dominant training-supported solution
-directions.
 
-Across all four models, CSP reduces AC power-balance residuals while
-improving voltage-magnitude accuracy, with model-dependent effects on
-angle accuracy. CSP adds negligible computational burden at inference and remains
-beneficial when used to initialize one Newton refinement step.
-Additional GridSFM evaluation across 31 systems shows that the benefit
-extends beyond GBnetwork, whereas distribution-shift experiments reveal
-that the training-solution subspace can become mismatched to a shifted
-operating distribution.
+To address these questions, we make three contributions.
+(i) We decompose calibrated prediction errors of four neural surrogates
+into in- and off-subspace components using a low-rank singular value
+decomposition (SVD) basis fitted to training AC-PF solutions, and show
+through fixed-norm interventions and local Jacobian analysis that
+off-subspace errors are substantially more residual-sensitive.
+(ii) Building on this finding, we propose \emph{calibrated
+solution-subspace projection} (CSP), a lightweight post-hoc output correction that
+uses only training data, removes systematic bias, and suppresses
+off-subspace prediction components without retraining.
+(iii) We evaluate CSP on frozen PIGNN-GC, GridSFM, gridfm-graphkit, and
+LUMINA models on the 2224-bus GBnetwork, where it lowers AC power-balance
+residuals and voltage-magnitude error in all four models and provides a
+better initialization for one Newton update.
+We further assess its
+generality on 31 additional systems and its robustness under topology
+and load-distribution shifts.
 
 
 \section{Error Geometry and CSP}
@@ -250,12 +254,9 @@ nonlinear AC-feasible set, and therefore does not guarantee exact feasibility.
 \section{Experiments and Results}
 \label{sec:experiments}
 
-\subsection{Experimental setup}
-\label{sec:setup}
-
 Our primary study uses 37,022 converged pandapower Newton--Raphson
 operating points on the 2224-bus GBnetwork, split 1:1:1 for
-training/validation/test. The corpus combines global load/generation
+training/validation/test. The dataset combines global load/generation
 scaling with independent load $P/Q$ and active-generation perturbations;
 the backbone topology and PV-voltage control schedule remain fixed.
 We evaluate PIGNN-GC, our global-context extension of
@@ -272,8 +273,8 @@ gridfm-graphkit uses its released architecture/configuration without a
 pretrained checkpoint. Both GridSFM and LUMINA retain their released backbones and are adapted
 from AC-OPF to AC-PF by fixing generator dispatch, predicting only voltage
 states with PF-specific residuals, and applying known-variable masking.
-All models use pre-solution pandapower~\cite{zimmerman2011matpower,thurner2018pandapower} internal PPC-derived inputs and a common PPC-based AC power-balance residual evaluator. Training and inference use one NVIDIA H100 96-GB GPU; inference uses
-the largest fitting batch size. Calibration statistics and solution
+All models use pre-solution pandapower~\cite{zimmerman2011matpower,thurner2018pandapower} internal PPC-derived inputs and a common PPC-based AC power-balance residual evaluator. Training and inference use one NVIDIA H100 96-GB GPU; inference timing
+uses the largest memory-fitting batch size to maximize GPU utilization. Calibration statistics and solution
 bases use training data only. From $k\in\{4,8,16,32,64\}$, validation
 Mean PB selects $k^\star=16$ without degrading calibrated
 voltage-magnitude RMSE and is frozen for test and distribution-shift experiments.
@@ -464,7 +465,7 @@ LUMINA
 & $.346 \pm .012$
 & $1.29896 \pm .85056$
 & $664.19 \pm 448.00$
-& $7.54 \pm 0.37$ \\
+& $7.548 \pm 0.369$ \\
 
 & $C$
 & $.01780 \pm .00020$
@@ -473,7 +474,7 @@ LUMINA
 & $.346 \pm .012$
 & $.21432 \pm .01186$
 & $20.65 \pm 15.82$
-& $7.38 \pm 0.16$ \\
+& $7.380 \pm 0.155$ \\
 
 & $P_{16}$
 & $.01898 \pm .00049$
@@ -482,7 +483,7 @@ LUMINA
 & $.338 \pm .012$
 & $.07641 \pm .00128$
 & $5.47 \pm .56$
-& $7.98 \pm 0.87$ \\
+& $7.981 \pm 0.868$ \\
 
 & CSP$_{16}$
 & $\mathbf{.01570 \pm .00024}$
@@ -491,7 +492,7 @@ LUMINA
 & $.338 \pm .012$
 & $\mathbf{.06662 \pm .00074}$
 & $\mathbf{4.61 \pm .19}$
-& $7.89 \pm 0.57$ \\
+& $7.891 \pm 0.567$ \\
 
 \bottomrule
 \end{tabular}

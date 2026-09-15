@@ -54,6 +54,7 @@ relative to calibrated predictions, while improving voltage-magnitude
 accuracy in all four models.
 These results identify output-error geometry as an important factor in
 physics-consistent neural AC power flow.
+Code: \href{http://github.com/Kimchangheon/neural-acpf-error-geometry}{github.com/Kimchangheon/neural-acpf-error-geometry}
 \end{abstract}
 
 
@@ -91,7 +92,9 @@ objectives and do not by themselves enforce exact satisfaction of the nonlinear 
 Consequently, small voltage errors can coexist with non-negligible
 power-balance violations. This raises a question beyond state accuracy:
 which properties of the remaining voltage error govern
-AC power-balance residuals?
+AC power-balance residuals? We hypothesize that error \emph{direction} is an important factor:
+similarly sized errors can induce very different residuals depending on
+their orientation across buses.
 
 \begin{figure}[t]
     \centering
@@ -101,19 +104,15 @@ AC power-balance residuals?
     \label{fig:graphical_abstract}
 \end{figure}
 
-We hypothesize that the key factor is the \emph{direction} of the remaining
-voltage error: similarly sized errors can induce very different
-power-balance residuals depending on their orientation across buses.
-
 Goodwin et al.~\cite{goodwin2026geometry} characterized the differential
 geometry and linear approximations of the AC-PF solution manifold. We instead study neural-surrogate error geometry empirically, asking
 whether error orientation relative to a training-derived subspace
 explains the remaining physical inconsistency. This also differs from
-Park et al.~\cite{park2024compact}, who use a PCA-based output space during training and to warm-start an exact solver, whereas we use a training-solution subspace to analyze and post-process frozen AC-PF predictions.
+Park et al.~\cite{park2024compact}, who use a principal component analysis based output space during training and to warm-start an exact solver, whereas we use a training-solution subspace to analyze and post-process frozen AC-PF predictions.
 
 We evaluate PIGNN-GC, GridSFM, gridfm-graphkit, and LUMINA on realistic
 2224-bus GBnetwork scenarios. From training solutions only, we construct
-separate SVD subspaces for voltage magnitude and angle and decompose
+separate singular value decomposition (SVD) subspaces for voltage magnitude and angle and decompose
 calibrated prediction errors into in- and off-subspace components.
 Fixed-norm interventions and local Jacobian analysis show that
 off-subspace errors are systematically more residual-sensitive.
@@ -131,8 +130,6 @@ extends beyond GBnetwork, whereas distribution-shift experiments reveal
 that the training-solution subspace can become mismatched to a shifted
 operating distribution.
 
-
-Code: \href{http://github.com/Kimchangheon/neural-acpf-error-geometry}{github.com/Kimchangheon/neural-acpf-error-geometry}
 
 \section{Error Geometry and CSP}
 \label{sec:method}
@@ -160,7 +157,7 @@ Q^{\mathrm{set}}-Q
 PB uses $\Delta P$ at PV/PQ and $\Delta Q$ at PQ buses, zero elsewhere;
 prescribed PV/slack magnitudes and the slack angle are restored before
 scoring. Mean/Max PB aggregate all bus--scenario pairs on a common
-100-MVA p.u. base.
+100-MVA per unit (p.u.) base.
 
 Before geometric analysis, we remove train-only prediction bias:
 \[
@@ -171,9 +168,9 @@ Before geometric analysis, we remove train-only prediction bias:
 with $\hat b$ frozen at test time; angle offsets use circular differences
 after gauge alignment.
 
-\subsection{Error geometry in a training solution subspace}
+\subsection{Error geometry and training solution subspace projection}
 
-From training Newton--Raphson solutions, we construct separate rank-$k$
+From training Newton--Raphson solutions, we construct rank-$k$
 bases for centered magnitudes $X_V$ and gauge-aligned angles $X_\theta$:
 \begin{equation}
 X_V=W_V\Sigma_VU_V^\top,\qquad
@@ -183,14 +180,19 @@ P_k=W_kW_k^\top,
 where $W_k=\operatorname{diag}(W_{V,k},W_{\theta,k})$ contains the
 leading $k$ directions per channel; $k=16$ denotes 16 per channel.
 These subspaces capture dominant training-solution variation and define the error coordinates.
+
 For calibrated error $e=\hat x^C-x^\star$,
 \begin{equation}
-e^{\parallel}=P_k e,\qquad
-e^{\perp}=(I-P_k)e,
+e^{\parallel}=P_ke,\quad
+e^{\perp}=(I-P_k)e,\qquad
+\hat x-x^\star=\hat b+e^{\parallel}+e^{\perp}.
 \label{eq:error_decomposition}
 \end{equation}
-are its in- and off-subspace components. Around a converged state with
-fixed topology and bus types,
+Here, $\hat b$ is the train-estimated mean bias, while
+$e^{\parallel}$ and $e^{\perp}$ partition the remaining error into
+in- and off-subspace components.
+
+Around a converged state with fixed topology and bus types,
 \begin{equation}
 r(x^\star+e;u)
 =
@@ -200,10 +202,24 @@ J(x^\star;u)e+\mathcal{O}(\|e\|_2^2),
 where $r(x^\star;u)=0$ and $J$ is the AC residual Jacobian; hence
 equal-norm errors can yield different residuals by orientation.
 
-\subsection{Calibrated solution-subspace projection}
+% For calibrated error $e=\hat x^C-x^\star$,
+% \begin{equation}
+% e^{\parallel}=P_k e,\qquad
+% e^{\perp}=(I-P_k)e,
+% \label{eq:error_decomposition}
+% \end{equation}
+% are its in- and off-subspace components. Around a converged state with
+% fixed topology and bus types,
+% \begin{equation}
+% r(x^\star+e;u)
+% =
+% J(x^\star;u)e+\mathcal{O}(\|e\|_2^2),
+% \label{eq:local_residual}
+% \end{equation}
+% where $r(x^\star;u)=0$ and $J$ is the AC residual Jacobian; hence
+% equal-norm errors can yield different residuals by orientation.
 
-Motivated by this directional sensitivity, CSP first removes train-estimated
-bias and then projects onto the dominant training-solution directions:
+Motivated by this directional sensitivity, CSP first removes $\hat{b}$ and then projects onto the dominant training-solution directions:
 \begin{equation}
 \boxed{
 \hat x^{\mathrm{CSP}}
@@ -247,7 +263,7 @@ training/validation/test. The corpus combines global load/generation
 scaling with independent load $P/Q$ and active-generation perturbations;
 the backbone topology and PV-voltage control schedule remain fixed.
 We evaluate PIGNN-GC, our global-context extension of
-PIGNN-Attn-LS~\cite{kim2026pignn}, GridSFM~\cite{yang2026gridsfm},
+PIGNN-Attn-LS~\cite{kim2026pignn} retaining its line-search, GridSFM~\cite{yang2026gridsfm},
 gridfm-graphkit~\cite{gridfmgraphkit2026}, and
 LUMINA~\cite{li2026lumina}; GridSFM is also evaluated
 cross-grid on 31 systems.

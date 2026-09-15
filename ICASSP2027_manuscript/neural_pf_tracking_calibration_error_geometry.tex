@@ -16,7 +16,7 @@
 \newcommand{\Sbus}{S_{\mathrm{bus}}}
 \newcommand{\dP}{\Delta P}
 \newcommand{\dQ}{\Delta Q}
-\newcommand{\Vmag}{|V|}
+\newcommand{\Vmag}{V}
 \newcommand{\Pcal}{\mathcal{C}}
 \newcommand{\Pproj}{\mathcal{P}}
 
@@ -74,18 +74,15 @@ AC power flow (AC-PF) is a fundamental tool for steady-state power-system
 analysis \cite{zimmerman2011matpower}, repeatedly evaluated in time-series
 and contingency studies \cite{bolz2023contingency} and underlying optimal power flow (OPF)
 \cite{frank2012opf, owerko2020opf} and state-estimation workflows
-\cite{cheng2024stateestimation}. This computational burden has motivated
-neural surrogates spanning \cite{owerko2024unsupervised,xu2025opformer} direct data-driven approximation
-\cite{donon2020graphsolver, lin2024powerflownet}, physics- or constraint-aware training
-\cite{wen2026pigat,jiang2025upinn}, learned projection-based correction
-\cite{chzhen2026fab}, and feasibility-seeking mechanisms
-\cite{nguyen2025fsnet,donti2021dc3}. More recent cross-grid and
+\cite{cheng2024stateestimation}.
+This computational burden has motivated neural surrogates including direct data-driven approximation~\cite{owerko2024unsupervised,xu2025opformer,donon2020graphsolver, lin2024powerflownet}, physics- or constraint-aware training \cite{wen2026pigat,jiang2025upinn}, learned projection-based correction \cite{chzhen2026fab}, and feasibility-seeking mechanisms \cite{nguyen2025fsnet,donti2021dc3}.
+More recent cross-grid and
 foundation-model efforts---including GridSFM \cite{yang2026gridsfm},
 gridfm-graphkit and GENCO \cite{gridfmgraphkit2026,puech2026genco},
 and LUMINA \cite{li2026lumina}---extend this direction with global context
-and rich, heterogeneous, topology-aware representations \cite{dejongh2022physics} designed to operate
+and topology-aware representations of heterogeneous grid components \cite{dejongh2022physics} designed to operate
 across diverse grids and operating conditions \cite{zheng2022glassoformer, karim2026domainadaptation}. However, accurate voltage
-prediction does not necessarily imply AC-consistent output
+prediction does not necessarily imply physical consistency
 \cite{ma2026safepowergraph, shamseldein2026hybrid}. Physics-informed objectives can reduce
 power-flow residuals \cite{nellikkath2022pinn, hu2021physicsguided}, but remain soft training
 objectives and do not by themselves enforce exact satisfaction of the nonlinear AC equations \cite{kim2026pignn}.
@@ -105,13 +102,13 @@ their orientation across buses.
 \end{figure}
 
 Goodwin et al.~\cite{goodwin2026geometry} characterized the differential
-geometry and linear approximations of the AC-PF solution manifold. We instead study neural-surrogate error geometry empirically, asking
+geometry and linear approximations of the AC-PF solution manifold. We study neural-surrogate error geometry empirically, asking
 whether error orientation relative to a training-derived subspace
 explains the remaining physical inconsistency. This also differs from
 Park et al.~\cite{park2024compact}, who use a principal component analysis based output space during training and to warm-start an exact solver, whereas we use a training-solution subspace to analyze and post-process frozen AC-PF predictions.
 
 We evaluate PIGNN-GC, GridSFM, gridfm-graphkit, and LUMINA on realistic
-2224-bus GBnetwork scenarios. From training solutions only, we construct
+2224-bus GBnetwork scenarios. Using training solutions only, we construct
 separate singular value decomposition (SVD) subspaces for voltage magnitude and angle and decompose
 calibrated prediction errors into in- and off-subspace components.
 Fixed-norm interventions and local Jacobian analysis show that
@@ -136,8 +133,8 @@ operating distribution.
 
 \subsection{AC power-balance consistency and calibration}
 
-For an $N$-bus grid, let $x=[|V|,\theta]\in\mathbb{R}^{2N}$ denote the
-voltage state, with $\underline V=|V|\odot e^{\jmath\theta}$.
+For an $N$-bus grid, let $x=[V,\theta]\in\mathbb{R}^{2N}$ denote the
+voltage state, with $\underline V=V\odot e^{\jmath\theta}$.
 Given operating condition $u$, a surrogate predicts $\hat{x}=f_\phi(u)$, from which $(P,Q)$
 are recomputed using the network admittance model. For setpoints
 $(P^{\mathrm{set}},Q^{\mathrm{set}})$, we define
@@ -179,7 +176,7 @@ P_k=W_kW_k^\top,
 \end{equation}
 where $W_k=\operatorname{diag}(W_{V,k},W_{\theta,k})$ contains the
 leading $k$ directions per channel; $k=16$ denotes 16 per channel.
-These subspaces capture dominant training-solution variation and define the error coordinates.
+% These subspaces capture dominant training-solution variation and define the error coordinates.
 
 For calibrated error $e=\hat x^C-x^\star$,
 \begin{equation}
@@ -196,7 +193,7 @@ Around a converged state with fixed topology and bus types,
 \begin{equation}
 r(x^\star+e;u)
 =
-J(x^\star;u)e+\mathcal{O}(\|e\|_2^2),
+r(x^\star;u)+J(x^\star;u)e+\mathcal{O}(\|e\|_2^2),
 \label{eq:local_residual}
 \end{equation}
 where $r(x^\star;u)=0$ and $J$ is the AC residual Jacobian; hence
@@ -219,7 +216,7 @@ equal-norm errors can yield different residuals by orientation.
 % where $r(x^\star;u)=0$ and $J$ is the AC residual Jacobian; hence
 % equal-norm errors can yield different residuals by orientation.
 
-Motivated by this directional sensitivity, CSP first removes $\hat{b}$ and then projects onto the dominant training-solution directions:
+Motivated by this orientational sensitivity, CSP first removes $\hat{b}$ and then projects onto the dominant training-solution directions:
 \begin{equation}
 \boxed{
 \hat x^{\mathrm{CSP}}
@@ -232,7 +229,6 @@ P_k\left(\hat x-\hat b-\bar x_{\mathrm{tr}}\right)
 \end{equation}
 where $\bar x_{\mathrm{tr}}$ is the training-solution mean;
 both $\bar x_{\mathrm{tr}}$ and $P_k$ remain fixed at test time.
-
 Projection can remove prediction error but also discard valid reference
 variation. Let
 $e^C=\hat x^C-x^\star$ and
@@ -273,13 +269,10 @@ All models are trained from scratch using model-specific stable
 initialization, and CSP is evaluated within each frozen model.
 % Unless otherwise stated, results are averaged over three model seeds; single-seed diagnostic analyses use one fixed seed.
 gridfm-graphkit uses its released architecture/configuration without a
-pretrained checkpoint. GridSFM retains the released backbone but is adapted
-from AC-OPF to AC-PF by fixing generator dispatch and training only for
-voltage-state prediction with PF-specific residuals. LUMINA likewise retains
-its released backbone but uses an enhanced AC-PF configuration with
-known-variable masking, electrical bus features, and stabilized initialization.
-All models use pre-solution pandapower~\cite{zimmerman2011matpower,thurner2018pandapower} internal PPC-derived inputs and a common PPC-based AC power-balance residual evaluator.
-. Training and inference use one NVIDIA H100 96-GB GPU; inference uses
+pretrained checkpoint. Both GridSFM and LUMINA retain their released backbones and are adapted
+from AC-OPF to AC-PF by fixing generator dispatch, predicting only voltage
+states with PF-specific residuals, and applying known-variable masking.
+All models use pre-solution pandapower~\cite{zimmerman2011matpower,thurner2018pandapower} internal PPC-derived inputs and a common PPC-based AC power-balance residual evaluator. Training and inference use one NVIDIA H100 96-GB GPU; inference uses
 the largest fitting batch size. Calibration statistics and solution
 bases use training data only. From $k\in\{4,8,16,32,64\}$, validation
 Mean PB selects $k^\star=16$ without degrading calibrated
@@ -329,7 +322,7 @@ the corresponding output transform, reported per scenario.
 \begin{tabular}{llrrrrrrr}
 \toprule
 Model & Output &
-$|V|$ RMSE $\downarrow$ &
+$V$ RMSE $\downarrow$ &
 $\theta$ RMSE ($^\circ$) $\downarrow$ &
 $R_{\mathrm{w}}^2 \uparrow$ &
 $a_{\mathrm{w}}$ &
@@ -510,6 +503,7 @@ LUMINA
 % We vary the orientation of the voltage-magnitude error relative to the
 % training-derived solution subspace while holding its $\ell_2$ norm fixed,
 % thereby isolating direction from error magnitude.
+\noindent\textit{Off-subspace error.}
 Although the rank-16 basis explains 98.8\%/99.7\% of training
 voltage-magnitude/angle variation, the median fractions of total squared
 error lying outside the respective subspaces are
@@ -521,6 +515,8 @@ norms, scenarios with larger off-subspace fractions tend to have higher
 Mean PB, with partial Spearman correlations of
 .659/.635/.594/.833 for magnitude and
 .789/.906/.809/.860 for angle (all 95\% CIs exclude zero).
+
+\noindent\textit{Fixed-norm intervention.}
 We next test this directional association with an oracle diagnostic using
 the known reference state, varying the voltage-magnitude error orientation
 at fixed $\ell_2$ norm. We define
@@ -543,18 +539,19 @@ Because the voltage-magnitude error norm is fixed throughout the intervention,
 these results show that error orientation affects AC power-balance violation
 independently of error magnitude.
 
+\noindent\textit{Jacobian sensitivity.}
 Consistent with the fixed-norm experiment, a local Jacobian analysis
 using directional gain $g(d)=\|Jd\|_2/\|d\|_2$ shows that off-subspace
 perturbations have larger gain than in-subspace perturbations.
-In a model-independent audit of 4,096 paired random directions at 128
-held-out operating points, the median paired off-/in-subspace Jacobian
-gain ratio is $1{,}563\times$. The same directional sensitivity is
-present in the actual calibrated prediction errors: the ratios of median
-off- to in-subspace gains are $22.81\times$, $575.83\times$,
-$4.69\times$, and $6.51\times$ for PIGNN-GC, GridSFM,
-gridfm-graphkit, and LUMINA, respectively. The observed error regime is consistent with the first-order expansion in
-Eq.~\eqref{eq:local_residual}, with median linearized-to-nonlinear
-residual-change ratios between $0.996$ and $1.009$ across all four models.
+Using 32 random direction pairs at each of 128 held-out operating points,
+the median paired off-/in-subspace gain ratio is $1{,}563\times$.
+The same gain contrast appears in the actual calibrated prediction errors:
+the ratios of median off- to in-subspace gains are $22.81\times$,
+$575.83\times$, $4.69\times$, and $6.51\times$ for PIGNN-GC, GridSFM,
+gridfm-graphkit, and LUMINA, respectively. The observed error regime is
+consistent with the first-order expansion in Eq.~\eqref{eq:local_residual},
+with median linearized-to-nonlinear residual-change ratios between
+$0.996$ and $1.009$ across all four models.
 
 
 
@@ -572,16 +569,26 @@ residual-change ratios between $0.996$ and $1.009$ across all four models.
 
 
 \subsection{Solution subspace specificity.}
-Matched random, graph-Laplacian, and spatial low-pass projections all
-degrade voltage-magnitude accuracy and scenario tracking and increase
-AC residuals relative to the solution-SVD basis
-(Table~\ref{tab:basis_control}), showing that CSP gains depend on
-training-solution geometry rather than generic dimensionality reduction
-or smoothing.
+To test whether CSP benefits merely from preserving most reference-state
+variation, we compare SVD$_{16}$ with graph-Laplacian and spatial low-pass
+controls. Using training references only, each control is tuned to retain
+the same amount of $V/\theta$ variation as SVD$_{16}$.
+On the test set, all three therefore preserve nearly identical reference
+variation (Table~\ref{tab:basis_control}), yet the controls produce
+substantially larger PB for both projected references and corrected
+predictions. Thus, preserving the amount of state variation alone is
+insufficient; physical consistency also depends on which state-space
+directions are retained.
+% Matched random, graph-Laplacian, and spatial low-pass projections all
+% degrade voltage-magnitude accuracy and scenario tracking and increase
+% AC residuals relative to the solution-SVD basis
+% (Table~\ref{tab:basis_control}), showing that CSP gains depend on
+% training-solution geometry rather than generic dimensionality reduction
+% or smoothing.
 
 % Matched random, Laplacian low-frequency, and spatial low-pass projections
 % test whether CSP merely exploits dimensionality reduction or smoothing.
-% Only the solution SVD improves $|V|$ accuracy and PB while raising
+% Only the solution SVD improves $V$ accuracy and PB while raising
 % $R_{\mathrm{w}}^2$ from $.685$ to $.853$ with nearly unchanged
 % $a_{\mathrm{w}}$; all controls degrade tracking and residuals.
 % Thus, the gain depends on basis orientation rather than low dimensionality
@@ -596,36 +603,70 @@ or smoothing.
 \begin{table}[t]
 \centering
 \caption{
-Basis controls on GBnetwork for PIGNN-GC ($k=16$).
-Random denotes the mean over eight independently sampled bases.
+Basis controls on GBnetwork for PIGNN-GC.
+Parentheses denote $V/\theta$ ranks or smoothing strengths.
 }
 \label{tab:basis_control}
-\setlength{\tabcolsep}{2.2pt}
+\setlength{\tabcolsep}{1.8pt}
 \footnotesize
-\resizebox{\columnwidth}{!}{
-\begin{tabular}{lrrrrr}
+\begin{tabular}{lrrr}
 \toprule
-Projection &
-$|V|$ RMSE $\downarrow$ &
-$\theta$ RMSE ($^\circ$) $\downarrow$ &
-$R_{\mathrm{w}}^2 \uparrow$ &
-$a_{\mathrm{w}}$ &
-Mean PB $\downarrow$ \\
+Control &
+Ref. var. retained (\%) &
+Ref. PB &
+Pred. PB \\
 \midrule
-None ($C$)
-& .01421 & \textbf{.753} & .68522 & \textbf{.49329} & .14511 \\
-Solution SVD
-& \textbf{.01287} & .822 & \textbf{.85299} & .48903 & \textbf{.05690} \\
-Random
-& .02336 & 6.825 & .00540 & .00290 & 17.74 \\
-Laplacian LF
-& .02132 & 5.901 & .20128 & .12304 & 30.53 \\
-Spatial LP
-& .01568 & 1.926 & .63080 & .40717 & 29.29 \\
+SVD ($16/16$)
+& $98.789/99.683$
+& \textbf{.0415}
+& \textbf{.0569} \\
+
+Laplacian matched ($1750/2122$)
+& $98.819/99.688$
+& 26.15
+& 26.22 \\
+
+Spatial matched ($\beta=.357/.208$)
+& $98.801/99.684$
+& 6.20
+& 6.22 \\
 \bottomrule
 \end{tabular}
-}
 \end{table}
+
+% \begin{table}[t]
+% \centering
+% \caption{
+% Basis controls on GBnetwork for PIGNN-GC ($k=16$).
+% Random denotes the mean over eight independently sampled bases.
+% }
+% \label{tab:basis_control}
+% \setlength{\tabcolsep}{2.2pt}
+% \footnotesize
+% \resizebox{\columnwidth}{!}{
+% \begin{tabular}{lrrrrr}
+% \toprule
+% Projection &
+% $V$ RMSE $\downarrow$ &
+% $\theta$ RMSE ($^\circ$) $\downarrow$ &
+% $R_{\mathrm{w}}^2 \uparrow$ &
+% $a_{\mathrm{w}}$ &
+% Mean PB $\downarrow$ \\
+% \midrule
+% None ($C$)
+% & .01421 & \textbf{.753} & .68522 & \textbf{.49329} & .14511 \\
+% Solution SVD
+% & \textbf{.01287} & .822 & \textbf{.85299} & .48903 & \textbf{.05690} \\
+% Random
+% & .02336 & 6.825 & .00540 & .00290 & 17.74 \\
+% Laplacian LF
+% & .02132 & 5.901 & .20128 & .12304 & 30.53 \\
+% Spatial LP
+% & .01568 & 1.926 & .63080 & .40717 & 29.29 \\
+% \bottomrule
+% \end{tabular}
+% }
+% \end{table}
 
 % \subsection{Shrinkage control.}
 % To test whether CSP simply benefits from contracting predictions toward
@@ -638,10 +679,10 @@ Spatial LP
 % \qquad 0\leq\lambda\leq1.
 % \]
 % We select $\lambda$ on the validation set by minimizing Mean PB subject
-% to $|V|$ RMSE not exceeding that of calibration. The only admissible
+% to $V$ RMSE not exceeding that of calibration. The only admissible
 % value is $\lambda^\star=1$, i.e., no shrinkage. Without this accuracy
 % constraint, $\lambda=.125$ lowers Mean PB by 17.1\% but increases
-% $|V|$ RMSE by 55.1\% and angle RMSE from $.734^\circ$ to $5.940^\circ$.
+% $V$ RMSE by 55.1\% and angle RMSE from $.734^\circ$ to $5.940^\circ$.
 % Moreover, shrinkage leaves $R_{\mathrm{w}}^2$ nearly unchanged while
 % reducing $a_{\mathrm{w}}$ approximately in proportion to $\lambda$.
 % Thus, unlike CSP, scalar shrinkage trades prediction accuracy and
@@ -705,7 +746,7 @@ initializer for Newton refinement.
 \centering
 \caption{
 One Newton update from calibrated or CSP$_{16}$ outputs on GBnetwork.
-$|V|$ RMSE and Mean PB are reported in $10^{-3}$.
+$V$ RMSE and Mean PB are reported in $10^{-3}$.
 Values are means $\pm$ standard deviations over three model seeds.
 }
 \label{tab:nr1}
@@ -714,7 +755,7 @@ Values are means $\pm$ standard deviations over three model seeds.
 \begin{tabular}{llrrr}
 \toprule
 Model & Start &
-$|V|$ RMSE &
+$V$ RMSE &
 $\theta$ RMSE ($^\circ$) &
 Mean PB \\
 & & $(10^{-3})$ & & $(10^{-3})$ \\
@@ -809,7 +850,7 @@ whereas R refits both on condition-matched training data.
 \begin{tabular}{lrrrrrrrr}
 \toprule
 Condition &
-\(|V|\) RMSE &
+\(V\) RMSE &
 $R_{\mathrm{w}}^2 \uparrow$ &
 $a_{\mathrm{w}}$ &
 Mean &
@@ -880,8 +921,8 @@ This work identifies output-error geometry as an important factor in the
 accuracy--consistency gap of neural AC-PF surrogates. Fixed-norm and
 Jacobian analyses reveal strong directional sensitivity of AC residuals,
 while CSP reduces power-balance residuals and improves voltage-magnitude
-accuracy on GBnetwork. CSP also improves voltage accuracy and mean power-balance residuals after one Newton update, supporting its complementary role in
-residual-directed refinement. Cross-grid evaluation shows that the power-balance
+accuracy on GBnetwork. After one Newton update, CSP further improves voltage accuracy and mean
+power-balance residuals, supporting its complementary role in refinement. Cross-grid evaluation shows that the power-balance
 improvement extends beyond GBnetwork, whereas distribution-shift experiments
 show that a fixed solution subspace can become mismatched to the shifted
 operating distribution. These results motivate extending physics-consistent

@@ -70,7 +70,7 @@ analysis \cite{zimmerman2011matpower}, repeatedly evaluated in time-series
 and contingency studies \cite{bolz2023contingency} and underlying optimal power flow (OPF)
 \cite{frank2012opf, owerko2020opf} and state-estimation workflows
 \cite{cheng2024stateestimation}.
-This computational burden has motivated neural surrogates including direct data-driven approximation~\cite{owerko2024unsupervised,xu2025opformer,donon2020graphsolver, lin2024powerflownet}, physics- or constraint-aware training \cite{wen2026pigat,jiang2025upinn}, learned projection-based correction \cite{chzhen2026fab}, and feasibility-seeking mechanisms \cite{nguyen2025fsnet,donti2021dc3}.
+This computational burden has motivated neural surrogates including direct data-driven approximation~\cite{xu2025opformer,donon2020graphsolver,lin2024powerflownet}, physics- or constraint-aware training \cite{owerko2024unsupervised,wen2026pigat,jiang2025upinn}, learned projection-based correction \cite{chzhen2026fab}, and feasibility-seeking mechanisms \cite{nguyen2025fsnet,donti2021dc3}.
 More recent cross-grid and
 foundation-model efforts--including GridSFM \cite{yang2026gridsfm},
 gridfm-graphkit and GENCO \cite{gridfmgraphkit2026,puech2026genco},
@@ -85,11 +85,13 @@ Physics-informed objectives can reduce power-flow residuals
 objectives and do not by themselves enforce exact satisfaction of the nonlinear
 AC equations \cite{kim2026pignn}. Consequently, neural surrogates with small
 voltage errors can still exhibit non-negligible power-balance violations.
-We study this discrepancy as the \emph{accuracy--consistency gap} and ask
+We refer this discrepancy as the \emph{accuracy--consistency gap} and ask
 which properties of the remaining prediction error govern its physical impact.
+
 We hypothesize that error \emph{direction}, rather than magnitude alone, is
 an important factor: similarly sized voltage errors can induce substantially
-different AC residuals depending on their orientation across buses. This
+different AC residuals depending on their orientation across buses. Recent work has examined directional effects of warm-start errors in the distinct
+context of Newton--Raphson convergence~\cite{bose2026newtons}. This
 motivates studying the \emph{geometry} of neural-surrogate errors in the
 voltage-state space.
 
@@ -103,12 +105,12 @@ voltage-state space.
 \end{figure}
 
 Goodwin et al.~\cite{goodwin2026geometry} characterized the differential
-geometry and linear approximations of the AC-PF solution manifold, while
-Park et al.~\cite{park2024compact} empirically showed that AC-OPF solutions
-are highly compressible in a low-dimensional principal-component
-representation. Motivated by this evidence of low-dimensional solution
+geometry of the AC-PF solution manifold, while
+Park et al.~\cite{park2024compact} and Chevalier et al.~\cite{chevalier2022accelerated}
+demonstrated low-dimensional structure in AC-OPF and PF solutions,
+respectively. Motivated by this evidence of low-dimensional solution
 structure, we ask whether neural prediction errors relative to a
- \emph{training solution subspace} help explain physical inconsistency,
+\emph{training solution subspace} help explain physical inconsistency,
 and whether this structure can be exploited to reduce power-balance
 violations.
 
@@ -822,7 +824,7 @@ shifts, with degradation concentrated in isolated worst-case violations,
 whereas GBcorr causes a broader performance drop.
 Under the topology shifts, voltage accuracy, tracking, and bulk PB remain
 close to control, while larger maxima motivate worst-case assessment beyond
-average error~\cite{piloto2024canos}. GBcorr applies correlated, spatially
+average error. GBcorr applies correlated, spatially
 varying load scaling across 14 zones while preserving total demand and
 generation settings. Transferring both calibration and basis gives Mean PB
 $\approx0.100$ p.u.; refitting calibration alone reduces this to $0.0944$,

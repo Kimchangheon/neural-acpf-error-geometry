@@ -97,7 +97,7 @@ voltage-state space.
 \begin{figure}[t]
     \centering
     \includegraphics[width=\columnwidth]
-    {csp_diagram_finished_x2.pdf}
+    {csp_diagram_finished_big.pdf}
     \caption{Bias calibration and solution-subspace projection jointly suppress systematic bias and off-subspace prediction components, improving both voltage accuracy and AC power-balance consistency.}
     \label{fig:graphical_abstract}
 \end{figure}
@@ -248,8 +248,8 @@ Since $P_k$ is orthogonal,
 Hence, CSP improves state accuracy when the removed off-subspace
 prediction-error energy exceeds the discarded reference variation.
 
-CSP is a lightweight, data-driven post-hoc output correction, not a projection onto the
-nonlinear AC-feasible set, and therefore does not guarantee exact feasibility.
+CSP is a lightweight, data-driven post-hoc output correction rather than a projection onto the nonlinear AC-feasible set; it therefore does not guarantee exact feasibility, but improve physical consistency by suppressing residual-sensitive off-subspace prediction.
+
 
 \section{Experiments and Results}
 \label{sec:experiments}
@@ -273,7 +273,7 @@ gridfm-graphkit uses its released architecture/configuration without a
 pretrained checkpoint. Both GridSFM and LUMINA retain their released backbones and are adapted
 from AC-OPF to AC-PF by fixing generator dispatch, predicting only voltage
 states with PF-specific residuals, and applying known-variable masking.
-All models use pre-solution pandapower~\cite{zimmerman2011matpower,thurner2018pandapower} internal PPC-derived inputs and a common PPC-based AC power-balance residual evaluator. Training and inference use one NVIDIA H100 96-GB GPU; inference timing
+All models use pre-solution pandapower~\cite{zimmerman2011matpower,thurner2018pandapower} internal PPC-derived inputs. Training and inference use one NVIDIA H100 96-GB GPU; inference timing
 uses the largest memory-fitting batch size to maximize GPU utilization. Calibration statistics and solution
 bases use training data only. From $k\in\{4,8,16,32,64\}$, validation
 Mean PB selects $k^\star=16$ without degrading calibrated
@@ -530,10 +530,10 @@ error orientation at fixed $\ell_2$ norm:
 {\|e_V^\parallel+\alpha e_V^\perp\|_2}.
 \label{eq:controlled_geometry}
 \end{equation}
-Decreasing $\alpha$ suppresses off-subspace error; the control analogously
+where phase angles remain at their calibrated predictions. Decreasing $\alpha$ suppresses off-subspace error; the control analogously
 suppresses the in-subspace component by exchanging
-$e_V^\parallel$ and $e_V^\perp$. Phase angles remain at their calibrated
-predictions, and Mean PB is normalized at $\alpha=1$.
+$e_V^\parallel$ and $e_V^\perp$.
+\vspace{0.35em}
 
 \noindent\textit{Jacobian sensitivity.}
 Off-subspace directions are substantially more residual-sensitive than
@@ -552,7 +552,7 @@ residual-change ratios between $0.996$ and $1.009$ across all four models.
 \begin{figure}[t]
     \centering
     \includegraphics[width=\columnwidth]
-    {figure1_controlled_error_geometry_axis_labels_fixed.pdf}
+    {figure1_controlled_error_geometry_larger_text_final_v9_recreated.pdf}
     \caption{
     Fixed-norm directional intervention on GBnetwork, with Relative Mean PB
     normalized at $\alpha=1$.
@@ -696,7 +696,7 @@ Magnitude-only, angle-only, and full projection show model-dependent effects of
 angle projection. PIGNN-GC achieves the lowest PB with full CSP, whereas
 GridSFM performs best with magnitude-only projection. For gridfm-graphkit,
 adding angle projection reduces Mean/Max PB from $.0612/18.23$ to $.0457/5.08$,
-but increases angle RMSE from $.367^\circ$ to $.496^\circ$. For LUMINA, it
+but degrades angle RMSE from $.367^\circ$ to $.496^\circ$. For LUMINA, it
 reduces Mean/Max PB from $.1939/38.53$ to $.0660/4.51$ while improving angle RMSE
 from $1.374^\circ$ to $1.215^\circ$. Thus, better physical consistency from
 angle projection need not imply better angle accuracy.
@@ -712,7 +712,7 @@ the opposite holds for LUMINA.
 
 \begin{figure}[t]
     \centering
-    \includegraphics[width=1.0\columnwidth]{gridsfm_raw_vs_csp16_discrete3.pdf}
+    \includegraphics[width=1.0\columnwidth]{gridsfm_raw_vs_csp16_discrete3_larger_text_v7.pdf}
     \caption{
     Grid-by-grid physical consistency of GridSFM before and after
     CSP$_{16}$ across 31 systems ordered by bus count. Mean PB is shown
@@ -727,8 +727,7 @@ CSP provides a consistently better initialization for one-step Newton
 refinement, improving both state accuracy and post-update physical
 consistency across all four models. Starting from $C$ or CSP$_{16}$, we
 apply one Newton update ($\mathrm{NR}_1$) to non-slack angles and PQ voltage
-magnitudes, with validation-selected damping factor; $\eta=1$ is
-selected for all models, with no linear-solve failures. Relative to $C$
+magnitudes, with validation-selected damping factor; $\eta=1$ selected for all models, with no linear-solve failures. Relative to $C$
 initialization, CSP lowers magnitude and angle RMSE in all models and
 reduces post-update Mean PB by $21.1$--$96.4\%$
 (Table~\ref{tab:nr1}).
@@ -818,7 +817,7 @@ PV-voltage setpoints vary for most systems, but remain fixed for GBnetwork due t
 \vspace{0.35em}
 
 \noindent\textit{Topology and spatial shifts.}
-CSP remains stable in bulk performance under $N$--1/$N$--2 topology
+CSP remains stable in most statistics under $N$--1/$N$--2 topology
 shifts, with degradation concentrated in isolated worst-case violations,
 whereas GBcorr causes a broader performance drop.
 Under the topology shifts, voltage accuracy, tracking, and bulk PB remain
@@ -914,7 +913,17 @@ GBcorr (R)
 
 \section{CONCLUSION}
 
-This work identifies output-error geometry as an important factor in the accuracy--consistency gap of neural AC-PF surrogates. Fixed-norm and Jacobian analyses reveal strong directional sensitivity of AC residuals, while CSP reduces power-balance residuals and improves voltage-magnitude accuracy on GBnetwork. After one Newton update, CSP further improves voltage accuracy and mean power-balance residuals, supporting its complementary role in refinement. Cross-grid evaluation shows that the power-balance improvement extends beyond GBnetwork, whereas distribution-shift experiments show that a fixed solution subspace can become mismatched to the shifted operating distribution. These results motivate extending physics-consistent neural surrogates toward broader power-system analysis, estimation, and optimization.
+This work identifies output-error geometry as a key source of the gap
+between voltage accuracy and physical consistency in neural AC
+power-flow surrogates. Across four architecturally diverse neural surrogates, we show that small voltage errors can contain off-subspace
+components that induce large AC power-balance violations. Building on
+this insight, calibrated solution-subspace projection suppresses these
+components, reducing voltage-magnitude error and power-balance residuals
+without retraining; the residual reduction extends to 31 additional
+grids. These results suggest that error direction, not only magnitude,
+should inform surrogate evaluation and design. They also motivate
+extending physics-consistent neural surrogates toward broader
+power-system analysis, estimation, and optimization.
 
 
 

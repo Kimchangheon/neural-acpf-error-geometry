@@ -100,7 +100,7 @@ voltage-state space.
     \centering
     \includegraphics[width=\columnwidth]
     {csp_diagram_finished_big.pdf}
-    \caption{Bias calibration and solution-subspace projection jointly suppress systematic bias and off-subspace prediction components, improving both voltage accuracy and AC power-balance consistency.}
+    \caption{A low-dimensional subspace is derived from the training solutions. CSP first removes train-estimated bias and projects the corrected prediction onto this subspace, suppressing off-subspace errors and improving voltage accuracy and AC power-balance consistency.}
     \label{fig:graphical_abstract}
 \end{figure}
 
@@ -168,13 +168,13 @@ Before geometric analysis, we remove train-only prediction bias:
 \qquad
 \hat x^C=\hat x-\hat b,
 \]
-with $\hat b$ frozen at test time; angle offsets use circular differences
-after gauge alignment.
+with $\hat b$ frozen at test time; angle bias is estimated as the
+per-bus circular mean of wrapped prediction errors.
 
 \subsection{Error geometry and training solution subspace projection}
 
 From training Newton--Raphson solutions, we construct rank-$k$
-bases for centered magnitudes $X_V$ and gauge-aligned angles $X_\theta$:
+bases for centered magnitudes $X_V$ and circularly centered angles $X_\theta$:
 \begin{equation}
 X_V=W_V\Sigma_VU_V^\top,\qquad
 X_\theta=W_\theta\Sigma_\theta U_\theta^\top,\qquad
@@ -250,7 +250,12 @@ Since $P_k$ is orthogonal,
 Hence, CSP improves state accuracy when the removed off-subspace
 prediction-error energy exceeds the discarded reference variation.
 
-CSP is a lightweight, data-driven post-hoc output correction rather than a projection onto the nonlinear AC-feasible set; it therefore does not guarantee exact feasibility, but improve physical consistency by suppressing residual-sensitive off-subspace prediction.
+CSP is a lightweight, data-driven post-hoc output correction rather than a projection onto the nonlinear AC-feasible set; it therefore does not guarantee exact feasibility, but can improve physical consistency when the removed off-subspace components are residual-sensitive under the local AC Jacobian.
+
+% but can improve physical consistency when the removed
+% off-subspace components are residual-sensitive under the local AC Jacobian.
+
+% improve physical consistency by suppressing residual-sensitive off-subspace prediction.
 
 
 \section{Experiments and Results}
@@ -275,8 +280,8 @@ gridfm-graphkit uses its released architecture/configuration without a
 pretrained checkpoint. Both GridSFM and LUMINA retain their released backbones and are adapted
 from AC-OPF to AC-PF by fixing generator dispatch, predicting only voltage
 states with PF-specific residuals, and applying known-variable masking.
-All models use pre-solution pandapower~\cite{zimmerman2011matpower,thurner2018pandapower} internal PPC-derived inputs. Training and inference use one NVIDIA H100 96-GB GPU; inference timing
-uses the largest memory-fitting batch size to maximize GPU utilization. Calibration statistics and solution
+All models use pre-solution pandapower~\cite{zimmerman2011matpower,thurner2018pandapower} internal PPC-derived inputs. Training and inference use one NVIDIA H100 96-GB GPU; inference timing uses the
+largest memory-fitting batch to maximize GPU utilization. Calibration statistics and solution
 bases use training data only. From $k\in\{4,8,16,32,64\}$, validation
 Mean PB selects $k^\star=16$ without degrading calibrated
 voltage-magnitude RMSE and is frozen for test and distribution-shift experiments.
@@ -685,9 +690,7 @@ Spatial matched ($\beta=.357/.208$)
 
 \subsection{Post-training CSP correction}
 
-Table~\ref{tab:intervention} compares raw predictions, calibration ($C$),
-projection ($P_{16}$), and CSP$_{16}$ on frozen outputs from PIGNN-GC,
-GridSFM, gridfm-graphkit, and LUMINA. Relative to $C$, CSP reduces Mean
+Table~\ref{tab:intervention} compares Raw, $C$, $P_{16}$, and CSP$_{16}$ across the four frozen surrogates. Relative to $C$, CSP reduces Mean
 PB by $67.0\%$, $37.8\%$, $40.5\%$, and $68.9\%$, respectively, while
 lowering voltage-magnitude RMSE in all four models.
 Projection improves $R_w^2$ with little change in $a_w$; angle
@@ -807,14 +810,14 @@ LUMINA
 \label{sec:breadth_shift}
 
 \noindent\textit{Cross-grid breadth.}
-CSP reduces GridSFM Mean PB across all 31 evaluated systems
+CSP reduces GridSFM Mean PB across all 31 systems
 (Fig.~\ref{fig:crossgrid_csp}), spanning 4--9,241 buses and sub-kV to
 750-kV levels. The set includes 28 pandapower/PYPOWER-format systems
 from IEEE, PEGASE, RTE, and GB benchmark families, plus three Common
 Information Model (CIM)-based networks. For each system, calibration and
 subspace statistics are fitted from its training data, using nominal
 $k=16$ per channel and the available SVD components on smaller systems.
-PV-voltage setpoints vary for most systems, but remain fixed for GBnetwork due to conflicting controllers.
+PV-voltage setpoints vary for most systems, but are fixed for GBnetwork with conflicting controllers.
 
 \vspace{0.35em}
 

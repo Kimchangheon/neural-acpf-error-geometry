@@ -59,7 +59,7 @@ Code: \href{http://github.com/Kimchangheon/neural-acpf-error-geometry}{github.co
 
 
 \begin{keywords}
-AC power flow, physics-informed neural network, error geometry, calibration, subspace projection
+AC power flow, physics-informed neural network, graph neural network, error geometry, subspace projection
 \end{keywords}
 
 \section{Introduction}
@@ -70,7 +70,7 @@ analysis \cite{zimmerman2011matpower}, repeatedly evaluated in time-series
 and contingency studies \cite{bolz2023contingency} and underlying optimal power flow (OPF)
 \cite{frank2012opf, owerko2020opf} and state-estimation workflows
 \cite{cheng2024stateestimation}.
-This computational burden has motivated neural surrogates including direct data-driven approximation~\cite{xu2025opformer,donon2020graphsolver,lin2024powerflownet}, physics- or constraint-aware training \cite{owerko2024unsupervised,wen2026pigat,jiang2025upinn}, learned projection-based correction \cite{chzhen2026fab}, and feasibility-seeking mechanisms \cite{nguyen2025fsnet,donti2021dc3}.
+This computational burden has motivated neural surrogates including direct data-driven approximation~\cite{donon2020graphsolver,lin2024powerflownet,  xu2025opformer}, physics- or constraint-aware training \cite{owerko2024unsupervised,jiang2025upinn,wen2026pigat}, learned projection-based correction \cite{chzhen2026fab}, and feasibility-seeking mechanisms \cite{nguyen2025fsnet,donti2021dc3}.
 More recent cross-grid and
 foundation-model efforts--including GridSFM \cite{yang2026gridsfm},
 gridfm-graphkit and GENCO \cite{gridfmgraphkit2026,puech2026genco},
@@ -85,7 +85,7 @@ Physics-informed objectives can reduce power-flow residuals
 objectives and do not by themselves enforce exact satisfaction of the nonlinear
 AC equations \cite{kim2026pignn}. Consequently, neural surrogates with small
 voltage errors can still exhibit non-negligible power-balance violations.
-We refer this discrepancy as the \emph{accuracy--consistency gap} and ask
+We refer to discrepancy as the \emph{accuracy--consistency gap} and ask
 which properties of the remaining prediction error govern its physical impact.
 
 We hypothesize that error \emph{direction}, rather than magnitude alone, is

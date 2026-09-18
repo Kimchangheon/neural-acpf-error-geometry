@@ -91,7 +91,7 @@ which properties of the remaining prediction error govern its physical impact.
 We hypothesize that error \emph{direction}, rather than magnitude alone, is
 an important factor: similarly sized voltage errors can induce substantially
 different AC residuals depending on their orientation across buses. Recent work has examined directional effects of warm-start errors in the distinct
-context of Newton--Raphson convergence~\cite{bose2026newtons}. This
+context of Newton--Raphson (NR) convergence~\cite{bose2026newtons}. This
 motivates studying the \emph{geometry} of neural-surrogate errors in the
 voltage-state space.
 
@@ -168,20 +168,23 @@ Before geometric analysis, we remove train-only prediction bias:
 \qquad
 \hat x^C=\hat x-\hat b,
 \]
-with $\hat b$ frozen at test time; angle bias is estimated as the
+where $s$ indexes scenarios, $\star$ denotes the converged NR reference,
+and $C$ denotes calibration. $\hat b$ is frozen at test time; angle bias is estimated as the
 per-bus circular mean of wrapped prediction errors.
 
 \subsection{Error geometry and training solution subspace projection}
 
-From training Newton--Raphson solutions, we construct rank-$k$
-bases for centered magnitudes $X_V$ and circularly centered angles $X_\theta$:
+From training Newton--Raphson solutions, let
+$X_V,X_\theta\in\mathbb{R}^{S_{\mathrm{tr}}\times N}$ stack centered
+magnitudes and circularly centered angles:
 \begin{equation}
-X_V=W_V\Sigma_VU_V^\top,\qquad
-X_\theta=W_\theta\Sigma_\theta U_\theta^\top,\qquad
-P_k=W_kW_k^\top,
+X_V=W_V\Sigma_VU_V^\top,\quad
+X_\theta=W_\theta\Sigma_\theta U_\theta^\top,\quad
+P_k=U_kU_k^\top,
 \end{equation}
-where $W_k=\operatorname{diag}(W_{V,k},W_{\theta,k})$ contains the
-leading $k$ directions per channel; $k=16$ denotes 16 per channel.
+where $U_k=\operatorname{diag}(U_{V,k},U_{\theta,k})$ contains the
+leading $k$ state-space directions per channel; $k=16$ denotes 16 per channel.
+
 % These subspaces capture dominant training-solution variation and define the error coordinates.
 
 For calibrated error $e=\hat x^C-x^\star$,

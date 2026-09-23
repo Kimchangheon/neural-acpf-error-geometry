@@ -10,6 +10,12 @@
 \usepackage{hyperref}
 \usepackage{graphicx}
 \usepackage{xcolor}
+% Tighter float spacing so body-size tables fit the 4-page limit.
+\setlength{\textfloatsep}{8pt plus 2pt minus 2pt}
+\setlength{\dbltextfloatsep}{8pt plus 2pt minus 2pt}
+\setlength{\floatsep}{6pt plus 2pt minus 2pt}
+\setlength{\dblfloatsep}{6pt plus 2pt minus 2pt}
+\renewcommand{\arraystretch}{0.94}
 \newtheorem{proposition}{Proposition}
 \newcommand{\Rpool}{R^2_{\mathrm{pool}}}
 \newcommand{\Rbus}{R^2_{\mathrm{within}}}
@@ -44,7 +50,7 @@ Even small complex voltage errors can yield large AC power-balance residuals.
 We study this accuracy--consistency gap across PIGNN-GC, GridSFM,
 gridfm-graphkit, and LUMINA on realistic 2224-bus Great Britain network (GBnetwork) scenarios,
 with cross-grid evaluation of GridSFM over 31 systems.
-Using an SVD basis fitted to training AC power-flow solutions, we find
+Using a singular value decomposition (SVD) basis fitted to training AC power-flow solutions, we find
 that neural prediction errors contain substantial components outside the
 dominant solution subspace. To address this mismatch, calibrated
 solution-subspace projection (CSP) suppresses off-subspace prediction
@@ -66,17 +72,20 @@ AC power flow, physics-informed neural network, graph neural network, error geom
 \label{sec:introduction}
 
 AC power flow (AC-PF) is a fundamental tool for steady-state power-system
-analysis \cite{zimmerman2011matpower}, repeatedly evaluated in time-series
-and contingency studies \cite{bolz2023contingency} and underlying optimal power flow (OPF)
-\cite{frank2012opf, owerko2020opf} and state-estimation workflows
+analysis \cite{zimmerman2011matpower}. It is repeatedly solved in congestion
+management \cite{conrad2026congestion} and contingency studies
+\cite{bolz2023contingency}, and underlies optimal power flow (OPF)
+\cite{frank2012opf,owerko2020opf} and state-estimation workflows
 \cite{cheng2024stateestimation}.
-This computational burden has motivated neural surrogates including direct data-driven approximation~\cite{donon2020graphsolver,lin2024powerflownet,  xu2025opformer}, physics- or constraint-aware training \cite{owerko2024unsupervised,jiang2025upinn,wen2026pigat}, learned projection-based correction \cite{chzhen2026fab}, and feasibility-seeking mechanisms \cite{nguyen2025fsnet,donti2021dc3}.
+The need for both computational efficiency and physical consistency has
+motivated neural surrogates including direct data-driven approximation~\cite{donon2020graphsolver,lin2024powerflownet}, physics-informed training \cite{owerko2024unsupervised,jiang2025upinn,wen2026pigat}, feasibility-seeking mechanisms \cite{nguyen2025fsnet,donti2021dc3}, and learned projection-based correction \cite{chzhen2026fab}.
+
 More recent cross-grid and
 foundation-model efforts--including GridSFM \cite{yang2026gridsfm},
 gridfm-graphkit and GENCO \cite{gridfmgraphkit2026,puech2026genco},
 and LUMINA \cite{li2026lumina}--extend this direction with global context
 and topology-aware representations of heterogeneous grid components \cite{dejongh2022physics} designed to operate
-across diverse grids and operating conditions \cite{zheng2022glassoformer, karim2026domainadaptation}.
+across diverse grids and operating conditions \cite{karim2026domainadaptation}.
 
 However, accurate voltage prediction does not necessarily imply physical
 consistency \cite{ma2026safepowergraph,shamseldein2026hybrid}.
@@ -85,7 +94,7 @@ Physics-informed objectives can reduce power-flow residuals
 objectives and do not by themselves enforce exact satisfaction of the nonlinear
 AC equations \cite{kim2026pignn}. Consequently, neural surrogates with small
 voltage errors can still exhibit non-negligible power-balance violations.
-We refer to discrepancy as the \emph{accuracy--consistency gap} and ask
+We refer to this discrepancy as the \emph{accuracy--consistency gap} and ask
 which properties of the remaining prediction error govern its physical impact.
 
 We hypothesize that error \emph{direction}, rather than magnitude alone, is
@@ -109,11 +118,10 @@ geometry of the AC-PF solution manifold, while
 Park et al.~\cite{park2024compact} and Chevalier et al.~\cite{chevalier2022accelerated}
 demonstrated low-dimensional structure in AC-OPF and PF solutions,
 respectively. Motivated by this evidence of low-dimensional solution
-structure, we ask whether neural prediction errors relative to a
-\emph{training solution subspace} help explain physical inconsistency,
-and whether this structure can be exploited to reduce power-balance
-violations.
-
+structure, we ask whether the relationship between neural prediction
+errors and a \emph{training solution subspace} can be quantified to explain
+physical inconsistency, and whether this structure can be exploited to
+reduce power-balance violations.
 
 To address these questions, we make three contributions.
 (i) We decompose calibrated prediction errors of four neural surrogates
@@ -130,7 +138,7 @@ LUMINA models on the 2224-bus GBnetwork, where it lowers AC power-balance
 residuals and voltage-magnitude error in all four models and provides a
 better initialization for one Newton update.
 We further assess its
-generality on 31 additional systems and its robustness under topology
+generality on 30 additional systems and its robustness under topology
 and load-distribution shifts.
 
 
@@ -328,18 +336,18 @@ composition. Inference time is GPU-synchronized forward execution plus
 the corresponding output transform, reported per scenario.
 }
 \label{tab:intervention}
-\setlength{\tabcolsep}{3.5pt}
-\resizebox{\textwidth}{!}{
+\setlength{\tabcolsep}{2.5pt}
 \begin{tabular}{llrrrrrrr}
 \toprule
 Model & Output &
-$V$ RMSE $\downarrow$ &
-$\theta$ RMSE ($^\circ$) $\downarrow$ &
+$V$ RMSE &
+$\theta$ RMSE &
 $R_{\mathrm{w}}^2 \uparrow$ &
 $a_{\mathrm{w}}$ &
-Mean PB $\downarrow$ &
-Max PB $\downarrow$ &
-Inference (ms/scen.) \\
+Mean PB &
+Max PB &
+Inference \\
+& & $\downarrow$ & ($^\circ$) $\downarrow$ & & & $\downarrow$ & $\downarrow$ & (ms/scen.) \\
 \midrule
 
 Per-bus mean
@@ -355,158 +363,158 @@ Per-bus mean
 \midrule
 PIGNN-GC
 & Raw
-& $.02850 \pm .00232$
-& $1.108 \pm .175$
-& $.671 \pm .050$
-& $.546 \pm .072$
-& $.31592 \pm .03240$
-& $195.89 \pm 52.54$
-& $10.034 \pm .023$ \\
+& $.02850{\pm}.00232$
+& $1.108{\pm}.175$
+& $.671{\pm}.050$
+& $.546{\pm}.072$
+& $.31592{\pm}.03240$
+& $195.89{\pm}52.54$
+& $10.034{\pm}.023$ \\
 
 & $C$
-& $.01393 \pm .00105$
-& $\mathbf{.777 \pm .161}$
-& $.671 \pm .050$
-& $.546 \pm .072$
-& $.16661 \pm .02352$
-& $190.00 \pm 37.53$
-& $10.028 \pm .023$ \\
+& $.01393{\pm}.00105$
+& $\mathbf{.777{\pm}.161}$
+& $.671{\pm}.050$
+& $.546{\pm}.072$
+& $.16661{\pm}.02352$
+& $190.00{\pm}37.53$
+& $10.028{\pm}.023$ \\
 
 & $P_{16}$
-& $.01624 \pm .00254$
-& $1.091 \pm .166$
-& $\mathbf{.829 \pm .045}$
-& $.541 \pm .071$
-& $.07594 \pm .00422$
-& $5.07 \pm .85$
-& $10.036 \pm .023$ \\
+& $.01624{\pm}.00254$
+& $1.091{\pm}.166$
+& $\mathbf{.829{\pm}.045}$
+& $.541{\pm}.071$
+& $.07594{\pm}.00422$
+& $5.07{\pm}.85$
+& $10.036{\pm}.023$ \\
 
 & CSP$_{16}$
-& $\mathbf{.01222 \pm .00134}$
-& $.835 \pm .141$
-& $\mathbf{.829 \pm .045}$
-& $.541 \pm .071$
-& $\mathbf{.05497 \pm .00257}$
-& $\mathbf{3.93 \pm .07}$
-& $10.034 \pm .032$ \\
+& $\mathbf{.01222{\pm}.00134}$
+& $.835{\pm}.141$
+& $\mathbf{.829{\pm}.045}$
+& $.541{\pm}.071$
+& $\mathbf{.05497{\pm}.00257}$
+& $\mathbf{3.93{\pm}.07}$
+& $10.034{\pm}.032$ \\
 
 \midrule
 GridSFM
 & Raw
-& $.02868 \pm .01652$
-& $2.294 \pm .302$
-& $.768 \pm .151$
-& $.724 \pm .149$
-& $.26867 \pm .13004$
-& $9.10 \pm 4.02$
-& $25.045 \pm .207$ \\
+& $.02868{\pm}.01652$
+& $2.294{\pm}.302$
+& $.768{\pm}.151$
+& $.724{\pm}.149$
+& $.26867{\pm}.13004$
+& $9.10{\pm}4.02$
+& $25.045{\pm}.207$ \\
 
 & $C$
-& $.01086 \pm .00403$
-& $\mathbf{1.781 \pm .055}$
-& $.768 \pm .151$
-& $.724 \pm .149$
-& $.08251 \pm .01093$
-& $7.29 \pm 3.53$
-& $25.015 \pm .096$ \\
+& $.01086{\pm}.00403$
+& $\mathbf{1.781{\pm}.055}$
+& $.768{\pm}.151$
+& $.724{\pm}.149$
+& $.08251{\pm}.01093$
+& $7.29{\pm}3.53$
+& $25.015{\pm}.096$ \\
 
 & $P_{16}$
-& $.01814 \pm .01145$
-& $2.244 \pm .325$
-& $\mathbf{.936 \pm .032}$
-& $.724 \pm .149$
-& $.07630 \pm .01942$
-& $5.08 \pm .49$
-& $25.087 \pm .279$ \\
+& $.01814{\pm}.01145$
+& $2.244{\pm}.325$
+& $\mathbf{.936{\pm}.032}$
+& $.724{\pm}.149$
+& $.07630{\pm}.01942$
+& $5.08{\pm}.49$
+& $25.087{\pm}.279$ \\
 
 & CSP$_{16}$
-& $\mathbf{.00782 \pm .00307}$
-& $1.807 \pm .053$
-& $\mathbf{.936 \pm .032}$
-& $.724 \pm .149$
-& $\mathbf{.05136 \pm .00143}$
-& $\mathbf{4.94 \pm .42}$
-& $24.577 \pm .091$ \\
+& $\mathbf{.00782{\pm}.00307}$
+& $1.807{\pm}.053$
+& $\mathbf{.936{\pm}.032}$
+& $.724{\pm}.149$
+& $\mathbf{.05136{\pm}.00143}$
+& $\mathbf{4.94{\pm}.42}$
+& $24.577{\pm}.091$ \\
 
 \midrule
-gridfm-graphkit
+gridfm-
 & Raw
-& $.00892 \pm .00154$
-& $.385 \pm .042$
-& $.905 \pm .030$
-& $.811 \pm .045$
-& $.09282 \pm .01763$
-& $19.82 \pm 8.65$
-& $5.917 \pm .019$ \\
+& $.00892{\pm}.00154$
+& $.385{\pm}.042$
+& $.905{\pm}.030$
+& $.811{\pm}.045$
+& $.09282{\pm}.01763$
+& $19.82{\pm}8.65$
+& $5.917{\pm}.019$ \\
+graphkit
 
 & $C$
-& $.00753 \pm .00118$
-& $\mathbf{.367 \pm .042}$
-& $.905 \pm .030$
-& $.811 \pm .045$
-& $.07685 \pm .01307$
-& $18.88 \pm 8.69$
-& $5.730 \pm .004$ \\
+& $.00753{\pm}.00118$
+& $\mathbf{.367{\pm}.042}$
+& $.905{\pm}.030$
+& $.811{\pm}.045$
+& $.07685{\pm}.01307$
+& $18.88{\pm}8.69$
+& $5.730{\pm}.004$ \\
 
 & $P_{16}$
-& $.00617 \pm .00099$
-& $.503 \pm .018$
-& $\mathbf{.959 \pm .008}$
-& $.801 \pm .044$
-& $.04593 \pm .00156$
-& $5.36 \pm .56$
-& $5.723 \pm .011$ \\
+& $.00617{\pm}.00099$
+& $.503{\pm}.018$
+& $\mathbf{.959{\pm}.008}$
+& $.801{\pm}.044$
+& $.04593{\pm}.00156$
+& $5.36{\pm}.56$
+& $5.723{\pm}.011$ \\
 
 & CSP$_{16}$
-& $\mathbf{.00606 \pm .00090}$
-& $.496 \pm .021$
-& $\mathbf{.959 \pm .008}$
-& $.801 \pm .044$
-& $\mathbf{.04571 \pm .00135}$
-& $\mathbf{5.08 \pm .18}$
-& $5.779 \pm .012$ \\
+& $\mathbf{.00606{\pm}.00090}$
+& $.496{\pm}.021$
+& $\mathbf{.959{\pm}.008}$
+& $.801{\pm}.044$
+& $\mathbf{.04571{\pm}.00135}$
+& $\mathbf{5.08{\pm}.18}$
+& $5.779{\pm}.012$ \\
 
 \midrule
 LUMINA
 & Raw
-& $.02653 \pm .00031$
-& $2.703 \pm .313$
-& $.443 \pm .014$
-& $.346 \pm .012$
-& $1.29896 \pm .85056$
-& $664.19 \pm 448.00$
-& $7.548 \pm 0.369$ \\
+& $.02653{\pm}.00031$
+& $2.703{\pm}.313$
+& $.443{\pm}.014$
+& $.346{\pm}.012$
+& $1.29896{\pm}.85056$
+& $664.19{\pm}448.00$
+& $7.548{\pm}0.369$ \\
 
 & $C$
-& $.01780 \pm .00020$
-& $1.442 \pm .060$
-& $.443 \pm .014$
-& $.346 \pm .012$
-& $.21432 \pm .01186$
-& $20.65 \pm 15.82$
-& $7.380 \pm 0.155$ \\
+& $.01780{\pm}.00020$
+& $1.442{\pm}.060$
+& $.443{\pm}.014$
+& $.346{\pm}.012$
+& $.21432{\pm}.01186$
+& $20.65{\pm}15.82$
+& $7.380{\pm}0.155$ \\
 
 & $P_{16}$
-& $.01898 \pm .00049$
-& $2.160 \pm .268$
-& $\mathbf{.906 \pm .012}$
-& $.338 \pm .012$
-& $.07641 \pm .00128$
-& $5.47 \pm .56$
-& $7.981 \pm 0.868$ \\
+& $.01898{\pm}.00049$
+& $2.160{\pm}.268$
+& $\mathbf{.906{\pm}.012}$
+& $.338{\pm}.012$
+& $.07641{\pm}.00128$
+& $5.47{\pm}.56$
+& $7.981{\pm}0.868$ \\
 
 & CSP$_{16}$
-& $\mathbf{.01570 \pm .00024}$
-& $\mathbf{1.282 \pm .058}$
-& $\mathbf{.906 \pm .012}$
-& $.338 \pm .012$
-& $\mathbf{.06662 \pm .00074}$
-& $\mathbf{4.61 \pm .19}$
-& $7.891 \pm 0.567$ \\
+& $\mathbf{.01570{\pm}.00024}$
+& $\mathbf{1.282{\pm}.058}$
+& $\mathbf{.906{\pm}.012}$
+& $.338{\pm}.012$
+& $\mathbf{.06662{\pm}.00074}$
+& $\mathbf{4.61{\pm}.19}$
+& $7.891{\pm}0.567$ \\
 
 \bottomrule
 \end{tabular}
-}
 \end{table*}
 
 
@@ -524,6 +532,7 @@ After accounting for differences in total error norms, scenarios with larger
 off-subspace fractions have higher Mean PB, with partial Spearman correlations
 of .659/.635/.594/.833 for magnitude and
 .789/.906/.809/.860 for angle (all 95\% CIs exclude zero).
+\vspace{0.35em}
 
 \noindent\textit{Fixed-norm intervention.}
 At fixed error norm, suppressing off-subspace error consistently lowers
@@ -562,7 +571,7 @@ residual-change ratios between $0.996$ and $1.009$ across all four models.
 \begin{figure}[t]
     \centering
     \includegraphics[width=\columnwidth]
-    {figure1_controlled_error_geometry_larger_text_final_v9_recreated.pdf}
+    {figure1_controlled_error_geometry_larger_text_final_v9_recreated_searchable_no_type3.pdf}
     \caption{
     Fixed-norm directional intervention on GBnetwork, with Relative Mean PB
     normalized at $\alpha=1$.
@@ -611,13 +620,13 @@ Parentheses denote $V/\theta$ ranks or smoothing strengths.
 }
 \label{tab:basis_control}
 \setlength{\tabcolsep}{1.8pt}
-\footnotesize
 \begin{tabular}{lrrr}
 \toprule
 Control &
-Ref. var. retained (\%) &
-Ref. PB &
-Pred. PB \\
+Ref. var. &
+Ref. &
+Pred. \\
+& retained (\%) & PB & PB \\
 \midrule
 SVD ($16/16$)
 & $98.789/99.683$
@@ -720,7 +729,7 @@ the opposite holds for LUMINA.
 
 \begin{figure}[t]
     \centering
-    \includegraphics[width=1.0\columnwidth]{gridsfm_raw_vs_csp16_discrete3_larger_text_v7.pdf}
+    \includegraphics[width=1.0\columnwidth]{gridsfm_raw_vs_csp16_discrete3_larger_text_v7_searchable_no_type3.pdf}
     \caption{
     Grid-by-grid physical consistency of GridSFM before and after
     CSP$_{16}$ across 31 systems ordered by bus count. Mean PB is shown
@@ -735,7 +744,7 @@ CSP provides a consistently better initialization for one-step Newton
 refinement, improving both state accuracy and post-update physical
 consistency across all four models. Starting from $C$ or CSP$_{16}$, we
 apply one Newton update ($\mathrm{NR}_1$) to non-slack angles and PQ voltage
-magnitudes, with validation-selected damping factor; $\eta=1$ selected for all models, with no linear-solve failures. Relative to $C$
+magnitudes, with validation-selected damping factor; $\eta=1$ is selected for all models, with no linear-solve failures. Relative to $C$
 initialization, CSP lowers magnitude and angle RMSE in all models and
 reduces post-update Mean PB by $21.1$--$96.4\%$
 (Table~\ref{tab:nr1}).
@@ -752,59 +761,58 @@ $V$ RMSE and Mean PB are reported in $10^{-3}$.
 Values are means $\pm$ standard deviations over three model seeds.
 }
 \label{tab:nr1}
-\setlength{\tabcolsep}{2.6pt}
-\footnotesize
+\setlength{\tabcolsep}{2.2pt}
 \begin{tabular}{llrrr}
 \toprule
 Model & Start &
 $V$ RMSE &
-$\theta$ RMSE ($^\circ$) &
+$\theta$ RMSE &
 Mean PB \\
-& & $(10^{-3})$ & & $(10^{-3})$ \\
+& & $(10^{-3})$ & ($^\circ$) & $(10^{-3})$ \\
 \midrule
 
 PIGNN-GC
 & $C$
-& $1.80\pm.12$
-& $.119\pm.013$
-& $2.84\pm.46$ \\
+& $1.80{\pm}.12$
+& $.119{\pm}.013$
+& $2.84{\pm}.46$ \\
 & CSP$_{16}$
-& $\mathbf{1.17\pm.10}$
-& $\mathbf{.073\pm.009}$
-& $\mathbf{1.48\pm.13}$ \\
+& $\mathbf{1.17{\pm}.10}$
+& $\mathbf{.073{\pm}.009}$
+& $\mathbf{1.48{\pm}.13}$ \\
 
 \midrule
 GridSFM
 & $C$
-& $11.86\pm6.77$
-& $.681\pm.380$
-& $2.50\pm1.54$ \\
+& $11.86{\pm}6.77$
+& $.681{\pm}.380$
+& $2.50{\pm}1.54$ \\
 & CSP$_{16}$
-& $\mathbf{.97\pm.20}$
-& $\mathbf{.059\pm.013}$
-& $\mathbf{1.22\pm.29}$ \\
+& $\mathbf{.97{\pm}.20}$
+& $\mathbf{.059{\pm}.013}$
+& $\mathbf{1.22{\pm}.29}$ \\
 
 \midrule
-gridfm-graphkit
+gridfm-
 & $C$
-& $.943\pm.232$
-& $.0843\pm.0236$
-& $.941\pm.325$ \\
-& CSP$_{16}$
-& $\mathbf{.496\pm.085}$
-& $\mathbf{.0277\pm.0041}$
-& $\mathbf{.742\pm.080}$ \\
+& $.943{\pm}.232$
+& $.0843{\pm}.0236$
+& $.941{\pm}.325$ \\
+graphkit & CSP$_{16}$
+& $\mathbf{.496{\pm}.085}$
+& $\mathbf{.0277{\pm}.0041}$
+& $\mathbf{.742{\pm}.080}$ \\
 
 \midrule
 LUMINA
 & $C$
-& $13.71\pm9.23$
-& $.671\pm.038$
-& $46.08\pm64.15$ \\
+& $13.71{\pm}9.23$
+& $.671{\pm}.038$
+& $46.08{\pm}64.15$ \\
 & CSP$_{16}$
-& $\mathbf{1.040\pm.016}$
-& $\mathbf{.0802\pm.0031}$
-& $\mathbf{1.653\pm.036}$ \\
+& $\mathbf{1.040{\pm}.016}$
+& $\mathbf{.0802{\pm}.0031}$
+& $\mathbf{1.653{\pm}.036}$ \\
 
 \bottomrule
 \end{tabular}
@@ -849,8 +857,7 @@ operating-distribution shifts. T transfers the control calibration and basis,
 whereas R refits both on condition-matched training data.
 }
 \label{tab:shift}
-\setlength{\tabcolsep}{1.8pt}
-\footnotesize
+\setlength{\tabcolsep}{1.2pt}
 \begin{tabular}{lrrrrrrrr}
 \toprule
 Condition &
@@ -858,7 +865,7 @@ Condition &
 $R_{\mathrm{w}}^2 \uparrow$ &
 $a_{\mathrm{w}}$ &
 Mean &
-Median &
+Med. &
 p95 &
 p99 &
 Max \\
@@ -921,13 +928,13 @@ GBcorr (R)
 
 \section{CONCLUSION}
 
-This work identifies output-error geometry as a key source of the gap
+This work identifies output-error geometry as an important factor in the gap
 between voltage accuracy and physical consistency in neural AC
 power-flow surrogates. Across four architecturally diverse neural surrogates, we show that small voltage errors can contain off-subspace
 components that induce large AC power-balance violations. Building on
 this insight, calibrated solution-subspace projection suppresses these
 components, reducing voltage-magnitude error and power-balance residuals
-without retraining; the residual reduction extends to 31 additional
+without retraining; the residual reduction extends to 30 additional
 grids. These results suggest that error direction, not only magnitude,
 should inform surrogate evaluation and design. They also motivate
 extending physics-consistent neural surrogates toward broader

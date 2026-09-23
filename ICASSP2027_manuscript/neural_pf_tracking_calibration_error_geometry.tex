@@ -123,6 +123,7 @@ errors and a \emph{training solution subspace} can be quantified to explain
 physical inconsistency, and whether this structure can be exploited to
 reduce power-balance violations.
 
+
 To address these questions, we make three contributions.
 (i) We decompose calibrated prediction errors of four neural surrogates
 into in- and off-subspace components using a low-rank singular value
@@ -317,8 +318,8 @@ a_{\mathrm{w}}
 \left(\tilde{V}_{is},\tilde{\hat{V}}_{is}\right)}
 {\operatorname{Var}\left(\tilde{V}_{is}\right)} .
 \end{equation}
-$R_{\mathrm{w}}^2$ is the squared correlation between the centered
-prediction and reference pooled over all bus--scenario pairs, while
+$R_{\mathrm{w}}^2$ is the squared correlation between the within-bus-centered
+prediction and reference across all bus--scenario pairs, while
 $a_{\mathrm{w}}$ measures the scale of the predicted variation
 relative to the true variation.
 % A per-bus constant predictor gives
@@ -523,7 +524,7 @@ LUMINA
 \noindent\textit{Off-subspace error.}
 Off-subspace error is substantial across models and is positively associated
 with Mean PB. Although the rank-16 basis explains 98.8\%/99.7\% of training
-voltage-magnitude/angle variation, the median fractions of total squared
+voltage-magnitude/angle variation, the median scenario-wise fractions of total squared
 error lying outside the respective subspaces are
 26.3/55.0/56.8/27.1\% for magnitude and
 10.3/2.7/39.6/31.7\% for angle, for
@@ -580,13 +581,13 @@ residual-change ratios between $0.996$ and $1.009$ across all four models.
 \end{figure}
 
 \subsection{Solution subspace specificity.}
-Our matched-control experiments show that preserving the same amount of
+Our matched-basis comparison show that preserving the same amount of
 reference-state variation is insufficient for low PB, indicating that the
-specific state-space directions retained by the solution subspace matter.
+specific state-space directions retained by the basis are important.
 We compare SVD$_{16}$ with graph-Laplacian and spatial low-pass controls,
 each tuned using training references to match the $V/\theta$ variation
 retained by SVD$_{16}$. On the test set, all three preserve nearly identical
-reference variation (Table~\ref{tab:basis_control}), yet the controls yield
+reference variation (Table~\ref{tab:basis_control}), yet the alternatives yield
 substantially larger PB for both projected references and corrected predictions.
 
 
@@ -615,14 +616,14 @@ substantially larger PB for both projected references and corrected predictions.
 \begin{table}[t]
 \centering
 \caption{
-Basis controls on GBnetwork for PIGNN-GC.
+Matched basis comparison on GBnetwork for PIGNN-GC.
 Parentheses denote $V/\theta$ ranks or smoothing strengths.
 }
 \label{tab:basis_control}
 \setlength{\tabcolsep}{1.8pt}
 \begin{tabular}{lrrr}
 \toprule
-Control &
+Basis &
 Ref. var. &
 Ref. &
 Pred. \\
@@ -840,9 +841,9 @@ Under the topology shifts, voltage accuracy, tracking, and bulk PB remain
 close to control, while larger maxima motivate worst-case assessment beyond
 average error. GBcorr applies correlated, spatially
 varying load scaling across 14 zones while preserving total demand and
-generation settings. Transferring both calibration and basis gives Mean PB
-$\approx0.100$ p.u.; refitting calibration alone reduces this to $0.0944$,
-basis alone to $0.0740$, and both to $\approx0.068$.
+generation settings. Transferring both calibration and basis gives Mean PB of
+$0.103$ p.u.; refitting calibration alone reduces this to $0.0944$,
+basis alone to $0.0740$, and both to $0.068$.
 Although the transferred/refitted bases retain $93.55\%/98.53\%$ of GBcorr
 magnitude variation, projecting converged GBcorr references yields Mean PBs
 of $0.0868/0.0438$ p.u., respectively. This reference-only diagnostic

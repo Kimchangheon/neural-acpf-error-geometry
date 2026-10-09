@@ -1,8 +1,13 @@
-# CSP — calibrated subspace projection for AC power-flow surrogates
+# Physics-Informed but Not Physics-Consistent: Error Geometry and Subspace Projection for Neural AC Power Flow
 
-Code for *"Tracking, calibration and error geometry of neural AC power-flow
-surrogates"* (ICASSP 2027). Manuscript:
-[`paper/submitted_manuscript.tex`](paper/submitted_manuscript.tex).
+Official code for the paper
+**"Physics-Informed but Not Physics-Consistent: Error Geometry and Subspace
+Projection for Neural AC Power Flow"** (submitted to ICASSP 2027).
+Paper: [arXiv:2610.05959](https://arxiv.org/abs/2610.05959)
+
+Changhun Kim, Timon Conrad, Redwanul Karim, Karan Pahlajani, Julian Oelhaf,
+David Riebesel, Tomás Arias-Vergara, Andreas Maier, Johann Jäger, Siming Bayer
+— Friedrich-Alexander-Universität Erlangen-Nürnberg
 
 ## The idea in one paragraph
 
@@ -15,9 +20,12 @@ frozen checkpoint, in two steps:
 1. **C** — subtract the per-bus bias measured on the training split.
 2. **P_k** — project onto the rank-`k` training-solution subspace.
 
-On the 2224-bus GBnetwork this cuts mean power-balance violation by a factor of
-2 to 20 across four different surrogates, while voltage RMSE improves for every
-one of them, at a cost at or below measurement noise.
+This is **calibrated solution-subspace projection (CSP)**. On the realistic
+2224-bus Great Britain network (GBnetwork), relative to calibrated predictions,
+CSP (k = 16) reduces mean power-balance violation (Mean PB) by 67.0%, 37.8%,
+40.5% and 68.9% for PIGNN-GC, GridSFM, gridfm-graphkit and LUMINA respectively,
+while improving voltage-magnitude accuracy for all four models. GridSFM is
+additionally evaluated across 31 grids.
 
 ```python
 from csp import CSP, evaluate
@@ -65,7 +73,6 @@ csp/            the method — small, dependency-light, this is what you use
 examples/       runnable quickstart, no data required
 tests/          properties, plus numerical equivalence with the paper's code
 docs/           how to use it, and how to reproduce the paper
-paper/          submitted manuscript and its figures
 reproduction/   the research archive: training drivers, job scripts, results
 third_party/    released sources of GridSFM, LUMINA and GridFM-GraphKit
 ```
@@ -108,12 +115,19 @@ computes what the paper computed.
 ## Citation
 
 ```bibtex
-@inproceedings{kim2027csp,
-  title     = {Tracking, Calibration and Error Geometry of Neural AC Power-Flow Surrogates},
-  author    = {Kim, Changhun and others},
-  booktitle = {ICASSP},
-  year      = {2027}
+@misc{kim2026physicsconsistent,
+  title         = {Physics-Informed but Not Physics-Consistent: Error Geometry and Subspace Projection for Neural {AC} Power Flow},
+  author        = {Kim, Changhun and Conrad, Timon and Karim, Redwanul and Pahlajani, Karan and Oelhaf, Julian and Riebesel, David and Arias-Vergara, Tom{\'a}s and Maier, Andreas and J{\"a}ger, Johann and Bayer, Siming},
+  year          = {2026},
+  eprint        = {2610.05959},
+  archivePrefix = {arXiv}
 }
 ```
 
 `third_party/` contains upstream projects under their own licences.
+
+## Acknowledgements
+
+Supported by the GridAssist project under the "OptiNetD" initiative of the
+German Federal Ministry for Economic Affairs and Energy (BMWE), and by HPC
+resources from NHR@FAU, partially funded by the German Research Foundation (DFG).

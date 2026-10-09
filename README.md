@@ -3,7 +3,7 @@
 Official code for the paper
 **"Physics-Informed but Not Physics-Consistent: Error Geometry and Subspace
 Projection for Neural AC Power Flow"** (submitted to ICASSP 2027).
-Paper: [arXiv:2610.05959](https://arxiv.org/abs/2610.05959)
+Paper: [arXiv:2610.05959](https://arxiv.org/abs/2610.05959) 
 
 Changhun Kim, Timon Conrad, Redwanul Karim, Karan Pahlajani, Julian Oelhaf,
 David Riebesel, Tomás Arias-Vergara, Andreas Maier, Johann Jäger, Siming Bayer

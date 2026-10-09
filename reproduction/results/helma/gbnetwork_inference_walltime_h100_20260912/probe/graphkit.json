@@ -1,0 +1,107 @@
+{
+  "stage": "probe",
+  "model": "graphkit",
+  "checkpoint": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/ckpt/gk_e120_20260910/k08_s42_e120_best.pt",
+  "gpu": "NVIDIA H100",
+  "gpu_total_memory_bytes": 100228136960,
+  "test_scenarios": 12344,
+  "parameters_total": 20069187,
+  "parameters_trainable": 20069187,
+  "parameter_bytes": 80276748,
+  "timing_scope": "GPU-synchronized model forward plus requested output transform; data loading, model loading, calibration fitting, and SVD fitting excluded",
+  "probe": {
+    "probe_output": "CSP16",
+    "max_successful_batch": 1048,
+    "first_failed_batch": 2048,
+    "probe_cap": 2048,
+    "cap_reached_without_oom": false,
+    "peak_at_selected_batch": {
+      "peak_allocated_bytes": 99043390976,
+      "peak_reserved_bytes": 99304341504,
+      "actual_batch": 1048
+    },
+    "trials": {
+      "16": {
+        "success": true,
+        "peak_allocated_bytes": 1624858112,
+        "peak_reserved_bytes": 1845493760,
+        "actual_batch": 16
+      },
+      "32": {
+        "success": true,
+        "peak_allocated_bytes": 3135220224,
+        "peak_reserved_bytes": 3254779904,
+        "actual_batch": 32
+      },
+      "64": {
+        "success": true,
+        "peak_allocated_bytes": 6155945472,
+        "peak_reserved_bytes": 6616514560,
+        "actual_batch": 64
+      },
+      "128": {
+        "success": true,
+        "peak_allocated_bytes": 12197404672,
+        "peak_reserved_bytes": 13090422784,
+        "actual_batch": 128
+      },
+      "256": {
+        "success": true,
+        "peak_allocated_bytes": 24280323584,
+        "peak_reserved_bytes": 26073890816,
+        "actual_batch": 256
+      },
+      "512": {
+        "success": true,
+        "peak_allocated_bytes": 48446159872,
+        "peak_reserved_bytes": 54739861504,
+        "actual_batch": 512
+      },
+      "1024": {
+        "success": true,
+        "peak_allocated_bytes": 96777833984,
+        "peak_reserved_bytes": 99367256064,
+        "actual_batch": 1024
+      },
+      "2048": {
+        "success": false
+      },
+      "1536": {
+        "success": false
+      },
+      "1280": {
+        "success": false
+      },
+      "1152": {
+        "success": false
+      },
+      "1088": {
+        "success": false
+      },
+      "1056": {
+        "success": false
+      },
+      "1040": {
+        "success": true,
+        "peak_allocated_bytes": 98288206336,
+        "peak_reserved_bytes": 99325313024,
+        "actual_batch": 1040
+      },
+      "1048": {
+        "success": true,
+        "peak_allocated_bytes": 99043390976,
+        "peak_reserved_bytes": 99304341504,
+        "actual_batch": 1048
+      },
+      "1052": {
+        "success": false
+      },
+      "1050": {
+        "success": false
+      },
+      "1049": {
+        "success": false
+      }
+    }
+  }
+}

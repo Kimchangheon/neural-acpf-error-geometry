@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/jacobian_graphkit_e120_20260912/jacobian_subspace_reproducibility.py", line 155, in <module>
+    if __name__ == "__main__": main()
+                               ^^^^^^
+  File "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/jacobian_graphkit_e120_20260912/jacobian_subspace_reproducibility.py", line 80, in main
+    model, forward=make_model(kind,ckpt,args.parquet,args.basis_batch,device,lumina_args=args.lumina_args if kind == "lumina" else "")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/jacobian_graphkit_e120_20260912/controlled_error_geometry.py", line 51, in make_model
+    model, ext_forward, ext_to_dev = make_graphkit_or_lumina(
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: make_graphkit_or_lumina() got an unexpected keyword argument 'lumina_args'
+srun: error: a0326: task 0: Exited with exit code 1
+srun: Terminating StepId=4224740.0

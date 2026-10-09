@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/jacobian_lumina_gbv06z_20260913/jacobian_subspace_reproducibility.py", line 20, in <module>
+    from jacobian_subspace_alignment import _orthonormal_restricted_basis, reduced_jvp, summarize
+ModuleNotFoundError: No module named 'jacobian_subspace_alignment'
+srun: error: a1622: task 0: Exited with exit code 1
+srun: Terminating StepId=4222545.0

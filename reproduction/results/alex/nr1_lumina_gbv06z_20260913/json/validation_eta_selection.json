@@ -1,0 +1,13 @@
+{
+  "rule": "minimum validation Mean PB over C+NR1 and CSP16+NR1; one LUMINA seed",
+  "candidates": {
+    "0.25": 0.10959870433117694,
+    "0.5": 0.0727755775158446,
+    "0.75": 0.03581600075993033,
+    "1.0": 0.005301408050078568
+  },
+  "selected_eta": 1.0,
+  "inputs": [
+    "/home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_lumina_gbv06z_20260913/json/lumina_s42_validation.json"
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "protocol": {
+    "split": "seed-42 current-paper split",
+    "calibration": "train-only per-bus offsets",
+    "projection": "separate train-only magnitude/angle SVD; k=16",
+    "post_projection": "none",
+    "pb": "complex128 GENCO structural-zero PB"
+  },
+  "result": {
+    "model": "graphkit",
+    "checkpoint": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/ckpt/gk_e120_20260910/k06_s41_e120_best.pt",
+    "rank": 16,
+    "n_test": 12344,
+    "basis_explained_variance": {
+      "magnitude": 0.9880053751661676,
+      "angle": 0.9968392019907943
+    },
+    "calibration_offset_rms_vmag": 0.004825409003599668,
+    "conditions": {
+      "C": {
+        "vmag_rmse": 0.007216231023374831,
+        "angle_rmse_deg": 0.3308930433764948,
+        "within_r2": 0.9121569109155565,
+        "within_slope": 0.8313298603368139,
+        "mean_pb": 0.07023269010833365,
+        "max_pb": 28.36936841193681,
+        "mean_abs_delta_p": 0.002651829826690971,
+        "mean_abs_delta_q": 0.0033626951590178984,
+        "restoration_abs_delta_v": 0.0,
+        "restoration_abs_delta_theta": 0.0
+      },
+      "V_only": {
+        "vmag_rmse": 0.0057014199137928635,
+        "angle_rmse_deg": 0.3308930433764948,
+        "within_r2": 0.9611966408449147,
+        "within_slope": 0.8208224256755051,
+        "mean_pb": 0.05672736605568581,
+        "max_pb": 28.878807507841582,
+        "mean_abs_delta_p": 0.002719318543530303,
+        "mean_abs_delta_q": 0.001856344824334268,
+        "restoration_abs_delta_v": 0.0,
+        "restoration_abs_delta_theta": 0.0
+      },
+      "theta_only": {
+        "vmag_rmse": 0.007216231023374831,
+        "angle_rmse_deg": 0.4792432091901487,
+        "within_r2": 0.9121569109155565,
+        "within_slope": 0.8313298603368139,
+        "mean_pb": 0.07940851560002216,
+        "max_pb": 7.058835298475961,
+        "mean_abs_delta_p": 0.002811742575767422,
+        "mean_abs_delta_q": 0.0036003648824779358,
+        "restoration_abs_delta_v": 0.0,
+        "restoration_abs_delta_theta": 0.0
+      },
+      "CSP16": {
+        "vmag_rmse": 0.0057014199137928635,
+        "angle_rmse_deg": 0.4792432091901487,
+        "within_r2": 0.9611966408449147,
+        "within_slope": 0.8208224256755051,
+        "mean_pb": 0.04542082574798136,
+        "max_pb": 5.277383337994252,
+        "mean_abs_delta_p": 0.0022803045802663184,
+        "mean_abs_delta_q": 0.0012952730648945181,
+        "restoration_abs_delta_v": 0.0,
+        "restoration_abs_delta_theta": 0.0
+      }
+    }
+  }
+}

@@ -1,0 +1,162 @@
+### Starting TaskPrologue of job 4224534 on a0324 at Sun Sep 13 07:52:25 CEST 2026
+Running on cores 32-47 with governor schedutil
+Sun Sep 13 07:52:25 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A40                     On  |   00000000:41:00.0 Off |                  Off |
+|  0%   34C    P8             22W /  300W |       0MiB /  49140MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+Indexing parquet lazily from /home/vault/iwi5/iwi5295h/PIGNN-Attn-LS/ScenarioSynthesis_PPC/out/GBnetwork_ppcY_backbone_dc_compile_ppNR_ls0.60-1.40_u0clean_sgenpert_pvqvstart_siNR_37022_NR_branchrows_directSI.parquet ...
+[Dataset] /home/vault/iwi5/iwi5295h/PIGNN-Attn-LS/ScenarioSynthesis_PPC/out/GBnetwork_ppcY_backbone_dc_compile_ppNR_ls0.60-1.40_u0clean_sgenpert_pvqvstart_siNR_37022_NR_branchrows_directSI.parquet
+[Dataset]   parquet S_base = 1.000e+08 VA (= 100 MVA)
+[Dataset]   per-unit S_base matches target (100 MVA); no rebase
+Indexed 37022 valid rows from /home/vault/iwi5/iwi5295h/PIGNN-Attn-LS/ScenarioSynthesis_PPC/out/GBnetwork_ppcY_backbone_dc_compile_ppNR_ls0.60-1.40_u0clean_sgenpert_pvqvstart_siNR_37022_NR_branchrows_directSI.parquet across 1852 row groups (removed 0 diverged rows)
+Final combined dataset shape: (37022, streamed rows) | removed 0 diverged rows total
+[Dataset]   share_ybus=True: cached shared Ybus from first row (N=2224, |Y|_pu max=2.048e+05); subsequent rows will skip dense Y reconstruction
+[Dataset]   share_grid=True: cached 21 grid-only tensors from first row (Ybus + Branch_y_* + topology + vn_kv + ...); subsequent rows skip parquet decode + per-unit math for these fields
+[manifold] 12339 train scenarios, 2224 buses; k=16 captures 98.801% of |V| and 99.684% of theta variance
+[model] LUMINA HGT layers=6 hidden=128 heads=2 dropout=0.0
+[model] bus input widened to 13 (+6)
+[init] normal_(0, 0.02) applied to 66 weight matrices
+[init] terminal bus head zeroed (Linear, (2, 128)): flat-voltage start
+[lumina] checkpoint missing=0 unexpected=0
+[debias] per-bus offset fitted on 12339 training scenarios; rms dvm 2.02462e-02 pu
+[diagnostic] 50/772 test batches
+[diagnostic] 100/772 test batches
+[diagnostic] 150/772 test batches
+[diagnostic] 200/772 test batches
+[diagnostic] 250/772 test batches
+[diagnostic] 300/772 test batches
+[diagnostic] 350/772 test batches
+[diagnostic] 400/772 test batches
+[diagnostic] 450/772 test batches
+[diagnostic] 500/772 test batches
+[diagnostic] 550/772 test batches
+[diagnostic] 600/772 test batches
+[diagnostic] 650/772 test batches
+[diagnostic] 700/772 test batches
+[diagnostic] 750/772 test batches
+{
+  "protocol": {
+    "split": "controlled_error_geometry.split_dataset: random_split seed=42; sorted membership order",
+    "basis": "diagnose_residual_distributions.manifold_basis -> manifold_projection.fit_basis; train NR only; circular angle mean/wrap; k=16",
+    "calibration": "diagnose_residual_distributions.fit_per_bus_offset + controlled_error_geometry.calibrated_forward; train only; circular angle offset",
+    "csp": "manifold_projection.project_state then output_intervention_metrics._restore_known_setpoints, matching restore_known paper rows",
+    "pb": "controlled_error_geometry.pb_per_scenario; final complex128 voltage; GENCO structural-zero PB",
+    "oracle_floor": "pure project_state(reference), as requested; operational restore_known oracle PB additionally reported",
+    "no_clipping": true,
+    "known_state_restoration_after_csp": "PV/slack magnitude and slack angle restored from V_start",
+    "rank_requested": 16,
+    "rank_actual_magnitude": 16,
+    "rank_actual_angle": 16,
+    "test_scenarios": 12344
+  },
+  "reference": {
+    "training_explained_variance": {
+      "magnitude": 0.9880053751661676,
+      "angle": 0.9968392019907943
+    },
+    "test_reference_retained_variance": {
+      "magnitude": 0.9878940592596026,
+      "angle": 0.9968251315392486
+    },
+    "oracle_pure_reference_projection": {
+      "vmag_rmse": 0.00257593046740752,
+      "angle_rmse_deg": 0.3857722189492722,
+      "mean_pb": 0.04153755348707348,
+      "max_pb": 5.970846736512022
+    },
+    "oracle_restore_known_reference_projection": {
+      "mean_pb": 0.041537553487073414,
+      "max_pb": 5.970846736512022,
+      "restoration_change_vmag_rmse": 1.0688060938893328e-16,
+      "restoration_change_angle_rmse_deg": 0.0
+    }
+  },
+  "models": {
+    "LUMINA": {
+      "off_error_fraction_calibrated": {
+        "magnitude": 0.2535031929567414,
+        "angle": 0.2964005561129042
+      },
+      "removed_error_energy_calibrated": {
+        "magnitude": 2175.521247942652,
+        "angle": 4675.919295797402
+      },
+      "identity_check": {
+        "magnitude": {
+          "calibrated_error_energy": 8581.829769354777,
+          "csp_pure_error_energy": 6588.471017115441,
+          "csp_operational_error_energy": 6588.471017115441,
+          "reference_off_subspace_energy": 182.162495703322,
+          "calibrated_error_off_subspace_energy": 2175.521247942652,
+          "rhs_reference_off_minus_error_off": -1993.3587522393298,
+          "lhs_pure_projection": -1993.3587522393364,
+          "lhs_operational_restore_known": -1993.3587522393364,
+          "pure_discrepancy": -6.59383658785373e-12,
+          "operational_discrepancy": -6.59383658785373e-12,
+          "pure_relative_discrepancy": 3.307902594275227e-15,
+          "operational_relative_discrepancy": 3.307902594275227e-15,
+          "max_abs_scenario_discrepancy_pure": 7.882583474838611e-15,
+          "max_abs_scenario_discrepancy_operational": 7.882583474838611e-15
+        },
+        "angle": {
+          "calibrated_error_energy": 15775.676527463267,
+          "csp_pure_error_energy": 12344.292846565879,
+          "csp_operational_error_energy": 12344.292846565879,
+          "reference_off_subspace_energy": 1244.535614899944,
+          "calibrated_error_off_subspace_energy": 4675.919295797402,
+          "rhs_reference_off_minus_error_off": -3431.383680897458,
+          "lhs_pure_projection": -3431.3836808973883,
+          "lhs_operational_restore_known": -3431.3836808973883,
+          "pure_discrepancy": 6.957634468562901e-11,
+          "operational_discrepancy": 6.957634468562901e-11,
+          "pure_relative_discrepancy": 2.0276468957103547e-14,
+          "operational_relative_discrepancy": 2.0276468957103547e-14,
+          "max_abs_scenario_discrepancy_pure": 1.0480505352461478e-13,
+          "max_abs_scenario_discrepancy_operational": 1.0480505352461478e-13
+        }
+      }
+    }
+  }
+}
+=== JOB_STATISTICS ===
+=== current date     : Sun Sep 13 08:09:41 CEST 2026
+= Job-ID             : 4224534 on alex
+= Job-Name           : lumina_csp_posthoc
+= Job-Command        : /home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/csp_posthoc_diagnostics_lumina_gbv06z_alex_a40_20260913.sh
+= Initial workdir    : /home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC
+= Queue/Partition    : a40
+= Slurm account      : iwi5 with QOS=normal
+= Requested resources:  for 06:00:00
+= Elapsed runtime    : 00:17:18
+= Total RAM usage    : 3.9 GiB of assigned  GiB (%)
+= Node list          : a0324
+= Subm/Elig/Start/End: 2026-09-13T07:52:08 / 2026-09-13T07:52:08 / 2026-09-13T07:52:23 / 2026-09-13T08:09:41
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/woody           470.2G  1000.0G  1500.0G        N/A     467K   5,000K   7,500K        N/A    
+!!! /home/hpc             142.8G   104.9G   209.7G  -28997days     196K     500K   1,000K        N/A !!!
+    /home/vault           368.8G  1048.6G  2097.2G        N/A      70K     200K     400K        N/A    
+    /lustre                 4.0K     0.0K     0.0K        N/A       1       80K     250K        N/A    
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA A40, 00000000:41:00.0, 548824, 5 %, 4 %, 1024 MiB, 1011672 ms

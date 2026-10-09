@@ -1,0 +1,15 @@
+{
+  "rule": "minimize unweighted mean validation Mean PB over C+NR1 and CSP16+NR1 across the three GraphKit seeds",
+  "candidates": {
+    "0.25": 0.04583060417686787,
+    "0.5": 0.03055463952190965,
+    "0.75": 0.015289095551456798,
+    "1.0": 0.0008341499535796003
+  },
+  "selected_eta": 1.0,
+  "inputs": [
+    "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_graphkit_e120_gbnetwork_a40_20260912/json/graphkit_s41_validation.json",
+    "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_graphkit_e120_gbnetwork_a40_20260912/json/graphkit_s42_validation.json",
+    "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_graphkit_e120_gbnetwork_a40_20260912/json/graphkit_s43_validation.json"
+  ]
+}

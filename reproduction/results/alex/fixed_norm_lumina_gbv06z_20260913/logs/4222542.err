@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "/home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/fixed_norm_lumina_gbv06z_20260913/controlled_error_geometry.py", line 260, in <module>
+    main()
+  File "/home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/fixed_norm_lumina_gbv06z_20260913/controlled_error_geometry.py", line 248, in main
+    summary, scenario_arrays = run_model(kind, ckpt, train, evaluation, args.parquet,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/fixed_norm_lumina_gbv06z_20260913/controlled_error_geometry.py", line 145, in run_model
+    model, forward = make_model(kind, checkpoint, parquet, batch, device, lumina_args=lumina_args)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/fixed_norm_lumina_gbv06z_20260913/controlled_error_geometry.py", line 51, in make_model
+    model, ext_forward, ext_to_dev = make_graphkit_or_lumina(
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: make_graphkit_or_lumina() got an unexpected keyword argument 'lumina_args'
+srun: error: a0228: task 0: Exited with exit code 1
+srun: Terminating StepId=4222542.0

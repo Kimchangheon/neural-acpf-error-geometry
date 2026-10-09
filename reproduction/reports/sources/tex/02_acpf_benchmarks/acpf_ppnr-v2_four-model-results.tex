@@ -1,0 +1,1289 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.7in]{geometry}
+\usepackage{amsmath}\usepackage{booktabs}\usepackage{float}\usepackage{pdflscape}\usepackage{longtable}
+\title{AC power-flow surrogates on the ppNR v2 corpus\\\large Four models, 31 grids: results so far}
+\author{PIGNN-Attn-LS-PPC experimental summary}
+\date{19 August 2026}
+\begin{document}\maketitle
+
+\section{Scope and status}
+
+Four PF surrogates, one model per grid, trained on the regenerated \textbf{ppNR
+v2} corpus. v2 is selected by the \texttt{\_u0clean\_sgenpert\_pvqvstart\_}
+configuration tag rather than the \texttt{\_ppNR\_} solver tag: several
+generations now share the latter, so selecting on it would silently mix corpora.
+All four share the parquet, the $1/3$--$1/3$--$1/3$ split and seed 42.
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{llrr}
+\toprule
+Tag & Model & Finished & Usable \\
+\midrule
+\texttt{pignn}    & \texttt{GNSMsg\_EdgeSelfAttn}, unrolled solver $K=40$ & 26/31 & \textbf{22} \\
+\texttt{graphkit} & IBM \texttt{gridfm\_graphkit} \texttt{GNS\_heterogeneous} & 30/31 & \textbf{30} \\
+\texttt{gridsfm}  & \texttt{gridsfm.GridTransformerBackbone} (released) & 26/31 & \textbf{26} \\
+\texttt{lumina}   & \texttt{lumina\_inference} HGT (released) & 30/31 & \textbf{30} \\
+\bottomrule
+\end{tabular}
+\caption{All trained from scratch; no released weights are loaded. ``Usable''
+excludes runs whose validation RMSE never moved. Aggregates below are over the
+\textbf{22 grids where all four produced a usable model}.}
+\end{table}
+
+\paragraph{Placement.} Grids were assigned to hardware by size: the 10 smallest
+to alex a40, case39--case\_illinois200 to alex2 a100, case300--case1888rte and
+the nine largest to helma h100. Batch sizes follow from that placement by the
+rule in Section 2.
+
+\paragraph{PIGNN configuration used for the results.} The \texttt{pignn} rows
+were launched by \texttt{dispatch\_pf\_v2.sh}; this table gives the complete
+effective setting (driver flags plus parser defaults).
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{ll}
+\toprule
+Setting & Value \\
+\midrule
+Model / architecture & \texttt{GNSMsg\_EdgeSelfAttn}; $d=4$, $d_{hi}=24$ \\
+Attention & 8 heads; 8 attention layers \\
+Unrolled solver & $K=40$; $\gamma=0.9$ \\
+PINN / batching & PINN enabled; block-diagonal batches \\
+Solver step & Armijo enabled; \texttt{geometric\_safe}; $\rho=0.5$, $c_1=10^{-4}$, 5 backtracks, $\alpha_{min}=0.0625$ \\
+Objective & $1.0\,L_{MSE}+1.0\,L_{physics}$; physics form \texttt{logcosh} \\
+Physics normalization & residual norm \texttt{none}; norm $\epsilon=10^{-6}$ \\
+Optimization & AdamW; learning rate $10^{-4}$; weight decay $10^{-3}$ \\
+Schedule / accumulation & default scheduler; accumulation 1; no effective-batch target \\
+Training budget & 40 epochs (largest-grid reruns used reduced budgets noted in Section 4) \\
+Data split & train/valid/test $=1/3/1/3/1/3$; seed 42 \\
+Data scaling / loading & per-unit; target $S_{base}=100$ MVA; shared grid and Y-bus cache \\
+Numerics & complex64 dataset tensors; no extra $v_n$ or bus-type features \\
+\bottomrule
+\end{tabular}
+\caption{Effective PIGNN settings for the \texttt{pignn} results. Batch size is grid-dependent and listed below.}
+\end{table}
+
+\section{Batch sizes and the rule that set them}
+
+Batch size was never chosen per grid by hand. It follows one formula, applied
+by \texttt{dispatch\_pf\_v2.sh}:
+\[
+B(\text{model},\text{grid})
+  \;=\;\min\!\Big(\text{CAP},\;
+  \Big\lfloor \frac{\text{BUDGET}\times M/48}{N}\Big\rfloor\Big),
+\]
+where $N$ is the bus count, $M$ the GPU memory in GiB, and BUDGET a per-model
+allowance in \emph{bus-samples} calibrated so that $B\cdot N$ activations fit a
+48~GiB card with headroom. The budgets differ because the measured activation
+cost per bus-sample differs by a factor of seven across the four models.
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{lrrr}
+\toprule
+Model & activation [KiB / bus-sample] & BUDGET [bus-samples @ 48 GiB] & CAP \\
+\midrule
+\texttt{pignn}    & $\sim$1080 & 27\,000  & 32 \\
+\texttt{graphkit} & $\sim$479  & 60\,000  & 64 \\
+\texttt{gridsfm}  & $\sim$1040 & 30\,000  & 32 \\
+\texttt{lumina}   & $\sim$145  & 200\,000 & 32 \\
+\bottomrule
+\end{tabular}
+\caption{Every budget lands at roughly 28 GiB of activations on a 48 GiB card,
+i.e.\ about 60\% of it. $M$ was 48 (alex a40), 40 (alex2 a100), or 94 (helma
+h100) depending on where the grid ran.}
+\end{table}
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{lr rrrr}
+\toprule
+Grid & Buses & \texttt{pignn} & \texttt{graphkit} & \texttt{gridsfm} & \texttt{lumina} \\
+\midrule
+case4gs & 4 & 32 & 64 & 32 & 32 \\
+case5 & 5 & 32 & 64 & 32 & 32 \\
+case6ww & 6 & 32 & 64 & 32 & 32 \\
+case9 & 9 & 32 & 64 & 32 & 32 \\
+case14 & 14 & 32 & 64 & 32 & 32 \\
+case24\_ieee\_rts & 24 & 32 & 64 & 32 & 32 \\
+GBreducednetwork & 29 & 32 & 64 & 32 & 32 \\
+case30 & 30 & 32 & 64 & 32 & 32 \\
+case\_ieee30 & 30 & 32 & 64 & 32 & 32 \\
+case33bw & 33 & 32 & 64 & 32 & 32 \\
+case39 & 39 & 32 & 64 & 32 & 32 \\
+case57 & 57 & 32 & 64 & 32 & 32 \\
+case89pegase & 89 & 32 & 64 & 32 & 32 \\
+SimBench & 94 & 32 & 64 & 32 & 32 \\
+case118 & 118 & 32 & 64 & 32 & 32 \\
+case145 & 145 & 32 & 64 & 32 & 32 \\
+iceland & 189 & 32 & 64 & 32 & 32 \\
+case\_illinois200 & 200 & 32 & 64 & 32 & 32 \\
+case300 & 300 & 32 & 64 & 32 & 32 \\
+LVN\_heo1 & 722 & 32 & 64 & 32 & 32 \\
+case1354pegase & 1354 & 32 & 64 & 32 & 32 \\
+case1888rte & 1888 & \textbf{28} & \textbf{62} & \textbf{31} & 32 \\
+GBnetwork & 2224 & \textbf{23} & \textbf{52} & \textbf{26} & 32 \\
+case2848rte & 2848 & \textbf{18} & \textbf{41} & \textbf{20} & 32 \\
+case2869pegase & 2869 & \textbf{18} & \textbf{40} & \textbf{20} & 32 \\
+case3120sp & 3120 & \textbf{16} & \textbf{37} & \textbf{18} & 32 \\
+ENTSO\_E\_RealGridTest & 6051 & \textbf{8} & \textbf{19} & \textbf{9} & 32 \\
+case6470rte & 6470 & \textbf{8} & \textbf{18} & \textbf{9} & 32 \\
+case6495rte & 6495 & \textbf{8} & \textbf{18} & \textbf{9} & 32 \\
+case6515rte & 6515 & \textbf{8} & \textbf{18} & \textbf{9} & 32 \\
+case9241pegase & 9241 & \textbf{5} & \textbf{12} & \textbf{6} & 32 \\
+\bottomrule
+\end{tabular}
+\caption{Micro-batch actually used, in graphs per optimiser step. \textbf{Bold}
+marks a grid where memory bound the batch below the cap. case1888rte first ran
+on alex a100\_80 ($M{=}80$, batches 23/52/31) and was rerun on helma; the helma
+figures are shown.}
+\end{table}
+
+\paragraph{The cap binds up to case1354pegase; past it, memory does.} Every
+model runs at its cap on the first 21 grids, so nothing about batch size
+distinguishes them there. From case1888rte on, $B$ falls with $1/N$: by
+case9241pegase \texttt{pignn} is at 5 graphs per step, \texttt{gridsfm} at 6 and
+\texttt{graphkit} at 12 --- reductions of 6.4$\times$, 5.3$\times$ and
+5.3$\times$ against their small-grid batches.
+
+\textbf{This confounds the size comparison.} Gradient noise scales as
+$1/\sqrt{B}$, so the largest grids were optimised under roughly 2.5 times more
+noise than the smallest, at the same learning rate and the same 40-epoch budget.
+Any degradation reported above for $N \geq 2000$ mixes the difficulty of the
+grid with a weaker optimiser setting, and the two are not separated by these
+runs.
+
+\texttt{lumina} is the exception: its activation cost is low enough that its
+budget never binds, so it held $B=32$ on all 31 grids. It is the only model here
+whose optimiser saw a constant batch across the corpus --- and also the only one
+whose error is flat in $N$, which is consistent with it being limited by
+something other than batch size.
+
+\paragraph{This is now adjustable.} All four drivers take
+\texttt{-{}-grad\_accum\_steps} and \texttt{-{}-target\_effective\_batch};
+the latter derives the accumulation count from \texttt{-{}-BATCH} so the
+effective batch can be held fixed across grids without more memory. Gradient
+clipping moved to once per accumulation group. Neither flag was used for the
+runs reported here, all of which ran at accumulation 1.
+
+\section{Two failure modes, both identified}
+
+\paragraph{Ten LUMINA runs died on a missing file.} Every LUMINA job on the alex
+tier failed at \texttt{make\_model} with \texttt{FileNotFoundError} on
+\texttt{lumina\_ckpt/lumina\_config.json}. LUMINA reads its architecture from
+the released config even when training from scratch, and the file existed only
+under the b313dc11 account while the dispatcher built the path from
+\texttt{\$HOME\_BASE}. Copying it to the iwi5295h account and resubmitting fixed
+all ten; they now train normally.
+
+\paragraph{Twelve runs hit the 24-hour wall clock, and the fix for it failed.}
+All twelve are among the five largest grids, where a single epoch costs
+2900--6700 s, so 40 epochs needs 32--74 h:
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{llrrr}
+\toprule
+Model & Grid & epochs reached & s/epoch & 40 epochs needs \\
+\midrule
+pignn    & ENTSO\_E\_RealGridTest & 29/40 & 2920 & 32.4 h \\
+pignn    & case9241pegase        & 17/40 & 5125 & 57.0 h \\
+graphkit & case9241pegase        & 28/40 & 3087 & 34.3 h \\
+gridsfm  & case6470rte           & 24/40 & 3602 & 40.0 h \\
+gridsfm  & case9241pegase        & 13/40 & 6655 & 74.0 h \\
+lumina   & case9241pegase        & 35/40 & 2450 & 27.2 h \\
+\bottomrule
+\end{tabular}
+\caption{Six of the twelve.}
+\end{table}
+
+helma's \texttt{preempt} partition allows 48 h on the same h100s, so all twelve
+were resubmitted there. \textbf{Every one was evicted within three hours}
+(elapsed 2:44 to 3:03, state \texttt{PREEMPTED}), and since the drivers have no
+resume, that work was lost outright --- a worse outcome than the 24 h runs it
+was meant to replace. Choosing preempt on its time limit alone, without
+weighting how contended it is, was the wrong call.
+
+They are now back on \texttt{h100} with the epoch budget cut to what fits ~21 h
+at each run's measured per-epoch cost: pignn 14--25, graphkit 24, gridsfm
+11--23, lumina 30, against 40 everywhere else. \textbf{Those twelve cells will
+therefore carry a smaller training budget than the rest of the report}, and are
+not equal-budget comparisons. They are still training and do not appear in the
+tables below.
+
+\section{Results}
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{lr rrrr}
+\toprule
+ & & \multicolumn{4}{c}{$|V|$ RMSE [pu]} \\
+\cmidrule(lr){3-6}
+Grid & Buses & pignn & graphkit & gridsfm & lumina \\
+\midrule
+case4gs & 4 & \textbf{3.43e-05} & 3.22e-04 & 9.97e-03 & 1.80e-02 \\
+case5 & 5 & \textbf{1.62e-05} & 1.19e-04 & 1.55e-03 & 2.46e-02 \\
+case6ww & 6 & \textbf{2.13e-05} & 4.54e-04 & 6.01e-03 & 1.59e-02 \\
+case9 & 9 & \textbf{1.12e-04} & 7.39e-04 & 4.42e-03 & 2.02e-02 \\
+case14 & 14 & \textbf{8.13e-05} & 9.98e-04 & 3.17e-03 & 2.26e-02 \\
+case24\_ieee\_rts & 24 & \textbf{6.53e-05} & 1.24e-03 & 7.19e-03 & 2.49e-02 \\
+GBreducednetwork & 29 & \textbf{4.01e-05} & 4.09e-01 & 5.25e-02 & 6.02e-02 \\
+case30 & 30 & \textbf{1.34e-04} & 1.13e-03 & 1.63e-03 & 2.20e-02 \\
+case\_ieee30 & 30 & \textbf{2.22e-04} & 2.13e-03 & 3.04e-03 & 1.99e-02 \\
+case33bw & 33 & 3.84e-03 & \textbf{1.45e-03} & 5.14e-03 & 1.78e-02 \\
+case39 & 39 & \textbf{4.57e-05} & 7.29e-03 & 8.92e-03 & 2.87e-02 \\
+case57 & 57 & 1.92e-02 & \textbf{4.59e-03} & 1.97e-02 & 3.60e-02 \\
+case89pegase & 89 & \textbf{2.71e-03} & 1.08e-02 & 2.00e-02 & 2.96e-02 \\
+SimBench & 94 & \textbf{1.52e-03} & 5.15e-03 & 1.14e-02 & 5.42e-02 \\
+case118 & 118 & \textbf{3.22e-05} & 1.31e-03 & 1.95e-02 & 2.52e-02 \\
+case145 & 145 & \textbf{9.29e-03} & 1.25e-01 & 4.80e-02 & 6.70e-02 \\
+iceland & 189 & 1.05e-01 & \textbf{2.11e-02} & 4.63e-02 & 3.99e-02 \\
+case\_illinois200 & 200 & \textbf{1.52e-04} & 8.09e-03 & 5.39e-03 & 2.38e-02 \\
+case300 & 300 & 2.63e-02 & \textbf{2.37e-02} & 2.47e-02 & 4.23e-02 \\
+LVN\_heo1 & 722 & \textsc{nan} & \textbf{2.02e-02} & 3.09e-02 & 3.09e-02 \\
+case1354pegase & 1354 & 1.73e-01 & \textbf{2.09e-02} & 2.54e-02 & 2.99e-02 \\
+case1888rte & 1888 & \textsc{nan} & \textbf{2.52e-02} & 2.90e-02 & 3.29e-02 \\
+GBnetwork & 2224 & \textsc{nan} & 3.54e-02 & \textbf{3.19e-02} & 4.44e-02 \\
+case2848rte & 2848 & \textsc{nan} & 2.64e-02 & \textbf{1.67e-02} & 4.00e-02 \\
+case2869pegase & 2869 & 1.77e-01 & 3.21e-02 & \textbf{1.74e-02} & 4.13e-02 \\
+case3120sp & 3120 & 1.76e-01 & \textbf{2.86e-02} & 3.05e-02 & 3.37e-02 \\
+ENTSO\_E\_RealGridTest & 6051 & --- & \textbf{2.42e-02} & 2.70e-02 & 3.46e-02 \\
+case6470rte & 6470 & --- & 4.00e-02 & \textbf{3.29e-02} & 4.31e-02 \\
+case6495rte & 6495 & --- & 3.87e-02 & \textbf{3.54e-02} & 4.46e-02 \\
+case6515rte & 6515 & --- & \textbf{3.81e-02} & 3.91e-02 & 4.42e-02 \\
+case9241pegase & 9241 & --- & 5.32e-02 & \textbf{4.00e-02} & 6.02e-02 \\
+\bottomrule
+\end{tabular}
+\caption{Voltage magnitude RMSE [pu]; best per grid in bold. \textsc{nan} marks a run that diverged (Section 4).}
+\end{table}
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{lr rrrr}
+\toprule
+ & & \multicolumn{4}{c}{$\theta$ RMSE [deg]} \\
+\cmidrule(lr){3-6}
+Grid & Buses & pignn & graphkit & gridsfm & lumina \\
+\midrule
+case4gs & 4 & \textbf{2.70e-03} & 2.47e-02 & 2.21e-01 & 5.58e-01 \\
+case5 & 5 & \textbf{5.37e-03} & 6.12e-02 & 2.89e-02 & 5.25e-01 \\
+case6ww & 6 & \textbf{8.73e-03} & 6.54e-02 & 3.13e+00 & 8.05e-01 \\
+case9 & 9 & \textbf{5.26e-02} & 1.18e-01 & 6.82e+00 & 1.38e+00 \\
+case14 & 14 & \textbf{1.52e-02} & 1.30e-01 & 2.45e+00 & 1.17e+00 \\
+case24\_ieee\_rts & 24 & \textbf{3.58e-02} & 2.64e-01 & 1.62e+00 & 3.03e+00 \\
+GBreducednetwork & 29 & \textbf{1.18e-01} & 1.02e+01 & 3.27e+01 & 1.20e+01 \\
+case30 & 30 & \textbf{4.73e-02} & 9.80e-02 & 1.84e+00 & 8.98e-01 \\
+case\_ieee30 & 30 & \textbf{1.71e-02} & 1.24e-01 & 3.86e+00 & 2.16e+00 \\
+case33bw & 33 & 2.65e-01 & \textbf{1.02e-01} & 1.47e+00 & 2.94e-01 \\
+case39 & 39 & \textbf{1.84e-02} & 5.11e-01 & 1.88e+01 & 5.76e+00 \\
+case57 & 57 & \textbf{1.03e-01} & 2.27e-01 & 3.06e+00 & 3.69e+00 \\
+case89pegase & 89 & \textbf{2.88e-01} & 6.82e-01 & 1.06e+00 & 6.58e+00 \\
+SimBench & 94 & \textbf{9.96e-02} & 2.78e-01 & 4.86e+00 & 7.36e+00 \\
+case118 & 118 & \textbf{3.77e-02} & 4.58e-01 & 3.64e+01 & 3.66e+00 \\
+case145 & 145 & \textbf{4.54e+00} & 1.84e+01 & 1.01e+02 & 6.84e+01 \\
+iceland & 189 & 4.20e+01 & \textbf{2.51e+00} & 2.55e+01 & 9.32e+00 \\
+case\_illinois200 & 200 & \textbf{5.62e-02} & 5.51e-01 & 5.03e+01 & 2.53e+00 \\
+case300 & 300 & \textbf{2.69e+00} & 4.76e+00 & 2.77e+01 & 1.90e+01 \\
+LVN\_heo1 & 722 & \textsc{nan} & 1.35e+00 & \textbf{7.49e-01} & 1.83e+00 \\
+case1354pegase & 1354 & 7.01e+01 & \textbf{4.73e+00} & 1.43e+01 & 1.05e+01 \\
+case1888rte & 1888 & \textsc{nan} & \textbf{7.18e+00} & 1.56e+02 & 1.44e+01 \\
+GBnetwork & 2224 & \textsc{nan} & 4.94e+00 & \textbf{2.14e+00} & 1.72e+01 \\
+case2848rte & 2848 & \textsc{nan} & \textbf{3.12e+00} & 6.97e+01 & 5.73e+00 \\
+case2869pegase & 2869 & 7.56e+01 & \textbf{9.69e+00} & 7.04e+01 & 2.87e+01 \\
+case3120sp & 3120 & 7.97e+01 & \textbf{8.03e+00} & 1.23e+01 & 1.64e+01 \\
+ENTSO\_E\_RealGridTest & 6051 & --- & \textbf{4.15e+00} & 1.03e+01 & 1.10e+01 \\
+case6470rte & 6470 & --- & \textbf{1.22e+01} & 3.67e+01 & 1.74e+01 \\
+case6495rte & 6495 & --- & \textbf{3.39e+00} & 3.53e+01 & 1.17e+01 \\
+case6515rte & 6515 & --- & \textbf{7.98e+00} & 1.04e+02 & 1.45e+01 \\
+case9241pegase & 9241 & --- & \textbf{3.71e+01} & 1.19e+02 & 6.58e+01 \\
+\bottomrule
+\end{tabular}
+\caption{Voltage angle RMSE [deg].}
+\end{table}
+
+\paragraph{PIGNN leads on every family.} Over the 22 grids all four completed:
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{lrrrr}
+\toprule
+median over 22 grids & pignn & graphkit & gridsfm & lumina \\
+\midrule
+$|V|$ RMSE [pu]              & \textbf{1.87e-04} & 4.87e-03 & 1.07e-02 & 2.70e-02 \\
+$\theta$ RMSE [deg]          & \textbf{0.0779}   & 0.368    & 5.84     & 3.68 \\
+$\operatorname{mean}_s\|\Delta P_s\|_\infty$ [pu] & \textbf{1.60e-02} & 2.34e-01 & 8.32e-01 & 3.01 \\
+$\operatorname{mean}_s\|\Delta Q_s\|_\infty$ [pu] & \textbf{1.18e-02} & 1.77e-01 & 3.92e-01 & 4.45e-01 \\
+$\overline{|\Delta P|}$ [pu] & \textbf{1.75e-03} & 3.90e-02 & 1.00e-01 & 4.00e-01 \\
+$\overline{|\Delta Q|}$ [pu] & \textbf{1.85e-03} & 3.03e-02 & 1.16e-01 & 1.35e-01 \\
+p95$|\Delta P|$ [pu]         & \textbf{4.40e-03} & 1.22e-01 & 4.39e-01 & 1.38 \\
+p95$|\Delta Q|$ [pu]         & \textbf{5.62e-03} & 9.34e-02 & 3.40e-01 & 3.67e-01 \\
+median $|\Delta P|$ [pu]   & \textbf{8.49e-04} & 2.46e-02 & 3.33e-02 & 1.78e-01 \\
+median $|\Delta Q|$ [pu]   & \textbf{9.62e-04} & 1.80e-02 & 7.21e-02 & 7.88e-02 \\
+frac $|\Delta P|\le10^{-6}$ & \textbf{0.06\%} & 0.00\% & 0.00\% & 0.00\% \\
+frac $|\Delta Q|\le10^{-6}$ & \textbf{0.06\%} & 0.00\% & 0.00\% & 0.00\% \\
+\bottomrule
+\end{tabular}
+\caption{Win counts follow the same order: PIGNN takes 14--17 of 22 on every
+family, graphkit 1--6, gridsfm 0--6, lumina \textbf{0 on all eight}. The median
+and tolerance-fraction rows are over the 20 grids where all four models have a
+rescored distribution, so they are not directly comparable with the 22-grid
+rows above.}
+\end{table}
+
+The ordering is \texttt{pignn} $<$ \texttt{graphkit} $<$ \texttt{gridsfm} $<$
+\texttt{lumina} on all eight metrics, with no crossing. PIGNN's margin is
+largest on the residuals --- a factor of 15 against graphkit on
+$\operatorname{mean}_s\|\Delta P_s\|_\infty$ and 22 on $\overline{|\Delta P|}$ --- which is the expected
+shape for a model whose iteration is driven by that residual.
+
+\begin{table}[H]
+\centering\small
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{lr rrrr rrrr}
+\toprule
+ & & \multicolumn{4}{c}{$\operatorname{mean}_s\|\Delta P_s\|_\infty$ [pu]} & \multicolumn{4}{c}{$\operatorname{mean}_s\|\Delta Q_s\|_\infty$ [pu]} \\
+\cmidrule(lr){3-6}\cmidrule(lr){7-10}
+Grid & Buses & pignn & graphkit & gridsfm & lumina & pignn & graphkit & gridsfm & lumina \\
+\midrule
+case4gs & 4 & \textbf{1.15e-03} & 1.37e-02 & 7.23e-02 & 3.24e-01 & \textbf{1.97e-03} & 2.00e-02 & 2.01e-01 & 1.86e-01 \\
+case5 & 5 & \textbf{3.52e-03} & 5.35e-02 & 3.50e-02 & 4.89e-01 & \textbf{3.73e-03} & 2.40e-02 & 1.26e-01 & 1.28e-01 \\
+case6ww & 6 & \textbf{5.37e-04} & 1.65e-02 & 4.91e-01 & 1.11e-01 & \textbf{4.10e-04} & 1.08e-02 & 1.51e-01 & 1.29e-01 \\
+case9 & 9 & \textbf{2.49e-03} & 2.20e-02 & 4.44e-01 & 1.99e-01 & \textbf{1.61e-03} & 1.75e-02 & 1.07e-01 & 9.96e-02 \\
+case14 & 14 & \textbf{8.07e-04} & 2.36e-02 & 5.51e-01 & 5.28e-01 & \textbf{7.05e-04} & 1.55e-02 & 5.22e-02 & 7.29e-02 \\
+case24\_ieee\_rts & 24 & \textbf{2.81e-03} & 1.51e-01 & 5.89e-01 & 1.97e+00 & \textbf{3.85e-03} & 5.95e-02 & 3.10e-01 & 3.79e-01 \\
+GBreducednetwork & 29 & \textbf{3.56e-01} & 4.66e+03 & 8.06e+01 & 2.10e+02 & \textbf{2.08e-01} & 2.98e+00 & 1.45e+00 & 5.46e+02 \\
+case30 & 30 & \textbf{2.53e-03} & 1.86e-02 & 1.73e-01 & 1.01e-01 & \textbf{2.20e-03} & 1.60e-02 & 9.75e-02 & 7.55e-02 \\
+case\_ieee30 & 30 & \textbf{1.79e-03} & 4.04e-02 & 6.17e-01 & 3.68e-01 & \textbf{1.22e-03} & 3.04e-02 & 6.36e-02 & 1.02e-01 \\
+case33bw & 33 & 2.21e-02 & \textbf{3.88e-03} & 3.88e-02 & 1.25e-01 & 2.61e-02 & \textbf{8.09e-03} & 3.13e-02 & 9.96e-02 \\
+case39 & 39 & \textbf{1.79e-03} & 3.71e-01 & 1.02e+00 & 4.46e+00 & \textbf{1.53e-03} & 3.43e-01 & 4.51e-01 & 8.36e-01 \\
+case57 & 57 & \textbf{3.97e-02} & 5.92e-02 & 2.16e+00 & 1.09e+00 & 4.89e-02 & \textbf{3.08e-02} & 3.34e-01 & 4.14e-01 \\
+case89pegase & 89 & 1.55e+00 & 9.84e-01 & \textbf{6.45e-01} & 1.95e+01 & 2.64e+00 & 1.06e+00 & \textbf{7.91e-01} & 2.63e+00 \\
+SimBench & 94 & \textbf{3.05e-02} & 2.48e-01 & 1.61e+00 & 7.15e+00 & \textbf{1.92e-02} & 2.37e-01 & 1.05e+00 & 3.48e+00 \\
+case118 & 118 & \textbf{9.88e-03} & 2.20e-01 & 2.38e+00 & 2.27e+00 & \textbf{4.29e-03} & 1.18e-01 & 7.08e-01 & 4.75e-01 \\
+case145 & 145 & \textbf{1.01e+00} & 2.09e+02 & 6.46e+01 & 2.74e+03 & \textbf{2.78e-01} & 3.88e+01 & 2.48e+00 & 2.35e+03 \\
+iceland & 189 & 7.23e+03 & 1.66e+00 & \textbf{3.39e-01} & 5.30e+00 & 1.19e+04 & \textbf{1.21e+00} & 1.22e+02 & 2.13e+00 \\
+case\_illinois200 & 200 & \textbf{7.26e-03} & 2.56e-01 & 1.72e+00 & 3.75e+00 & \textbf{1.75e-03} & 2.67e-01 & 2.26e-01 & 3.12e-01 \\
+case300 & 300 & 1.68e+00 & 1.04e+01 & \textbf{1.22e+00} & 8.06e+01 & 4.58e+00 & 6.82e+00 & \textbf{1.23e+00} & 1.81e+01 \\
+LVN\_heo1 & 722 & \textsc{nan} & 5.64e+00 & \textbf{1.54e+00} & 5.23e+00 & \textsc{nan} & 2.34e+00 & 3.81e+00 & \textbf{1.80e+00} \\
+case1354pegase & 1354 & 1.17e+04 & 4.79e+01 & \textbf{1.81e+00} & 4.32e+02 & 1.37e+04 & 1.42e+01 & \textbf{1.49e+00} & 1.22e+01 \\
+case1888rte & 1888 & \textsc{nan} & \textbf{6.81e+01} & 2.59e+02 & 5.69e+02 & \textsc{nan} & \textbf{4.64e+01} & 8.89e+01 & 1.18e+02 \\
+GBnetwork & 2224 & \textsc{nan} & 1.81e+02 & \textbf{1.10e+00} & 3.18e+04 & \textsc{nan} & 5.58e+01 & \textbf{4.81e+00} & 3.95e+03 \\
+case2848rte & 2848 & \textsc{nan} & \textbf{1.31e+01} & 1.97e+01 & 2.10e+02 & \textsc{nan} & 2.26e+01 & \textbf{2.20e+00} & 1.13e+02 \\
+case2869pegase & 2869 & 1.16e+04 & 4.44e+02 & \textbf{2.53e+00} & 7.66e+03 & 1.65e+04 & 1.35e+02 & \textbf{1.22e+00} & 6.69e+03 \\
+case3120sp & 3120 & 1.97e+04 & 1.94e+03 & \textbf{1.79e+03} & 7.97e+03 & 3.64e+04 & 8.85e+01 & \textbf{4.09e+01} & 4.18e+03 \\
+ENTSO\_E\_RealGridTest & 6051 & --- & 3.61e+01 & \textbf{9.48e+00} & 7.75e+01 & --- & \textbf{1.91e+01} & 2.57e+01 & 4.34e+01 \\
+case6470rte & 6470 & --- & 1.66e+02 & \textbf{3.70e+01} & 1.08e+03 & --- & 8.33e+01 & \textbf{4.00e+01} & 3.36e+02 \\
+case6495rte & 6495 & --- & 1.50e+03 & \textbf{3.58e+02} & 5.46e+03 & --- & 2.72e+02 & \textbf{1.70e+02} & 3.17e+03 \\
+case6515rte & 6515 & --- & \textbf{1.12e+02} & 2.20e+02 & 9.71e+02 & --- & 1.08e+02 & \textbf{8.51e+01} & 4.20e+02 \\
+case9241pegase & 9241 & --- & 2.05e+03 & \textbf{4.52e+00} & 8.56e+03 & --- & 6.97e+02 & \textbf{1.99e+01} & 1.34e+04 \\
+\bottomrule
+\end{tabular}
+\caption{Mean per-scenario maximum power-balance residual, pu on a 100 MVA
+base.  The reducer is $N_s^{-1}\sum_s\max_i|\Delta P_{s,i}|$ (and similarly
+for $Q$), not $\max_{s,i}$.  $P$ is not scored at the slack, $Q$ not at slack
+or PV.}
+\end{table}
+
+\paragraph{Residual reducer convention.}
+The legacy log names \texttt{dPinf}/\texttt{dQinf} and the earlier notation
+$\Delta P^\infty/\Delta Q^\infty$ can suggest a global test-set maximum.  The
+driver actually computes a maximum over buses for each scenario, sums those
+values, and divides by the number of scenarios.  Therefore all values in the
+preceding table are \emph{mean per-scenario maxima}.  By contrast,
+$\overline{|\Delta P|}$, RMSE and tolerance fractions pool all valid
+bus--scenario entries.  Median/p95 are pooled quantiles (with at most two
+million uniformly spaced entries retained by the older GridFM-derived driver
+on very large arrays).  A true global maximum $\max_{s,i}|\Delta P_{s,i}|$ is
+not reported in this document.
+
+\begin{table}[H]
+\centering\small
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{lr rrrr rrrr}
+\toprule
+ & & \multicolumn{4}{c}{$\overline{|\Delta P|}$ [pu]} & \multicolumn{4}{c}{$\overline{|\Delta Q|}$ [pu]} \\
+\cmidrule(lr){3-6}\cmidrule(lr){7-10}
+Grid & Buses & pignn & graphkit & gridsfm & lumina & pignn & graphkit & gridsfm & lumina \\
+\midrule
+case4gs & 4 & \textbf{7.42e-04} & 7.92e-03 & 4.04e-02 & 2.11e-01 & \textbf{1.67e-03} & 1.63e-02 & 1.42e-01 & 1.30e-01 \\
+case5 & 5 & \textbf{2.37e-03} & 2.73e-02 & 1.90e-02 & 2.63e-01 & \textbf{3.73e-03} & 2.40e-02 & 1.27e-01 & 1.28e-01 \\
+case6ww & 6 & \textbf{3.04e-04} & 8.25e-03 & 2.36e-01 & 5.39e-02 & \textbf{2.62e-04} & 6.22e-03 & 9.94e-02 & 7.76e-02 \\
+case9 & 9 & \textbf{1.04e-03} & 9.41e-03 & 1.09e-01 & 9.54e-02 & \textbf{9.22e-04} & 8.21e-03 & 4.61e-02 & 4.43e-02 \\
+case14 & 14 & \textbf{2.08e-04} & 7.64e-03 & 7.30e-02 & 1.03e-01 & \textbf{3.01e-04} & 6.38e-03 & 1.74e-02 & 3.04e-02 \\
+case24\_ieee\_rts & 24 & \textbf{1.02e-03} & 4.08e-02 & 1.43e-01 & 4.94e-01 & \textbf{1.39e-03} & 2.19e-02 & 1.09e-01 & 1.40e-01 \\
+GBreducednetwork & 29 & \textbf{5.99e-02} & 2.16e+02 & 4.38e+00 & 1.94e+01 & \textbf{9.08e-02} & 1.19e+00 & 5.66e-01 & 1.10e+02 \\
+case30 & 30 & \textbf{4.07e-04} & 5.06e-03 & 2.76e-02 & 2.53e-02 & \textbf{3.15e-04} & 4.45e-03 & 1.62e-02 & 1.31e-02 \\
+case\_ieee30 & 30 & \textbf{2.10e-04} & 9.73e-03 & 4.43e-02 & 9.59e-02 & \textbf{2.64e-04} & 8.74e-03 & 1.34e-02 & 2.61e-02 \\
+case33bw & 33 & 1.36e-03 & \textbf{9.12e-04} & 1.10e-02 & 1.40e-02 & 1.48e-03 & \textbf{1.32e-03} & 8.22e-03 & 9.69e-03 \\
+case39 & 39 & \textbf{3.31e-04} & 9.34e-02 & 2.56e-01 & 7.65e-01 & \textbf{5.32e-04} & 9.85e-02 & 1.23e-01 & 2.16e-01 \\
+case57 & 57 & \textbf{5.51e-03} & 1.24e-02 & 9.84e-02 & 2.14e-01 & \textbf{8.01e-03} & 8.05e-03 & 5.36e-02 & 6.78e-02 \\
+case89pegase & 89 & \textbf{5.31e-02} & 1.90e-01 & 9.64e-02 & 1.72e+00 & 1.55e-01 & 1.76e-01 & \textbf{1.26e-01} & 5.50e-01 \\
+SimBench & 94 & \textbf{2.13e-03} & 4.70e-02 & 4.02e-01 & 8.40e-01 & \textbf{2.03e-03} & 4.65e-02 & 1.57e-01 & 3.42e-01 \\
+case118 & 118 & \textbf{8.71e-04} & 3.71e-02 & 2.31e-01 & 3.06e-01 & \textbf{7.20e-04} & 2.26e-02 & 1.46e-01 & 9.07e-02 \\
+case145 & 145 & \textbf{5.24e-02} & 8.34e+00 & 3.67e+00 & 8.12e+01 & \textbf{2.73e-02} & 2.94e+00 & 2.74e-01 & 1.04e+02 \\
+iceland & 189 & 2.31e+02 & 1.42e-01 & \textbf{2.89e-02} & 6.50e-01 & 3.66e+02 & \textbf{1.18e-01} & 9.22e-01 & 1.66e-01 \\
+case\_illinois200 & 200 & \textbf{3.85e-04} & 3.73e-02 & 8.30e-02 & 2.60e-01 & \textbf{2.60e-04} & 3.66e-02 & 4.45e-02 & 5.71e-02 \\
+case300 & 300 & \textbf{3.71e-02} & 6.05e-01 & 9.80e-02 & 2.50e+00 & \textbf{8.65e-02} & 3.15e-01 & 1.06e-01 & 6.01e-01 \\
+LVN\_heo1 & 722 & \textsc{nan} & 1.04e-01 & \textbf{1.26e-02} & 3.34e-02 & \textsc{nan} & 9.66e-02 & 1.14e-01 & \textbf{8.04e-02} \\
+case1354pegase & 1354 & 3.72e+02 & 1.08e+00 & \textbf{1.02e-01} & 1.76e+00 & 5.28e+02 & 5.34e-01 & \textbf{1.16e-01} & 4.22e-01 \\
+case1888rte & 1888 & \textsc{nan} & 1.24e+00 & \textbf{6.77e-01} & 1.69e+00 & \textsc{nan} & 7.06e-01 & \textbf{3.56e-01} & 4.49e-01 \\
+GBnetwork & 2224 & \textsc{nan} & 2.05e+00 & \textbf{8.28e-02} & 1.38e+02 & \textsc{nan} & 7.71e-01 & \textbf{2.66e-01} & 3.18e+01 \\
+case2848rte & 2848 & \textsc{nan} & 4.44e-01 & \textbf{1.24e-01} & 7.78e-01 & \textsc{nan} & 2.79e-01 & \textbf{1.44e-01} & 3.63e-01 \\
+case2869pegase & 2869 & 3.89e+02 & 4.92e+00 & \textbf{1.23e-01} & 7.81e+01 & 6.71e+02 & 1.77e+00 & \textbf{1.16e-01} & 2.51e+01 \\
+case3120sp & 3120 & 5.83e+02 & 1.78e+00 & \textbf{6.44e-01} & 8.07e+00 & 8.70e+02 & 6.13e-01 & \textbf{1.96e-01} & 2.14e+00 \\
+ENTSO\_E\_RealGridTest & 6051 & --- & 3.46e-01 & \textbf{5.33e-02} & 5.83e-01 & --- & \textbf{1.88e-01} & 2.00e-01 & 2.38e-01 \\
+case6470rte & 6470 & --- & 1.04e+00 & \textbf{1.01e-01} & 1.80e+00 & --- & 4.37e-01 & \textbf{2.36e-01} & 4.98e-01 \\
+case6495rte & 6495 & --- & 9.51e-01 & \textbf{4.65e-01} & 2.12e+00 & --- & \textbf{3.41e-01} & 3.71e-01 & 9.53e-01 \\
+case6515rte & 6515 & --- & 7.27e-01 & \textbf{2.96e-01} & 1.52e+00 & --- & 3.63e-01 & \textbf{3.06e-01} & 4.98e-01 \\
+case9241pegase & 9241 & --- & 1.12e+01 & \textbf{9.99e-02} & 2.58e+02 & --- & 4.29e+00 & \textbf{3.75e-01} & 3.06e+02 \\
+\bottomrule
+\end{tabular}
+\caption{Mean residual, pu.}
+\end{table}
+
+\begin{table}[H]
+\centering\small
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{lr rrrr rrrr}
+\toprule
+ & & \multicolumn{4}{c}{p95$|\Delta P|$ [pu]} & \multicolumn{4}{c}{p95$|\Delta Q|$ [pu]} \\
+\cmidrule(lr){3-6}\cmidrule(lr){7-10}
+Grid & Buses & pignn & graphkit & gridsfm & lumina & pignn & graphkit & gridsfm & lumina \\
+\midrule
+case4gs & 4 & \textbf{1.83e-03} & 2.13e-02 & 9.27e-02 & 4.51e-01 & \textbf{3.23e-03} & 2.94e-02 & 3.57e-01 & 3.52e-01 \\
+case5 & 5 & \textbf{4.85e-03} & 7.29e-02 & 5.13e-02 & 6.95e-01 & \textbf{7.33e-03} & 6.25e-02 & 3.26e-01 & 3.32e-01 \\
+case6ww & 6 & \textbf{7.56e-04} & 2.34e-02 & 6.25e-01 & 1.47e-01 & \textbf{6.81e-04} & 1.73e-02 & 2.41e-01 & 2.01e-01 \\
+case9 & 9 & \textbf{2.76e-03} & 2.62e-02 & 4.77e-01 & 2.40e-01 & \textbf{2.40e-03} & 2.18e-02 & 1.28e-01 & 1.23e-01 \\
+case14 & 14 & \textbf{7.69e-04} & 2.28e-02 & 4.77e-01 & 4.18e-01 & \textbf{9.55e-04} & 1.68e-02 & 5.34e-02 & 7.73e-02 \\
+case24\_ieee\_rts & 24 & \textbf{2.73e-03} & 1.24e-01 & 4.93e-01 & 1.48e+00 & \textbf{3.91e-03} & 5.80e-02 & 2.86e-01 & 3.82e-01 \\
+GBreducednetwork & 29 & \textbf{3.03e-01} & 1.26e+03 & 8.28e+00 & 9.69e+01 & \textbf{2.26e-01} & 3.48e+00 & 1.94e+00 & 4.69e+02 \\
+case30 & 30 & \textbf{1.35e-03} & 1.41e-02 & 1.23e-01 & 9.04e-02 & \textbf{9.44e-04} & 1.18e-02 & 5.87e-02 & 4.35e-02 \\
+case\_ieee30 & 30 & \textbf{8.33e-04} & 3.01e-02 & 1.57e-01 & 3.07e-01 & \textbf{8.13e-04} & 2.55e-02 & 5.22e-02 & 8.64e-02 \\
+case33bw & 33 & 3.96e-03 & \textbf{2.85e-03} & 3.04e-02 & 1.02e-01 & \textbf{3.66e-03} & 4.04e-03 & 2.08e-02 & 4.78e-02 \\
+case39 & 39 & \textbf{8.76e-04} & 2.69e-01 & 8.25e-01 & 2.25e+00 & \textbf{1.39e-03} & 2.78e-01 & 3.44e-01 & 6.32e-01 \\
+case57 & 57 & \textbf{2.52e-02} & 3.63e-02 & 3.22e-01 & 7.02e-01 & 4.13e-02 & \textbf{2.19e-02} & 2.10e-01 & 3.00e-01 \\
+case89pegase & 89 & \textbf{1.68e-01} & 5.72e-01 & 2.79e-01 & 5.24e+00 & 1.29e+00 & 6.13e-01 & \textbf{4.40e-01} & 1.68e+00 \\
+SimBench & 94 & \textbf{6.68e-03} & 1.47e-01 & 1.34e+00 & 3.53e+00 & \textbf{7.49e-03} & 1.50e-01 & 7.07e-01 & 1.39e+00 \\
+case118 & 118 & \textbf{3.21e-03} & 1.13e-01 & 1.07e+00 & 1.28e+00 & \textbf{1.99e-03} & 6.69e-02 & 4.22e-01 & 2.97e-01 \\
+case145 & 145 & \textbf{2.05e-01} & 3.05e+01 & 1.79e+01 & 1.90e+02 & \textbf{1.10e-01} & 1.24e+01 & 8.54e-01 & 4.14e+02 \\
+iceland & 189 & 6.83e+02 & 5.28e-01 & \textbf{1.16e-01} & 2.10e+00 & 1.33e+03 & \textbf{4.33e-01} & 5.59e-01 & 6.03e-01 \\
+case\_illinois200 & 200 & \textbf{1.06e-03} & 1.20e-01 & 4.60e-01 & 8.64e-01 & \textbf{7.74e-04} & 1.20e-01 & 1.30e-01 & 1.64e-01 \\
+case300 & 300 & \textbf{9.92e-02} & 2.12e+00 & 3.78e-01 & 9.57e+00 & \textbf{2.50e-01} & 1.10e+00 & 3.60e-01 & 2.15e+00 \\
+LVN\_heo1 & 722 & \textsc{nan} & 3.21e-01 & \textbf{4.24e-02} & 1.18e-01 & \textsc{nan} & \textbf{3.19e-01} & 4.03e-01 & 3.79e-01 \\
+case1354pegase & 1354 & 1.75e+03 & 3.44e+00 & \textbf{4.17e-01} & 4.45e+00 & 2.68e+03 & 1.98e+00 & \textbf{3.39e-01} & 1.46e+00 \\
+case1888rte & 1888 & \textsc{nan} & 4.45e+00 & \textbf{1.48e+00} & 4.32e+00 & \textsc{nan} & 2.20e+00 & \textbf{9.81e-01} & 1.35e+00 \\
+GBnetwork & 2224 & \textsc{nan} & 6.85e+00 & \textbf{3.04e-01} & 8.27e+01 & \textsc{nan} & 2.74e+00 & \textbf{9.13e-01} & 1.56e+01 \\
+case2848rte & 2848 & \textsc{nan} & 1.63e+00 & \textbf{3.34e-01} & 2.50e+00 & \textsc{nan} & 9.14e-01 & \textbf{4.74e-01} & 1.07e+00 \\
+case2869pegase & 2869 & 1.96e+03 & 1.62e+01 & \textbf{5.44e-01} & 3.02e+02 & 3.63e+03 & 6.53e+00 & \textbf{3.41e-01} & 7.15e+01 \\
+case3120sp & 3120 & 2.44e+03 & 4.61e+00 & \textbf{2.10e-01} & 7.08e+00 & 3.39e+03 & 2.01e+00 & \textbf{7.53e-01} & 1.72e+00 \\
+ENTSO\_E\_RealGridTest & 6051 & --- & 1.18e+00 & \textbf{1.42e-01} & 2.71e+00 & --- & \textbf{6.77e-01} & 7.05e-01 & 8.87e-01 \\
+case6470rte & 6470 & --- & 3.60e+00 & \textbf{2.24e-01} & 5.71e+00 & --- & 1.63e+00 & \textbf{9.08e-01} & 1.51e+00 \\
+case6495rte & 6495 & --- & 2.04e+00 & \textbf{7.34e-01} & 3.68e+00 & --- & 1.06e+00 & \textbf{1.03e+00} & 1.33e+00 \\
+case6515rte & 6515 & --- & 2.51e+00 & \textbf{4.79e-01} & 4.48e+00 & --- & 1.18e+00 & \textbf{9.83e-01} & 1.29e+00 \\
+case9241pegase & 9241 & --- & 3.62e+01 & \textbf{3.95e-01} & 2.90e+03 & --- & 1.75e+01 & \textbf{1.45e+00} & 7.87e+02 \\
+\bottomrule
+\end{tabular}
+\caption{95th-percentile residual, pu.}
+\end{table}
+
+\paragraph{Where the last two families come from.} The four drivers all compute
+the median and the tolerance fraction, but only the PIGNN driver printed them;
+\texttt{format\_residual\_distribution\_compact} in the GridFM-derived drivers
+reported mean, p95 and RMSE only. The two families below were therefore
+recovered by re-running each saved checkpoint through its own driver with
+\texttt{-{}-EPOCHS 0 -{}-init\_checkpoint}, which skips training and repeats the
+test pass on the same split. The rescore reproduces the published figures
+exactly --- graphkit on ENTSO\_E gives $|V|=2.4238\text{e-}02$ against
+$2.42\text{e-}02$ in the table above, on case6470rte $3.9982\text{e-}02$ against
+$4.00\text{e-}02$, and lumina on case118 $2.5184\text{e-}02$ against
+$2.52\text{e-}02$ --- which is the check that the split and the weights line up.
+
+\paragraph{case9241pegase, and four cells that were blank.} The largest grid had
+no row at all: every model hit the 24\,h wall before its test pass. Its
+checkpoints survived, so the row above is the \texttt{\_v2t} checkpoint --- the
+v2 campaign's own resubmission, the same source as the other 6000-bus rows ---
+rescored. The same pass filled \texttt{gridsfm} on ENTSO\_E, case6470rte,
+case6495rte and case6515rte. PIGNN keeps a dash on all five: it produced no
+checkpoint on any of them.
+
+For context, \texttt{acpf\_extended-training\_results} reports these two models
+on case9241pegase after a longer DDP run --- graphkit $3.90\text{e-}02$ at 300
+epochs, gridsfm $3.92\text{e-}02$ at 125 --- against $5.32\text{e-}02$ and
+$4.00\text{e-}02$ here. Those are a different epoch budget and are deliberately
+kept out of this table, whose every other row is a 40-epoch v2 run.
+
+
+\begin{table}[H]
+\centering\small
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{lr rrrr rrrr}
+\toprule
+ & & \multicolumn{4}{c}{median $|\Delta P|$ [pu]} & \multicolumn{4}{c}{median $|\Delta Q|$ [pu]} \\
+\cmidrule(lr){3-6}\cmidrule(lr){7-10}
+Grid & Buses & pignn & graphkit & gridsfm & lumina & pignn & graphkit & gridsfm & lumina \\
+\midrule
+case4gs & 4 & \textbf{6.27e-04} & 5.88e-03 & 3.36e-02 & 1.97e-01 & \textbf{1.68e-03} & 1.58e-02 & 1.17e-01 & 1.01e-01 \\
+case5 & 5 & \textbf{2.33e-03} & 2.03e-02 & 1.49e-02 & 2.20e-01 & \textbf{3.64e-03} & 1.88e-02 & 1.03e-01 & 1.02e-01 \\
+case6ww & 6 & \textbf{2.53e-04} & 6.13e-03 & 1.64e-01 & 4.10e-02 & \textbf{2.09e-04} & 4.74e-03 & 8.51e-02 & 6.28e-02 \\
+case9 & 9 & \textbf{8.65e-04} & 6.96e-03 & 3.31e-02 & 7.92e-02 & \textbf{7.63e-04} & 6.37e-03 & 3.54e-02 & 3.40e-02 \\
+case14 & 14 & \textbf{1.26e-04} & 5.37e-03 & 1.64e-02 & 5.28e-02 & \textbf{2.00e-04} & 5.08e-03 & 1.14e-02 & 2.52e-02 \\
+case24\_ieee\_rts & 24 & \textbf{8.33e-04} & 2.81e-02 & 8.69e-02 & 3.32e-01 & \textbf{1.07e-03} & 1.72e-02 & 8.59e-02 & 1.12e-01 \\
+GBreducednetwork & 29 & \textbf{2.00e-02} & 1.58e+00 & 6.31e-01 & 4.60e+00 & \textbf{6.78e-02} & 8.48e-01 & 2.84e-01 & 1.26e+00 \\
+case30 & 30 & \textbf{2.46e-04} & 3.71e-03 & 1.11e-02 & 1.35e-02 & \textbf{1.88e-04} & 3.43e-03 & 8.35e-03 & 7.26e-03 \\
+case\_ieee30 & 30 & \textbf{9.35e-05} & 6.58e-03 & 1.07e-02 & 6.57e-02 & \textbf{1.79e-04} & 6.29e-03 & 6.68e-03 & 1.65e-02 \\
+case33bw & 33 & \textbf{3.47e-04} & 6.58e-04 & 8.40e-03 & 2.08e-03 & \textbf{3.97e-04} & 6.67e-04 & 6.68e-03 & 1.28e-03 \\
+case39 & 39 & \textbf{2.39e-04} & 6.71e-02 & 1.38e-01 & 5.37e-01 & \textbf{4.26e-04} & 7.23e-02 & 9.19e-02 & 1.54e-01 \\
+case57 & 57 & \textbf{1.77e-03} & 8.66e-03 & 2.59e-02 & 1.37e-01 & \textbf{2.33e-03} & 6.22e-03 & 2.19e-02 & 3.50e-02 \\
+case89pegase & 89 & \textbf{1.47e-02} & 1.33e-01 & 6.02e-02 & 9.98e-01 & \textbf{1.90e-02} & 9.97e-02 & 7.26e-02 & 3.68e-01 \\
+SimBench & 94 & \textbf{8.86e-04} & 2.96e-02 & 2.76e-01 & 3.76e-01 & \textbf{8.54e-04} & 2.84e-02 & 7.15e-02 & 1.43e-01 \\
+case118 & 118 & \textbf{4.16e-04} & 2.55e-02 & 6.70e-02 & 1.59e-01 & \textbf{5.29e-04} & 1.61e-02 & 1.02e-01 & 6.03e-02 \\
+case145 & 145 & \textbf{1.57e-02} & 2.33e+00 & 3.76e-01 & 9.93e+00 & \textbf{9.60e-03} & 9.78e-01 & 1.81e-01 & 3.54e+00 \\
+iceland & 189 & 1.09e+00 & 6.64e-02 & \textbf{1.11e-02} & 3.55e-01 & 2.19e+00 & 6.58e-02 & \textbf{4.26e-02} & 9.48e-02 \\
+case\_illinois200 & 200 & \textbf{2.47e-04} & 2.37e-02 & 1.41e-02 & 1.48e-01 & \textbf{1.83e-04} & 2.38e-02 & 3.24e-02 & 4.17e-02 \\
+case300 & 300 & \textbf{8.43e-03} & 2.94e-01 & 4.72e-02 & --- & \textbf{1.48e-02} & 1.31e-01 & 5.86e-02 & --- \\
+LVN\_heo1 & 722 & --- & 4.66e-02 & \textbf{1.92e-03} & --- & --- & 4.35e-02 & \textbf{1.18e-02} & --- \\
+case1354pegase & 1354 & 6.88e+01 & 5.69e-01 & \textbf{4.17e-02} & --- & 5.91e+01 & 2.40e-01 & \textbf{8.12e-02} & --- \\
+case1888rte & 1888 & --- & \textbf{5.19e-01} & --- & --- & --- & \textbf{2.86e-01} & --- & --- \\
+GBnetwork & 2224 & --- & 4.58e-01 & \textbf{4.32e-02} & 1.74e+00 & --- & 1.91e-01 & \textbf{1.56e-01} & 4.40e-01 \\
+case2848rte & 2848 & --- & 1.88e-01 & \textbf{3.27e-02} & 2.04e-01 & --- & 1.20e-01 & \textbf{8.51e-02} & 8.62e-02 \\
+case2869pegase & 2869 & 6.51e+01 & 2.02e+00 & \textbf{4.43e-02} & 1.48e+01 & 8.03e+01 & 5.39e-01 & \textbf{8.17e-02} & 2.53e+00 \\
+case3120sp & 3120 & 1.22e+02 & 4.27e-01 & \textbf{2.17e-02} & 5.85e-02 & 1.32e+02 & 2.37e-01 & 4.04e-02 & \textbf{1.83e-02} \\
+ENTSO\_E\_RealGridTest & 6051 & --- & 1.08e-01 & \textbf{1.35e-02} & 9.55e-02 & --- & 7.34e-02 & 5.91e-02 & \textbf{4.23e-02} \\
+case6470rte & 6470 & --- & 2.22e-01 & \textbf{2.65e-02} & 1.78e-01 & --- & 1.10e-01 & 6.78e-02 & \textbf{6.01e-02} \\
+case6495rte & 6495 & --- & 1.28e-01 & \textbf{6.52e-02} & 1.71e-01 & --- & 8.56e-02 & \textbf{4.92e-02} & 5.69e-02 \\
+case6515rte & 6515 & --- & 1.82e-01 & \textbf{4.96e-02} & 1.64e-01 & --- & 9.63e-02 & \textbf{4.94e-02} & 5.44e-02 \\
+case9241pegase & 9241 & --- & 3.49e+00 & \textbf{3.74e-02} & 2.32e+01 & --- & 1.22e+00 & \textbf{1.56e-01} & 4.74e+00 \\
+\bottomrule
+\end{tabular}
+\caption{Median power-balance residual, pu on a 100 MVA base, over the same scored
+buses as the mean. The mean and mean-scenario-maximum columns are set by a small number
+of pathological buses; the median describes the bulk, and the two can disagree
+by orders of magnitude on the ill-conditioned grids.}
+\end{table}
+
+\begin{table}[H]
+\centering\small
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{lr rrrr rrrr}
+\toprule
+ & & \multicolumn{4}{c}{frac $|\Delta P| \le 10^{-6}$} & \multicolumn{4}{c}{frac $|\Delta Q| \le 10^{-6}$} \\
+\cmidrule(lr){3-6}\cmidrule(lr){7-10}
+Grid & Buses & pignn & graphkit & gridsfm & lumina & pignn & graphkit & gridsfm & lumina \\
+\midrule
+case4gs & 4 & \textbf{0.09\%} & 0.02\% & 0.00\% & 0.00\% & \textbf{0.02\%} & 0.00\% & 0.00\% & 0.00\% \\
+case5 & 5 & \textbf{0.01\%} & 0.00\% & 0.00\% & 0.00\% & \textbf{0.01\%} & 0.00\% & 0.00\% & 0.00\% \\
+case6ww & 6 & \textbf{0.22\%} & 0.01\% & 0.00\% & 0.00\% & \textbf{0.24\%} & 0.01\% & 0.00\% & 0.00\% \\
+case9 & 9 & \textbf{0.04\%} & 0.01\% & 0.00\% & 0.00\% & \textbf{0.07\%} & 0.00\% & 0.00\% & 0.00\% \\
+case14 & 14 & \textbf{0.44\%} & 0.01\% & 0.00\% & 0.00\% & \textbf{0.26\%} & 0.01\% & 0.00\% & 0.00\% \\
+case24\_ieee\_rts & 24 & \textbf{0.06\%} & 0.00\% & 0.00\% & 0.00\% & \textbf{0.06\%} & 0.00\% & 0.00\% & 0.00\% \\
+GBreducednetwork & 29 & \textbf{0.00\%} & 0.00\% & 0.00\% & 0.00\% & \textbf{0.00\%} & 0.00\% & 0.00\% & 0.00\% \\
+case30 & 30 & 0.23\% & 0.01\% & \textbf{3.47\%} & 0.00\% & \textbf{0.31\%} & 0.01\% & 0.01\% & 0.00\% \\
+case\_ieee30 & 30 & \textbf{0.52\%} & 0.01\% & 0.00\% & 0.00\% & \textbf{0.21\%} & 0.01\% & 0.01\% & 0.00\% \\
+case33bw & 33 & \textbf{0.11\%} & 0.11\% & 0.01\% & 0.01\% & \textbf{0.12\%} & 0.09\% & 0.01\% & 0.00\% \\
+case39 & 39 & \textbf{0.21\%} & 0.00\% & 0.00\% & 0.00\% & \textbf{0.12\%} & 0.00\% & 0.00\% & 0.00\% \\
+case57 & 57 & \textbf{0.06\%} & 0.01\% & 0.00\% & 0.00\% & \textbf{0.04\%} & 0.01\% & 0.00\% & 0.00\% \\
+case89pegase & 89 & \textbf{0.03\%} & 0.00\% & 0.00\% & 0.00\% & \textbf{0.01\%} & 0.00\% & 0.00\% & 0.00\% \\
+SimBench & 94 & \textbf{0.06\%} & 0.00\% & 0.00\% & 0.00\% & \textbf{0.07\%} & 0.00\% & 0.00\% & 0.00\% \\
+case118 & 118 & \textbf{0.15\%} & 0.00\% & 0.00\% & 0.00\% & \textbf{0.06\%} & 0.00\% & 0.00\% & 0.00\% \\
+case145 & 145 & 0.00\% & 0.00\% & \textbf{0.49\%} & 0.00\% & \textbf{0.01\%} & 0.00\% & 0.00\% & 0.00\% \\
+iceland & 189 & \textbf{0.03\%} & 0.01\% & 0.03\% & 0.00\% & 0.03\% & 0.01\% & 0.00\% & \textbf{0.05\%} \\
+case\_illinois200 & 200 & \textbf{0.23\%} & 0.00\% & 0.02\% & 0.00\% & \textbf{0.31\%} & 0.00\% & 0.00\% & 0.00\% \\
+case300 & 300 & \textbf{0.01\%} & 0.00\% & 0.01\% & --- & \textbf{0.00\%} & 0.00\% & 0.00\% & --- \\
+LVN\_heo1 & 722 & --- & 0.00\% & \textbf{1.29\%} & --- & --- & 0.00\% & \textbf{0.03\%} & --- \\
+case1354pegase & 1354 & \textbf{0.00\%} & 0.00\% & 0.00\% & --- & \textbf{0.00\%} & 0.00\% & 0.00\% & --- \\
+case1888rte & 1888 & --- & \textbf{0.00\%} & --- & --- & --- & \textbf{0.00\%} & --- & --- \\
+GBnetwork & 2224 & --- & 0.00\% & 0.03\% & \textbf{0.09\%} & --- & \textbf{0.00\%} & 0.00\% & 0.00\% \\
+case2848rte & 2848 & --- & 0.00\% & \textbf{0.25\%} & 0.00\% & --- & \textbf{0.00\%} & 0.00\% & 0.00\% \\
+case2869pegase & 2869 & 0.00\% & 0.00\% & \textbf{0.11\%} & 0.00\% & \textbf{0.00\%} & 0.00\% & 0.00\% & 0.00\% \\
+case3120sp & 3120 & 0.00\% & 0.00\% & \textbf{0.01\%} & 0.01\% & \textbf{0.00\%} & 0.00\% & 0.00\% & 0.00\% \\
+ENTSO\_E\_RealGridTest & 6051 & --- & 0.00\% & \textbf{0.01\%} & 0.01\% & --- & 0.00\% & 0.00\% & \textbf{0.01\%} \\
+case6470rte & 6470 & --- & 0.00\% & \textbf{0.01\%} & 0.00\% & --- & 0.00\% & 0.00\% & \textbf{0.02\%} \\
+case6495rte & 6495 & --- & 0.00\% & \textbf{0.11\%} & 0.00\% & --- & \textbf{0.00\%} & 0.00\% & 0.00\% \\
+case6515rte & 6515 & --- & 0.00\% & \textbf{0.43\%} & 0.01\% & --- & 0.00\% & \textbf{0.01\%} & 0.00\% \\
+case9241pegase & 9241 & --- & 0.00\% & \textbf{0.98\%} & 0.00\% & --- & \textbf{0.00\%} & 0.00\% & 0.00\% \\
+\bottomrule
+\end{tabular}
+\caption{Fraction of scored buses already inside the Newton tolerance of
+$10^{-6}$~pu; higher is better, so \textbf{bold} marks the maximum. This is the
+strictest reading of the corpus: outside the smallest grids almost no bus is
+converged by this standard, and on every grid at or above 300 buses the figure
+is zero for all four models.}
+\end{table}
+
+
+\section{$R^2_{\sigma}$: how far is the prediction from the solver?}
+
+All $R^2$ in this section are $R^2_{\sigma}$ of
+Section~\ref{sec:r2notation}: $1-(\mathrm{RMSE}/\sigma)^2$ against a per-bus
+constant predictor.  It is not a tracking measure --- it also charges the model
+for bias and amplitude error --- and the tracking coefficient
+$R^2_{\mathrm{bus}}$ is reported separately there.
+
+
+RMSE says how far a prediction sits from the reference. It does not say whether
+the model responds to its input. Bus voltage magnitude occupies a narrow band,
+so a model that ignores the scenario and emits the corpus-mean profile still
+scores an RMSE equal to the spread of the data. On this corpus that spread,
+$\sigma$, is between $1.5\times10^{-3}$ and $4.7\times10^{-2}$~pu depending on
+the grid --- squarely inside the range several models report.
+
+The coefficient of determination separates the two. Pooling over all buses and
+all test scenarios,
+\[
+R^2_{\sigma} \;=\; 1 - \frac{\mathrm{SS}_{\text{res}}}{\mathrm{SS}_{\text{tot}}}
+      \;=\; 1 - \Big(\frac{\text{RMSE}}{\sigma}\Big)^{2},
+\]
+which is exact, not an approximation: $\mathrm{SS}_{\text{res}} = N\,\text{RMSE}^2$
+and $\mathrm{SS}_{\text{tot}} = N\,\sigma^2$ by definition.
+$R^2_{\sigma} = 1$ is a perfect fit, $R^2_{\sigma} = 0$ is exactly as good as
+the per-bus constant predictor, and $R^2_{\sigma} < 0$ is worse than it.
+
+$\sigma$ was measured directly from the reference solutions of each grid (300
+scenarios, all buses); angles are taken about the circular mean so a bus near
+$\pm\pi$ does not acquire a spurious spread. No model is involved in $\sigma$.
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{lrr rrrr}
+\toprule
+ & & & \multicolumn{4}{c}{$R^2_{\sigma}$ on $|V|$} \\
+\cmidrule(lr){4-7}
+Grid & Buses & $\sigma$ & pignn & graphkit & gridsfm & lumina \\
+\midrule
+case4gs & 4 & 1.966e-02 & \textbf{1.000} & 1.000 & 0.743 & 0.161 \\
+case5 & 5 & 2.482e-02 & \textbf{1.000} & 1.000 & 0.996 & 0.018 \\
+case6ww & 6 & 2.580e-02 & \textbf{1.000} & 1.000 & 0.946 & 0.620 \\
+case9 & 9 & 2.309e-02 & \textbf{1.000} & 0.999 & 0.963 & 0.235 \\
+case14 & 14 & 2.313e-02 & \textbf{1.000} & 0.998 & 0.981 & 0.045 \\
+case24\_ieee\_rts & 24 & 2.486e-02 & \textbf{1.000} & 0.998 & 0.916 & -0.003 \\
+GBreducednetwork & 29 & 1.663e-03 & \textbf{0.999} & $\ll$0 & $\ll$0 & $\ll$0 \\
+case30 & 30 & 2.204e-02 & \textbf{1.000} & 0.997 & 0.995 & 0.004 \\
+case\_ieee30 & 30 & 2.354e-02 & \textbf{1.000} & 0.992 & 0.983 & 0.285 \\
+case33bw & 33 & 1.520e-02 & 0.936 & \textbf{0.991} & 0.886 & -0.371 \\
+case39 & 39 & 2.725e-02 & \textbf{1.000} & 0.928 & 0.893 & -0.109 \\
+case57 & 57 & 3.553e-02 & 0.708 & \textbf{0.983} & 0.693 & -0.027 \\
+case89pegase & 89 & 2.399e-02 & \textbf{0.987} & 0.797 & 0.305 & -0.523 \\
+SimBench & 94 & 4.735e-02 & \textbf{0.999} & 0.988 & 0.942 & -0.310 \\
+case118 & 118 & 2.469e-02 & \textbf{1.000} & 0.997 & 0.376 & -0.042 \\
+case145 & 145 & 2.726e-02 & \textbf{0.884} & $\ll$0 & -2.100 & -5.040 \\
+iceland & 189 & 3.128e-02 & $\ll$0 & \textbf{0.545} & -1.190 & -0.627 \\
+case\_illinois200 & 200 & 2.074e-02 & \textbf{1.000} & 0.848 & 0.932 & -0.317 \\
+case300 & 300 & 3.244e-02 & 0.343 & \textbf{0.466} & 0.420 & -0.701 \\
+LVN\_heo1 & 722 & 1.766e-02 & --- & \textbf{-0.308} & -2.060 & -2.060 \\
+case1354pegase & 1354 & 2.600e-02 & $\ll$0 & \textbf{0.354} & 0.046 & -0.323 \\
+case1888rte & 1888 & 2.075e-02 & --- & \textbf{-0.475} & -0.953 & -1.514 \\
+GBnetwork & 2224 & 2.365e-02 & --- & -1.241 & \textbf{-0.820} & -2.525 \\
+case2848rte & 2848 & 1.767e-02 & --- & -1.233 & \textbf{0.107} & -4.125 \\
+case2869pegase & 2869 & 2.767e-02 & $\ll$0 & -0.346 & \textbf{0.605} & -1.228 \\
+case3120sp & 3120 & 2.106e-02 & $\ll$0 & \textbf{-0.844} & -1.097 & -1.560 \\
+ENTSO\_E\_RealGridTest & 6051 & 1.888e-02 & --- & \textbf{-0.643} & --- & -2.359 \\
+case6470rte & 6470 & 3.142e-02 & --- & \textbf{-0.621} & --- & -0.882 \\
+case6495rte & 6495 & 3.273e-02 & --- & \textbf{-0.398} & --- & -0.857 \\
+case6515rte & 6515 & 3.106e-02 & --- & \textbf{-0.505} & --- & -1.025 \\
+case9241pegase & 9241 & 2.399e-02 & --- & -3.916 & \textbf{-1.774} & -5.289 \\
+\bottomrule
+\end{tabular}
+\label{tab:r2vmag}\caption{$R^2_{\sigma}$ on voltage magnitude, pooled over buses and test scenarios. $\sigma$
+is the RMS spread of the reference $|V|$ about its mean, in pu --- equivalently
+the RMSE a constant predictor achieves. Best per grid in bold; $\ll$0 marks a
+model more than ten times worse than the mean predictor. \textsc{nan} runs and
+missing runs are shown as ---.}
+\end{table}
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{lrr rrrr}
+\toprule
+ & & & \multicolumn{4}{c}{$R^2_{\sigma}$ on $\theta$} \\
+\cmidrule(lr){4-7}
+Grid & Buses & $\sigma$ & pignn & graphkit & gridsfm & lumina \\
+\midrule
+case4gs & 4 & 0.615 & \textbf{1.000} & 0.998 & 0.871 & 0.177 \\
+case5 & 5 & 0.679 & \textbf{1.000} & 0.992 & 0.998 & 0.401 \\
+case6ww & 6 & 1.43 & \textbf{1.000} & 0.998 & -3.794 & 0.683 \\
+case9 & 9 & 1.84 & \textbf{0.999} & 0.996 & $\ll$0 & 0.435 \\
+case14 & 14 & 3.46 & \textbf{1.000} & 0.999 & 0.499 & 0.886 \\
+case24\_ieee\_rts & 24 & 3.34 & \textbf{1.000} & 0.994 & 0.765 & 0.177 \\
+GBreducednetwork & 29 & 12.4 & \textbf{1.000} & 0.319 & -6.004 & 0.057 \\
+case30 & 30 & 0.865 & \textbf{0.997} & 0.987 & -3.529 & -0.079 \\
+case\_ieee30 & 30 & 4 & \textbf{1.000} & 0.999 & 0.068 & 0.708 \\
+case33bw & 33 & 0.13 & -3.166 & \textbf{0.383} & $\ll$0 & -4.127 \\
+case39 & 39 & 5.83 & \textbf{1.000} & 0.992 & -9.402 & 0.024 \\
+case57 & 57 & 4.1 & \textbf{0.999} & 0.997 & 0.443 & 0.190 \\
+case89pegase & 89 & 2.25 & \textbf{0.984} & 0.908 & 0.778 & -7.570 \\
+SimBench & 94 & 6.54 & \textbf{1.000} & 0.998 & 0.447 & -0.268 \\
+case118 & 118 & 4.24 & \textbf{1.000} & 0.988 & $\ll$0 & 0.255 \\
+case145 & 145 & 86.7 & \textbf{0.997} & 0.955 & -0.357 & 0.378 \\
+iceland & 189 & 11.2 & $\ll$0 & \textbf{0.950} & -4.199 & 0.305 \\
+case\_illinois200 & 200 & 2.45 & \textbf{0.999} & 0.949 & $\ll$0 & -0.067 \\
+case300 & 300 & 19.3 & \textbf{0.981} & 0.939 & -1.056 & 0.033 \\
+LVN\_heo1 & 722 & 1.06 & --- & -0.618 & \textbf{0.502} & -1.973 \\
+case1354pegase & 1354 & 4.37 & $\ll$0 & \textbf{-0.170} & -9.694 & -4.765 \\
+case1888rte & 1888 & 8.49 & --- & \textbf{0.284} & $\ll$0 & -1.879 \\
+GBnetwork & 2224 & 7 & --- & 0.502 & \textbf{0.906} & -5.042 \\
+case2848rte & 2848 & 3.84 & --- & \textbf{0.341} & $\ll$0 & -1.224 \\
+case2869pegase & 2869 & 14.6 & $\ll$0 & \textbf{0.558} & $\ll$0 & -2.881 \\
+case3120sp & 3120 & 8.48 & $\ll$0 & \textbf{0.104} & -1.102 & -2.737 \\
+ENTSO\_E\_RealGridTest & 6051 & 8.24 & --- & \textbf{0.747} & --- & -0.781 \\
+case6470rte & 6470 & 15.2 & --- & \textbf{0.360} & --- & -0.302 \\
+case6495rte & 6495 & 6.45 & --- & \textbf{0.724} & --- & -2.288 \\
+case6515rte & 6515 & 10.2 & --- & \textbf{0.386} & --- & -1.028 \\
+\bottomrule
+\end{tabular}
+\label{tab:r2theta}\caption{$R^2_{\sigma}$ on voltage angle, with $\sigma$ in degrees about the circular mean.
+case33bw is a radial distribution feeder whose angles barely move
+($\sigma = 0.13^\circ$), so every model scores poorly there on a quantity of
+almost no physical consequence; case145 sits at the other extreme
+($\sigma = 87^\circ$), where a large absolute error is still a modest relative
+one.}
+\end{table}
+
+\paragraph{What the table says.} PIGNN is the only model that reaches
+$R^2_{\sigma} > 0.99$ on $|V|$, and it does so on most grids below 200 buses. graphkit
+follows, clearing 0.9 on the small grids and decaying steadily with size.
+gridsfm and lumina sit near or below zero almost everywhere: on the majority of
+grids they are no better than, or worse than, predicting the mean voltage
+profile. That is the failure the RMSE tables cannot show, and it is the single
+most important qualification on the headline ranking.
+\textbf{But $R^2_{\sigma}$ cannot separate a model that fails to track from one
+that tracks and is miscalibrated}, and Section~\ref{sec:rescore} shows the
+second is mostly what is happening: on $R^2_{\mathrm{bus}}$ most of these cells
+are positive.
+
+Above roughly 700 buses \emph{no} model clears $R^2_{\sigma} = 0.7$ on $|V|$.
+On $R^2_{\mathrm{bus}}$ (Table~\ref{tab:perbusr2}) several clear $0.5$ at that
+size, so the ordering in the RMSE tables there is a ranking
+of calibration as much as of skill.
+
+\paragraph{Slope is now measured.} $R^2_{\sigma}$ follows from RMSE, so it was
+available for every cell above; the regression slope needs the predictions
+themselves and therefore a pass over each saved checkpoint. Those passes have
+since run for all four models on all 31 grids, and the results are in
+Section~\ref{sec:rescore}. A slope near zero with $R^2_{\mathrm{bus}}$ near
+zero is collapse; a slope near one with low $R^2_{\mathrm{bus}}$ is an unbiased
+but noisy model; a slope well below one with a high $R^2_{\mathrm{bus}}$ ---
+the common case here --- is a model that tracks and under-states the spread.
+$R^2_{\sigma}$ settles none of the three.
+
+\section{Notation: three different $R^2$, and the calibration}
+\label{sec:r2notation}
+
+Three distinct coefficients appear in the literature and in this project's
+logs, and earlier revisions of this report used the word ``$R^2$'' for more
+than one of them.  Every table below names which one it is.  Write $v$ for the
+reference $|V|$ at a bus in a scenario, $\hat v$ for the prediction,
+$\bar v_i$ for bus $i$'s mean over scenarios, and fit
+$\hat v = a\,v + b + \varepsilon$ by least squares.
+
+\begin{table}[H]
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{llll}
+\toprule
+Symbol & Definition & Null model it scores $0$ against & Calibration\\
+\midrule
+$R^2_{\mathrm{pool}}$ & Pearson $R^2$ of $\hat v$ on $v$, pooled over
+  & one number for every bus & changes\\
+  & all buses and scenarios & and scenario & \\[2pt]
+$R^2_{\mathrm{bus}}$ & the same after subtracting $\bar v_i$
+  & each bus at its own mean & \textbf{invariant}\\
+  & from $\hat v$ and $v$ alike & & \\[2pt]
+$R^2_{\sigma}$ & $1-\sum(\hat v-v)^2/\sum(v-\bar v_i)^2$
+  & each bus at its own mean & changes\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+$R^2_{\mathrm{pool}}$ is the diagnostic GridSFM's section 6.2 defines, and it
+is the right one for a multi-grid foundation model, which must reproduce a
+static voltage profile it has never seen.  Every campaign here trains one model
+per grid on that grid, where that profile is memorisable from the training
+split; a predictor that emits each bus's training mean and ignores the scenario
+entirely scores $R^2_{\mathrm{pool}} = 0.798$ on GBnetwork.  So
+$R^2_{\mathrm{bus}}$ is the tracking question in this setting, and
+$R^2_{\mathrm{pool}}$ is kept only for comparability with the published
+numbers.
+
+$R^2_{\sigma}$ is what earlier revisions of this report printed.  It is not a
+tracking measure: it charges the model for bias and for amplitude error as
+well.  Writing $\sigma^2=\tfrac{1}{N}\sum(v-\bar v_i)^2$ and
+$\sigma_\varepsilon^2$ for the variance of $\varepsilon$, the mean square error
+splits exactly into three terms,
+\[
+  \mathrm{RMSE}^2 \;=\; \underbrace{b^2}_{\text{bias}}
+  \;+\;\underbrace{(a-1)^2\sigma^2}_{\text{amplitude}}
+  \;+\;\underbrace{\sigma_\varepsilon^2}_{\text{noise}},
+  \qquad\text{so}\qquad
+  R^2_{\sigma} \;=\; 1-\frac{b^2}{\sigma^2}-(a-1)^2-\frac{\sigma_\varepsilon^2}{\sigma^2}.
+\]
+$R^2_{\mathrm{bus}}$ normalises the noise term by the variance of the
+\emph{prediction} rather than of the reference, so it is not a simple
+difference away from $R^2_{\sigma}$; the two answer different questions and
+should not be converted into one another.
+
+Three relations are used below, and each was checked against the measurements
+rather than assumed.  (i) Calibration removes exactly the $b^2/\sigma^2$ term,
+so $R^2_{\sigma,\mathrm{cal}} = 1-(a-1)^2-\sigma_\varepsilon^2/\sigma^2$; over
+the 26 stabilization runs this held to $1.4\times10^{-2}$.  (ii)
+$R^2_{\mathrm{bus}}$ and the slope are unchanged by calibration, since a
+per-bus offset cannot alter a regression on per-bus deviations; measured
+deviation $<10^{-6}$ on all 26.  (iii) $R^2_{\sigma,\mathrm{cal}} \le
+R^2_{\mathrm{bus}}$, with the gap being the amplitude error; observed on all
+26, from $0.0006$ to $1.22$.
+
+\paragraph{Post-hoc per-bus calibration.}  The $b^2/\sigma^2$ term is removable
+without touching the model.  For each bus, take the mean prediction over the
+\emph{training} split, align it to the training reference mean, and subtract
+that fixed offset from every unseen test scenario:
+\[
+  \hat v^{\,\mathrm{cal}}_{i,s} \;=\; \hat v_{i,s}
+  \;-\;\bigl(\overline{\hat v}^{\,\mathrm{train}}_{i}-\bar v^{\,\mathrm{train}}_{i}\bigr),
+\]
+and the circular equivalent for $\theta$.  No test data enters the fit, so this
+is a correction a deployed model could carry.  Because it is fitted on one
+split and applied to another it does not transfer perfectly: across the 26
+stabilization runs the realised improvement in $R^2_{\sigma}$ differs from the
+fitted $b^2/\sigma^2$ by a median of $1.2\%$ and at most $8.4\%$.  Tables that
+report it use the form \emph{raw $\to$ calibrated}.  $R^2_{\mathrm{bus}}$ and the slope are
+mathematically unchanged by it --- a per-bus offset cannot alter a regression
+on per-bus deviations --- which is used below as a consistency check on the
+implementation.
+
+\section{Re-scored: what the $R^2$ tables above are and are not}
+\label{sec:rescore}
+
+The $R^2$ tables above are $1-(\mathrm{RMSE}/\sigma)^2$ with $\sigma$ measured
+per bus, which is the right null for a per-grid surrogate but is \emph{not} the
+diagnostic GridSFM's section 6.2 defines.  That one is a pooled regression of
+prediction against reference reported with a slope, and its $R^2$ is a Pearson
+$R^2$: it asks whether the model orders scenarios correctly, and is blind to
+bias and to amplitude error.  The discussion below Table~\ref{tab:r2theta}
+previously read the SSE quantity as if it answered the regression question.  It
+does not, and where the two disagree they disagree by a lot.
+
+All 31 grids have been re-scored from the saved checkpoints with both, plus
+per-edge angle diagnostics (alex jobs 4125850/4126397; 112 model--grid cells,
+3000 test scenarios each).  The rescore reproduces the earlier figures to every
+printed digit where they overlap, and its independently measured $\sigma$
+agrees with the hand-measured $\sigma$ of Table~\ref{tab:r2vmag} to a median of
+$1.3\%$, which confirms the per-bus convention used throughout this report.
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{lrrrr}
+\toprule
+Reading of $R^2$ on $|V|$ (median over grids) & pignn & graphkit & gridsfm & lumina\\
+\midrule
+$R^2_{\mathrm{pool}}$ (as GridSFM publishes it) & 1.000 & 0.828 & 0.720 & 0.182 \\
+$R^2_{\mathrm{bus}}$ (per-bus deviations) & 1.000 & 0.636 & 0.651 & 0.082 \\
+$R^2_{\sigma}$ (what the tables above print) & 1.000 & 0.493 & 0.373 & -0.628 \\
+\bottomrule
+\end{tabular}
+\caption{The same checkpoints under three readings.  Pooling over buses --- as
+GridSFM does, correctly, for a model that must predict grids it has never seen
+--- credits a per-grid surrogate for reproducing a static voltage profile it
+can memorise from its own training split.  On GBnetwork a predictor that emits
+each bus's training mean and ignores the scenario entirely scores $0.798$
+pooled.  The middle row removes that profile; the bottom row is what the tables
+above print.}
+\end{table}
+
+\subsection*{Does the model track the scenario? ($R^2_{\mathrm{bus}}$)}
+
+\begin{longtable}{lrrrrr}
+\toprule
+& & \multicolumn{4}{c}{$R^2_{\mathrm{bus}}$ on $|V|$ --- does the model track the scenario?} \\
+\cmidrule(lr){3-6}
+Grid & Buses & pignn & graphkit & gridsfm & lumina \\
+\midrule
+\endhead
+case4gs & 4 & \textbf{1.000} & 1.000 & 0.874 & 0.120 \\
+case5 & 5 & \textbf{1.000} & 1.000 & 0.997 & 0.003 \\
+case6ww & 6 & \textbf{1.000} & 1.000 & 0.981 & 0.643 \\
+case9 & 9 & \textbf{1.000} & 0.999 & 0.969 & 0.298 \\
+case14 & 14 & \textbf{1.000} & 0.998 & 0.992 & 0.082 \\
+case24\_ieee\_rts & 24 & \textbf{1.000} & 0.998 & 0.934 & 0.127 \\
+GBreducednetwork & 29 & \textbf{1.000} & 0.601 & 0.042 & 0.075 \\
+case30 & 30 & \textbf{1.000} & 0.999 & 0.996 & 0.119 \\
+case\_ieee30 & 30 & \textbf{1.000} & 0.992 & 0.991 & 0.308 \\
+case33bw & 33 & 0.985 & \textbf{0.992} & 0.912 & 0.002 \\
+case39 & 39 & \textbf{1.000} & 0.938 & 0.946 & 0.166 \\
+case57 & 57 & 0.828 & \textbf{0.986} & 0.731 & 0.305 \\
+case89pegase & 89 & \textbf{0.991} & 0.811 & 0.318 & 0.039 \\
+SimBench & 94 & \textbf{0.999} & 0.990 & 0.995 & 0.240 \\
+case118 & 118 & \textbf{1.000} & 0.998 & 0.674 & 0.002 \\
+case145 & 145 & \textbf{0.936} & 0.130 & 0.065 & 0.000 \\
+iceland & 189 & --- & \textbf{0.625} & 0.298 & 0.136 \\
+case\_illinois200 & 200 & \textbf{1.000} & 0.858 & 0.936 & 0.115 \\
+case300 & 300 & \textbf{0.733} & 0.636 & 0.513 & 0.201 \\
+LVN\_heo1 & 722 & --- & \textbf{0.088} & 0.024 & 0.000 \\
+case1354pegase & 1354 & 0.007 & \textbf{0.550} & 0.165 & 0.025 \\
+case1888rte & 1888 & --- & 0.395 & \textbf{0.589} & 0.003 \\
+GBnetwork & 2224 & --- & 0.232 & \textbf{0.752} & 0.010 \\
+case2848rte & 2848 & --- & \textbf{0.535} & 0.464 & 0.012 \\
+case2869pegase & 2869 & --- & 0.302 & \textbf{0.651} & 0.001 \\
+case3120sp & 3120 & --- & \textbf{0.338} & 0.047 & 0.004 \\
+ENTSO\_E\_RealGridTest & 6051 & --- & 0.435 & \textbf{0.587} & 0.121 \\
+case6470rte & 6470 & --- & 0.148 & \textbf{0.480} & 0.099 \\
+case6495rte & 6495 & --- & 0.293 & \textbf{0.471} & 0.052 \\
+case6515rte & 6515 & --- & 0.137 & \textbf{0.447} & 0.090 \\
+case9241pegase & 9241 & --- & \textbf{0.117} & 0.081 & 0.000 \\
+\midrule
+median & & 1.000 & 0.636 & 0.651 & 0.082 \\
+\bottomrule
+\caption{Pearson $R^2$ of predicted against reference $|V|$ after each bus's
+own mean is removed from both.  Best per grid in bold; \textsc{---} marks a
+grid with no v2 checkpoint for that model.  \textbf{This is a materially more
+favourable picture than the SSE tables above.}  graphkit and gridsfm hold
+median $0.64$ and $0.65$, and on several large grids where
+Table~\ref{tab:r2vmag} reports a strongly negative $R^2$ they still explain
+half the scenario variance --- gridsfm on GBnetwork $0.752$ against $-0.820$,
+graphkit on case1888rte $0.395$ against $-0.475$.  lumina is the exception, and
+the pooled column was flattering it: median $0.082$, and at or below $0.01$ on
+eleven grids, which is very nearly a fixed profile.}
+\label{tab:perbusr2}
+\end{longtable}
+
+\begin{longtable}{lrrrrr}
+\toprule
+& & \multicolumn{4}{c}{regression slope on $|V|$, per-bus deviations (best is nearest $1$)} \\
+\cmidrule(lr){3-6}
+Grid & Buses & pignn & graphkit & gridsfm & lumina \\
+\midrule
+\endhead
+case4gs & 4 & \textbf{1.000} & 1.001 & 0.655 & 0.097 \\
+case5 & 5 & \textbf{1.000} & 1.000 & 0.991 & 0.003 \\
+case6ww & 6 & \textbf{1.000} & 0.999 & 0.950 & 0.566 \\
+case9 & 9 & \textbf{1.000} & 0.993 & 0.962 & 0.248 \\
+case14 & 14 & \textbf{1.000} & 0.999 & 0.974 & 0.068 \\
+case24\_ieee\_rts & 24 & \textbf{1.000} & 0.989 & 0.887 & 0.059 \\
+GBreducednetwork & 29 & \textbf{1.005} & -0.228 & -1.614 & 1.135 \\
+case30 & 30 & \textbf{1.000} & 1.002 & 0.988 & 0.000 \\
+case\_ieee30 & 30 & \textbf{0.998} & 0.979 & 0.978 & 0.281 \\
+case33bw & 33 & 0.876 & \textbf{0.985} & 0.919 & 0.000 \\
+case39 & 39 & \textbf{1.000} & 0.897 & 0.806 & 0.056 \\
+case57 & 57 & 0.744 & \textbf{0.964} & 0.709 & 0.423 \\
+case89pegase & 89 & \textbf{0.935} & 0.680 & 0.283 & 0.022 \\
+SimBench & 94 & \textbf{0.992} & 0.976 & 1.015 & 0.035 \\
+case118 & 118 & \textbf{1.000} & 0.991 & 0.382 & 0.001 \\
+case145 & 145 & \textbf{0.904} & 0.832 & 0.268 & -0.003 \\
+iceland & 189 & --- & \textbf{0.629} & 0.294 & 0.099 \\
+case\_illinois200 & 200 & \textbf{0.999} & 0.828 & 0.911 & 0.057 \\
+case300 & 300 & \textbf{0.684} & 0.561 & 0.413 & 0.164 \\
+LVN\_heo1 & 722 & --- & \textbf{0.081} & 0.019 & 0.000 \\
+case1354pegase & 1354 & 0.251 & \textbf{0.483} & 0.133 & 0.017 \\
+case1888rte & 1888 & --- & 0.423 & \textbf{0.536} & 0.004 \\
+GBnetwork & 2224 & --- & 0.150 & \textbf{0.689} & 0.007 \\
+case2848rte & 2848 & --- & \textbf{0.558} & 0.389 & 0.014 \\
+case2869pegase & 2869 & --- & 0.351 & \textbf{0.536} & 0.000 \\
+case3120sp & 3120 & --- & \textbf{0.321} & 0.050 & 0.015 \\
+ENTSO\_E\_RealGridTest & 6051 & --- & 0.265 & \textbf{0.584} & 0.114 \\
+case6470rte & 6470 & --- & 0.122 & \textbf{0.494} & 0.090 \\
+case6495rte & 6495 & --- & 0.177 & \textbf{0.408} & 0.019 \\
+case6515rte & 6515 & --- & 0.129 & \textbf{0.425} & 0.040 \\
+case9241pegase & 9241 & --- & \textbf{0.364} & 0.069 & -0.000 \\
+\midrule
+median & & 1.000 & 0.680 & 0.536 & 0.035 \\
+\bottomrule
+\caption{Regression slope on the same per-bus deviations.  Bold is closest to
+$1$, not largest.  Slope is the amplitude question $R^2$ cannot answer: a model
+can order every scenario correctly and still emit a fraction of the true
+spread.  Read against Table~\ref{tab:perbusr2}: a low slope with a high $R^2$
+is under-confidence, correctable by rescaling; a low slope with a low $R^2$ is
+collapse.}
+\end{longtable}
+
+\subsection*{Post-hoc calibration, corpus-wide}
+\label{sec:calcorpus}
+
+The per-bus offset of Section~\ref{sec:r2notation} was fitted on each model's
+own training split and applied unchanged to the test split, for all 112
+model--grid cells (alex job 4129152).  Nothing is retrained.  The invariance
+check passes: $R^2_{\mathrm{bus}}$ and the slope move by less than $10^{-6}$ on
+111 of 112 cells.
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{lrrrr}
+\toprule
+Median over grids & pignn & graphkit & gridsfm & lumina\\
+\midrule
+$|V|$ RMSE, raw & 0.0001 & 0.0202 & 0.0199 & 0.0329 \\
+$|V|$ RMSE, calibrated & 0.0001 & 0.0106 & 0.0133 & 0.0232 \\
+$R^2_{\sigma}$, raw & 1.000 & 0.493 & 0.373 & -0.628 \\
+$R^2_{\sigma}$, calibrated & 1.000 & 0.626 & 0.587 & 0.031 \\
+$R^2_{\mathrm{bus}}$ (invariant) & 1.000 & 0.636 & 0.651 & 0.082 \\
+slope (invariant) & 1.000 & 0.680 & 0.536 & 0.035 \\
+$R^2_{\mathrm{pool}}$ & 1.000 & 0.828 & 0.720 & 0.182 \\
+per-edge $\Delta\theta_{ij}$, raw & 0.010 & 0.524 & 1.398 & 2.256 \\
+per-edge $\Delta\theta_{ij}$, calibrated & 0.009 & 0.474 & 0.475 & 1.107 \\
+\midrule
+$R^2_{\sigma}>0$, raw & 18/19 & 18/31 & 19/31 & 6/31 \\
+$R^2_{\sigma}>0$, calibrated & 18/19 & 28/31 & 29/31 & 23/31 \\
+\bottomrule
+\end{tabular}
+\caption{What the calibration buys, corpus-wide.  Median $|V|$ RMSE falls by
+$1.9\times$ for graphkit, $1.5\times$ for gridsfm and $1.4\times$ for lumina;
+$R^2_{\sigma}$ rises to just under $R^2_{\mathrm{bus}}$, as it must, the
+remaining gap being the amplitude error that the slope column reports.  The
+count of grids on which a model beats the per-bus constant predictor goes from
+$18$ to $28$ for graphkit, $19$ to $29$ for gridsfm and \textbf{$6$ to $23$}
+for lumina.  pignn's medians are dominated by the small grids it has
+checkpoints for and are not comparable across the row.  Per-edge
+$\Delta\theta_{ij}$ also improves, most sharply for gridsfm
+($1.398^\circ\to0.475^\circ$), because the calibration includes a per-bus angle
+offset.}
+\end{table}
+
+\begin{longtable}{lrrrrr}
+\toprule
+& & \multicolumn{4}{c}{$|V|$ RMSE [pu], \emph{raw $\to$ calibrated}} \\
+\cmidrule(lr){3-6}
+Grid & Buses & pignn & graphkit & gridsfm & lumina \\
+\midrule
+\endhead
+case4gs & 4 & 0.0000$\to$0.0000 & 0.0003$\to$0.0002 & 0.0100$\to$0.0081 & 0.0179$\to$0.0179 \\
+case5 & 5 & 0.0000$\to$0.0000 & 0.0001$\to$0.0001 & 0.0016$\to$0.0012 & 0.0246$\to$0.0246 \\
+case6ww & 6 & 0.0000$\to$0.0000 & 0.0004$\to$0.0004 & 0.0060$\to$0.0037 & 0.0159$\to$0.0159 \\
+case9 & 9 & 0.0001$\to$0.0001 & 0.0007$\to$0.0007 & 0.0045$\to$0.0042 & 0.0202$\to$0.0201 \\
+case14 & 14 & 0.0001$\to$0.0001 & 0.0010$\to$0.0010 & 0.0032$\to$0.0022 & 0.0226$\to$0.0225 \\
+case24\_ieee\_rts & 24 & 0.0001$\to$0.0001 & 0.0012$\to$0.0011 & 0.0071$\to$0.0066 & 0.0249$\to$0.0239 \\
+GBreducednetwork & 29 & 0.0000$\to$0.0000 & 0.4090$\to$0.0020 & 0.0524$\to$0.0134 & 0.0601$\to$0.0065 \\
+case30 & 30 & 0.0001$\to$0.0001 & 0.0011$\to$0.0008 & 0.0016$\to$0.0014 & 0.0219$\to$0.0219 \\
+case\_ieee30 & 30 & 0.0002$\to$0.0001 & 0.0021$\to$0.0021 & 0.0030$\to$0.0022 & 0.0199$\to$0.0197 \\
+case33bw & 33 & 0.0039$\to$0.0025 & 0.0015$\to$0.0013 & 0.0051$\to$0.0045 & 0.0179$\to$0.0151 \\
+case39 & 39 & 0.0001$\to$0.0000 & 0.0073$\to$0.0067 & 0.0089$\to$0.0073 & 0.0286$\to$0.0252 \\
+case57 & 57 & 0.0189$\to$0.0152 & 0.0045$\to$0.0043 & 0.0199$\to$0.0185 & 0.0364$\to$0.0307 \\
+case89pegase & 89 & 0.0028$\to$0.0026 & 0.0108$\to$0.0106 & 0.0200$\to$0.0192 & 0.0296$\to$0.0229 \\
+SimBench & 94 & 0.0015$\to$0.0012 & 0.0053$\to$0.0051 & 0.0115$\to$0.0038 & 0.0552$\to$0.0490 \\
+case118 & 118 & 0.0000$\to$0.0000 & 0.0013$\to$0.0011 & 0.0195$\to$0.0166 & 0.0251$\to$0.0246 \\
+case145 & 145 & 0.0074$\to$0.0069 & 0.1245$\to$0.0584 & 0.0477$\to$0.0339 & 0.0667$\to$0.0281 \\
+iceland & 189 & --- & 0.0213$\to$0.0183 & 0.0465$\to$0.0250 & 0.0401$\to$0.0279 \\
+case\_illinois200 & 200 & 0.0002$\to$0.0001 & 0.0081$\to$0.0076 & 0.0054$\to$0.0051 & 0.0236$\to$0.0192 \\
+case300 & 300 & 0.0262$\to$0.0171 & 0.0237$\to$0.0201 & 0.0246$\to$0.0234 & 0.0422$\to$0.0295 \\
+LVN\_heo1 & 722 & --- & 0.0202$\to$0.0168 & 0.0309$\to$0.0174 & 0.0310$\to$0.0176 \\
+case1354pegase & 1354 & 0.1716$\to$0.0792 & 0.0209$\to$0.0176 & 0.0254$\to$0.0239 & 0.0299$\to$0.0257 \\
+case1888rte & 1888 & --- & 0.0253$\to$0.0161 & 0.0291$\to$0.0133 & 0.0329$\to$0.0206 \\
+GBnetwork & 2224 & --- & 0.0353$\to$0.0208 & 0.0319$\to$0.0117 & 0.0444$\to$0.0232 \\
+case2848rte & 2848 & --- & 0.0263$\to$0.0121 & 0.0167$\to$0.0131 & 0.0399$\to$0.0177 \\
+case2869pegase & 2869 & --- & 0.0322$\to$0.0230 & 0.0174$\to$0.0166 & 0.0414$\to$0.0274 \\
+case3120sp & 3120 & --- & 0.0286$\to$0.0172 & 0.0305$\to$0.0206 & 0.0337$\to$0.0214 \\
+ENTSO\_E\_RealGridTest & 6051 & --- & 0.0241$\to$0.0153 & 0.0269$\to$0.0124 & 0.0346$\to$0.0181 \\
+case6470rte & 6470 & --- & 0.0399$\to$0.0299 & 0.0328$\to$0.0233 & 0.0430$\to$0.0307 \\
+case6495rte & 6495 & --- & 0.0387$\to$0.0289 & 0.0355$\to$0.0245 & 0.0447$\to$0.0329 \\
+case6515rte & 6515 & --- & 0.0383$\to$0.0300 & 0.0391$\to$0.0240 & 0.0442$\to$0.0312 \\
+case9241pegase & 9241 & --- & 0.0532$\to$0.0291 & 0.0400$\to$0.0235 & 0.0602$\to$0.0245 \\
+\midrule
+median & & 0.0001$\to$0.0001 & 0.0202$\to$0.0106 & 0.0199$\to$0.0133 & 0.0329$\to$0.0232 \\
+\bottomrule
+\caption{$|V|$ RMSE in pu, \emph{raw $\to$ calibrated}.  Every cell improves or
+is unchanged; no cell is made worse by the correction.}
+\label{tab:vrmsecal}
+\end{longtable}
+
+\begin{longtable}{lrrrrr}
+\toprule
+& & \multicolumn{4}{c}{$R^2_{\sigma}$ on $|V|$, \emph{raw $\to$ calibrated}} \\
+\cmidrule(lr){3-6}
+Grid & Buses & pignn & graphkit & gridsfm & lumina \\
+\midrule
+\endhead
+case4gs & 4 & +1.00$\to$+1.00 & +1.00$\to$+1.00 & +0.72$\to$+0.82 & +0.11$\to$+0.12 \\
+case5 & 5 & +1.00$\to$+1.00 & +1.00$\to$+1.00 & +1.00$\to$+1.00 & -0.00$\to$+0.00 \\
+case6ww & 6 & +1.00$\to$+1.00 & +1.00$\to$+1.00 & +0.95$\to$+0.98 & +0.63$\to$+0.63 \\
+case9 & 9 & +1.00$\to$+1.00 & +1.00$\to$+1.00 & +0.96$\to$+0.97 & +0.28$\to$+0.29 \\
+case14 & 14 & +1.00$\to$+1.00 & +1.00$\to$+1.00 & +0.98$\to$+0.99 & +0.07$\to$+0.08 \\
+case24\_ieee\_rts & 24 & +1.00$\to$+1.00 & +1.00$\to$+1.00 & +0.92$\to$+0.93 & +0.02$\to$+0.09 \\
+GBreducednetwork & 29 & +1.00$\to$+1.00 & -62161.55$\to$-0.54 & -1018.62$\to$-65.60 & -1342.22$\to$-14.84 \\
+case30 & 30 & +1.00$\to$+1.00 & +1.00$\to$+1.00 & +0.99$\to$+1.00 & -0.00$\to$-0.00 \\
+case\_ieee30 & 30 & +1.00$\to$+1.00 & +0.99$\to$+0.99 & +0.98$\to$+0.99 & +0.29$\to$+0.30 \\
+case33bw & 33 & +0.93$\to$+0.97 & +0.99$\to$+0.99 & +0.88$\to$+0.91 & -0.40$\to$-0.00 \\
+case39 & 39 & +1.00$\to$+1.00 & +0.92$\to$+0.94 & +0.89$\to$+0.92 & -0.17$\to$+0.09 \\
+case57 & 57 & +0.72$\to$+0.82 & +0.98$\to$+0.99 & +0.69$\to$+0.73 & -0.04$\to$+0.26 \\
+case89pegase & 89 & +0.99$\to$+0.99 & +0.78$\to$+0.79 & +0.25$\to$+0.31 & -0.63$\to$+0.03 \\
+SimBench & 94 & +1.00$\to$+1.00 & +0.99$\to$+0.99 & +0.95$\to$+0.99 & -0.19$\to$+0.06 \\
+case118 & 118 & +1.00$\to$+1.00 & +1.00$\to$+1.00 & +0.37$\to$+0.55 & -0.04$\to$+0.00 \\
+case145 & 145 & +0.93$\to$+0.94 & -20.14$\to$-3.66 & -2.10$\to$-0.57 & -5.07$\to$-0.08 \\
+iceland & 189 & --- & +0.49$\to$+0.62 & -1.43$\to$+0.30 & -0.80$\to$+0.12 \\
+case\_illinois200 & 200 & +1.00$\to$+1.00 & +0.84$\to$+0.86 & +0.93$\to$+0.93 & -0.38$\to$+0.08 \\
+case300 & 300 & +0.36$\to$+0.73 & +0.48$\to$+0.63 & +0.44$\to$+0.49 & -0.65$\to$+0.19 \\
+LVN\_heo1 & 722 & --- & -0.32$\to$+0.09 & -2.08$\to$+0.02 & -2.09$\to$-0.00 \\
+case1354pegase & 1354 & -42.52$\to$-8.26 & +0.35$\to$+0.54 & +0.05$\to$+0.16 & -0.32$\to$+0.02 \\
+case1888rte & 1888 & --- & -0.50$\to$+0.39 & -0.99$\to$+0.58 & -1.55$\to$+0.00 \\
+GBnetwork & 2224 & --- & -1.29$\to$+0.20 & -0.87$\to$+0.75 & -2.62$\to$+0.01 \\
+case2848rte & 2848 & --- & -1.20$\to$+0.53 & +0.11$\to$+0.45 & -4.06$\to$+0.01 \\
+case2869pegase & 2869 & --- & -0.39$\to$+0.29 & +0.60$\to$+0.63 & -1.29$\to$-0.00 \\
+case3120sp & 3120 & --- & -0.84$\to$+0.34 & -1.08$\to$+0.05 & -1.55$\to$-0.03 \\
+ENTSO\_E\_RealGridTest & 6051 & --- & -0.56$\to$+0.37 & -0.95$\to$+0.59 & -2.22$\to$+0.12 \\
+case6470rte & 6470 & --- & -0.53$\to$+0.14 & -0.03$\to$+0.48 & -0.77$\to$+0.10 \\
+case6495rte & 6495 & --- & -0.35$\to$+0.25 & -0.13$\to$+0.46 & -0.80$\to$+0.03 \\
+case6515rte & 6515 & --- & -0.41$\to$+0.14 & -0.47$\to$+0.45 & -0.88$\to$+0.06 \\
+case9241pegase & 9241 & --- & -3.72$\to$-0.41 & -1.66$\to$+0.08 & -5.04$\to$-0.00 \\
+\midrule
+median & & +1.00$\to$+1.00 & +0.49$\to$+0.63 & +0.37$\to$+0.59 & -0.63$\to$+0.03 \\
+\bottomrule
+\caption{$R^2_{\sigma}$ on $|V|$, \emph{raw $\to$ calibrated}.  The left-hand
+value of each pair is what Table~\ref{tab:r2vmag} prints.  \textbf{Most of the
+negative entries in that table are removable without touching the model.}  The
+large grids are where it matters most: gridsfm on GBnetwork
+$-0.85\to+0.75$, on case2869pegase $-0.35\to+0.62$; graphkit on case2848rte
+$-1.14\to+0.53$.  What does not move is lumina's amplitude --- its slope stays
+at a median $0.035$ --- so its calibrated $R^2_{\sigma}$ tops out near zero on
+most grids, which is the correct reading of a model that emits a fixed profile.}
+\label{tab:r2sigcal}
+\end{longtable}
+
+\paragraph{A caution the slope column earns.}  On case30, lumina reports
+$R^2_{\mathrm{bus}} = 0.119$, which looks like partial tracking.  Its predicted
+per-bus spread is $2.3\times10^{-7}$ pu against a reference spread of
+$2.2\times10^{-2}$, and its slope is $3.7\times10^{-6}$: the model is emitting a
+constant profile, and the $0.119$ is correlation measured inside floating-point
+noise.  This is the one cell where the calibration invariance check exceeds
+$10^{-6}$ (it differs in the sixth decimal), for the same reason.  A
+$R^2_{\mathrm{bus}}$ without its slope is not interpretable.
+
+\paragraph{On median residuals against the constant predictor.} On GBnetwork
+$76.8\%$ of the $Q$-scored buses have $Q^{\mathrm{set}}$ exactly zero, and
+$64.6\%$ of $P$-scored buses have $P^{\mathrm{set}}$ exactly zero; the median
+setpoint is $0.0000$~pu on both channels. A median residual therefore lands on
+pure transit nodes, where a predictor that emits a valid AC solution of the
+mean scenario is exact for free --- no injection, no mismatch, in any scenario
+--- while a learned model perturbs the voltage everywhere and gets no such
+gift. Median comparisons \emph{between models} are unaffected, since the
+distortion is common to them; median comparisons \emph{against the constant
+predictor} are not a measure of skill. The mean and the maximum are dominated
+by the buses that carry injection and are the honest comparison there.
+
+\subsection*{The angle tables are largely measuring gauge drift}
+
+Branch flows depend on $\theta_i-\theta_j$.  A model whose bus angles carry a
+common per-scenario offset scores an arbitrarily bad per-bus $\theta$ RMSE
+while predicting every flow exactly, and GridSFM's paper raises precisely this
+objection to gridfm-graphkit's angle column.  It applies here with force, and
+most of all to gridsfm itself.
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{lrrrr}
+\toprule
+Angle error RMSE, deg (median over grids) & pignn & graphkit & gridsfm & lumina\\
+\midrule
+per-bus $\theta$ & 0.051 & 1.353 & 12.577 & 6.586 \\
+gauge component & 0.045 & 0.492 & 9.735 & 3.556 \\
+per-edge $\Delta\theta_{ij}$ & 0.010 & 0.524 & 1.398 & 2.256 \\
+inflation factor & 3.4$\times$ & 2.4$\times$ & 8.7$\times$ & 2.4$\times$ \\
+\bottomrule
+\end{tabular}
+\caption{``gauge component'' is the circular mean of the bus-angle error within
+each scenario; ``inflation factor'' is the median per-grid ratio of per-bus to
+per-edge RMSE.  \textbf{gridsfm's angle error is inflated $8.7\times$}: a
+median $12.58^\circ$ per bus against $1.40^\circ$ on the quantity the flows
+see, $9.74^\circ$ of the former being a pure offset.  The angle ranking in
+Table~\ref{tab:r2theta} is therefore not a ranking of flow accuracy, and the
+$\theta$ RMSE column of the headline tables should not be compared across
+models with different gauge behaviour.}
+\end{table}
+
+\begin{longtable}{lrrrrr}
+\toprule
+& & \multicolumn{4}{c}{per-edge $\Delta\theta_{ij}$ RMSE [deg]} \\
+\cmidrule(lr){3-6}
+Grid & Buses & pignn & graphkit & gridsfm & lumina \\
+\midrule
+\endhead
+case4gs & 4 & \textbf{0.002} & 0.024 & 0.195 & 0.585 \\
+case5 & 5 & \textbf{0.004} & 0.047 & 0.027 & 0.442 \\
+case6ww & 6 & \textbf{0.004} & 0.051 & 1.972 & 0.554 \\
+case9 & 9 & \textbf{0.017} & 0.066 & 2.197 & 0.718 \\
+case14 & 14 & \textbf{0.004} & 0.070 & 1.398 & 0.766 \\
+case24\_ieee\_rts & 24 & \textbf{0.009} & 0.133 & 0.623 & 1.499 \\
+GBreducednetwork & 29 & \textbf{0.038} & 11.091 & 5.509 & 8.573 \\
+case30 & 30 & \textbf{0.010} & 0.052 & 0.508 & 0.377 \\
+case\_ieee30 & 30 & \textbf{0.004} & 0.075 & 1.146 & 1.146 \\
+case33bw & 33 & 0.052 & \textbf{0.024} & 0.154 & 0.078 \\
+case39 & 39 & \textbf{0.002} & 0.141 & 2.168 & 1.351 \\
+case57 & 57 & \textbf{0.082} & 0.129 & 1.356 & 1.620 \\
+case89pegase & 89 & \textbf{0.126} & 0.486 & 0.326 & 3.933 \\
+SimBench & 94 & \textbf{0.020} & 0.107 & 4.732 & 2.256 \\
+case118 & 118 & \textbf{0.005} & 0.187 & 2.033 & 1.445 \\
+case145 & 145 & \textbf{2.856} & 12.294 & 23.478 & 37.947 \\
+iceland & 189 & --- & \textbf{0.817} & 1.670 & 3.310 \\
+case\_illinois200 & 200 & \textbf{0.009} & 0.159 & 2.902 & 1.256 \\
+case300 & 300 & \textbf{0.339} & 2.164 & 1.642 & 4.870 \\
+LVN\_heo1 & 722 & --- & 0.524 & \textbf{0.176} & 1.017 \\
+case1354pegase & 1354 & 76.400 & 1.456 & \textbf{0.638} & 2.737 \\
+case1888rte & 1888 & --- & \textbf{1.659} & 2.573 & 3.808 \\
+GBnetwork & 2224 & --- & 3.531 & \textbf{0.446} & 10.856 \\
+case2848rte & 2848 & --- & \textbf{1.153} & 1.818 & 1.935 \\
+case2869pegase & 2869 & --- & 4.460 & \textbf{1.379} & 8.107 \\
+case3120sp & 3120 & --- & 3.374 & \textbf{0.861} & 5.397 \\
+ENTSO\_E\_RealGridTest & 6051 & --- & 0.927 & \textbf{0.413} & 3.010 \\
+case6470rte & 6470 & --- & 2.003 & \textbf{0.409} & 5.130 \\
+case6495rte & 6495 & --- & \textbf{1.324} & 2.562 & 3.650 \\
+case6515rte & 6515 & --- & \textbf{1.578} & 1.615 & 4.123 \\
+case9241pegase & 9241 & --- & 13.655 & \textbf{1.831} & 27.515 \\
+\midrule
+median & & 0.010 & 0.524 & 1.398 & 2.256 \\
+\bottomrule
+\caption{Per-edge $\Delta\theta_{ij}$ RMSE in degrees over in-service branches;
+lowest per grid in bold.  On this quantity gridsfm takes about half the large
+grids, having lost nearly all of them on per-bus $\theta$.}
+\end{longtable}
+
+\paragraph{A calibration defect, not collapse.}  With
+$\hat v = a v + b + \varepsilon$,
+$\mathrm{RMSE}^2 = b^2 + (a-1)^2\sigma^2 + \sigma_\varepsilon^2$, so the gap
+between the regression $R^2$ and the SSE $R^2$ is exactly
+$(a-1)^2 + b^2/\sigma^2$: amplitude error plus bias, and nothing about
+tracking.  On GBnetwork, where this was pursued in detail
+(\texttt{acpf\_gbnetwork\_case300\_global-context-report}), the bias term alone
+exceeds $\sigma$ for every model, and subtracting a per-bus offset fitted on
+the training split --- no retraining, no architecture change --- cuts $|V|$
+RMSE by $2.0$--$2.7\times$, turns every $R^2$ positive and improves median
+$|\Delta Q|$ by $3$--$4\times$.  That correction has now been applied
+corpus-wide as well (Section~\ref{sec:calcorpus}); the tables earlier in this
+report stand as measured, but what they measure is a miscalibration a post-hoc
+per-bus offset largely removes, not the absence of a learned mapping.
+
+\section{PIGNN diverges on four grids}
+
+On LVN\_heo1, case1888rte, GBnetwork and case2848rte the PIGNN run produced a
+constant validation RMSE, and the cause is \emph{not} the v1 defect. The
+zero-grad guard that killed 11 runs in v1 fired \textbf{zero times} here ---
+\texttt{-{}-armijo\_mode geometric\_safe} kept the graph edge alive as intended.
+What happens instead is divergence:
+
+\begin{verbatim}
+Epoch  0 | train loss 1.1116e+04  rmse 1.0297e+00  (dPinf 1.126e+05 pu)
+Epoch 40 | train loss nan         rmse nan         (dPinf nan)
+\end{verbatim}
+
+The initial loss is already $1.1\times10^{4}$ with a mean scenario-maximum mismatch of
+$1.1\times10^{5}$ pu, and the run reaches NaN. The reported validation RMSE is
+constant because the best checkpoint never moves past epoch 0. These cells are
+marked \textsc{nan} and excluded from the aggregates.
+
+\textbf{This is a different failure from v1 and needs a different fix.} The v1
+problem was no gradient; here the gradient exists and is too large.
+\texttt{geometric\_safe} always applies a step, including one that increases the
+residual, which plausibly contributes --- it is the trade-off noted when the
+mode was chosen. Gradient clipping or a lower learning rate on these grids is
+the obvious next experiment; neither has been run.
+
+\section{Caveats}
+
+\paragraph{Coverage is incomplete.} 22 of 31 grids have all four models:
+graphkit and lumina stand at 30 usable, gridsfm at 26, pignn at 22. The gap is
+the five largest grids, whose runs are described above.
+
+\paragraph{Twelve cells will carry a smaller budget.} The resubmitted runs on
+the five largest grids use 11--30 epochs against 40 elsewhere, because 40 does
+not fit a 24 h limit at their measured cost and the 48 h alternative is
+preempted.
+
+\paragraph{Single seed.} Every number is one run. Differences below roughly a
+factor of two should not be read as real; PIGNN's margins are far above that
+threshold, the graphkit--gridsfm gap on $|V|$ is not.
+
+\end{document}

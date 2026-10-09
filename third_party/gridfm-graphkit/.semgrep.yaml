@@ -1,0 +1,16 @@
+# Goal: do not fail on torch.load(..), for now
+
+rules:
+
+  - id: python.deserialization.pickle
+
+    # 👇 Exclude torch.load from this rule so it won't be reported as ERROR:
+    pattern-not: |
+      torch.load(...)
+
+  # ---  record torch.load usage as INFO, non-blocking ---
+  - id: python.deserialization.pytorch.torch-load
+    message: "torch.load detected (accepted for trusted checkpoints). Prefer weights_only=True."
+    languages: [python]
+    severity: INFO
+    pattern: |

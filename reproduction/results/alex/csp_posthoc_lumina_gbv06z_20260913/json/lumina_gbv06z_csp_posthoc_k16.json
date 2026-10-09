@@ -1,0 +1,84 @@
+{
+  "protocol": {
+    "split": "controlled_error_geometry.split_dataset: random_split seed=42; sorted membership order",
+    "basis": "diagnose_residual_distributions.manifold_basis -> manifold_projection.fit_basis; train NR only; circular angle mean/wrap; k=16",
+    "calibration": "diagnose_residual_distributions.fit_per_bus_offset + controlled_error_geometry.calibrated_forward; train only; circular angle offset",
+    "csp": "manifold_projection.project_state then output_intervention_metrics._restore_known_setpoints, matching restore_known paper rows",
+    "pb": "controlled_error_geometry.pb_per_scenario; final complex128 voltage; GENCO structural-zero PB",
+    "oracle_floor": "pure project_state(reference), as requested; operational restore_known oracle PB additionally reported",
+    "no_clipping": true,
+    "known_state_restoration_after_csp": "PV/slack magnitude and slack angle restored from V_start",
+    "rank_requested": 16,
+    "rank_actual_magnitude": 16,
+    "rank_actual_angle": 16,
+    "test_scenarios": 12344
+  },
+  "reference": {
+    "training_explained_variance": {
+      "magnitude": 0.9880053751661676,
+      "angle": 0.9968392019907943
+    },
+    "test_reference_retained_variance": {
+      "magnitude": 0.9878940592596026,
+      "angle": 0.9968251315392486
+    },
+    "oracle_pure_reference_projection": {
+      "vmag_rmse": 0.00257593046740752,
+      "angle_rmse_deg": 0.3857722189492722,
+      "mean_pb": 0.04153755348707348,
+      "max_pb": 5.970846736512022
+    },
+    "oracle_restore_known_reference_projection": {
+      "mean_pb": 0.041537553487073414,
+      "max_pb": 5.970846736512022,
+      "restoration_change_vmag_rmse": 1.0688060938893328e-16,
+      "restoration_change_angle_rmse_deg": 0.0
+    }
+  },
+  "models": {
+    "LUMINA": {
+      "off_error_fraction_calibrated": {
+        "magnitude": 0.2535031929567414,
+        "angle": 0.2964005561129042
+      },
+      "removed_error_energy_calibrated": {
+        "magnitude": 2175.521247942652,
+        "angle": 4675.919295797402
+      },
+      "identity_check": {
+        "magnitude": {
+          "calibrated_error_energy": 8581.829769354777,
+          "csp_pure_error_energy": 6588.471017115441,
+          "csp_operational_error_energy": 6588.471017115441,
+          "reference_off_subspace_energy": 182.162495703322,
+          "calibrated_error_off_subspace_energy": 2175.521247942652,
+          "rhs_reference_off_minus_error_off": -1993.3587522393298,
+          "lhs_pure_projection": -1993.3587522393364,
+          "lhs_operational_restore_known": -1993.3587522393364,
+          "pure_discrepancy": -6.59383658785373e-12,
+          "operational_discrepancy": -6.59383658785373e-12,
+          "pure_relative_discrepancy": 3.307902594275227e-15,
+          "operational_relative_discrepancy": 3.307902594275227e-15,
+          "max_abs_scenario_discrepancy_pure": 7.882583474838611e-15,
+          "max_abs_scenario_discrepancy_operational": 7.882583474838611e-15
+        },
+        "angle": {
+          "calibrated_error_energy": 15775.676527463267,
+          "csp_pure_error_energy": 12344.292846565879,
+          "csp_operational_error_energy": 12344.292846565879,
+          "reference_off_subspace_energy": 1244.535614899944,
+          "calibrated_error_off_subspace_energy": 4675.919295797402,
+          "rhs_reference_off_minus_error_off": -3431.383680897458,
+          "lhs_pure_projection": -3431.3836808973883,
+          "lhs_operational_restore_known": -3431.3836808973883,
+          "pure_discrepancy": 6.957634468562901e-11,
+          "operational_discrepancy": 6.957634468562901e-11,
+          "pure_relative_discrepancy": 2.0276468957103547e-14,
+          "operational_relative_discrepancy": 2.0276468957103547e-14,
+          "max_abs_scenario_discrepancy_pure": 1.0480505352461478e-13,
+          "max_abs_scenario_discrepancy_operational": 1.0480505352461478e-13
+        }
+      }
+    }
+  }
+}

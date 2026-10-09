@@ -1,0 +1,74 @@
+### Starting TaskPrologue of job 844065 on h11-11 at Sat Sep 12 22:19:17 CEST 2026
+Running on cores 96-127 with governor performance
+Sat Sep 12 22:19:17 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:C6:00.0 Off |                    0 |
+| N/A   37C    P0             72W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+Indexing parquet lazily from /home/hpc/b313dc/b313dc11/data_staging/controlled_geometry_20260905/GBnetwork.parquet ...
+[Dataset] /home/hpc/b313dc/b313dc11/data_staging/controlled_geometry_20260905/GBnetwork.parquet
+[Dataset]   parquet S_base = 1.000e+08 VA (= 100 MVA)
+[Dataset]   per-unit S_base matches target (100 MVA); no rebase
+Indexed 37022 valid rows from /home/hpc/b313dc/b313dc11/data_staging/controlled_geometry_20260905/GBnetwork.parquet across 1852 row groups (removed 0 diverged rows)
+Final combined dataset shape: (37022, streamed rows) | removed 0 diverged rows total
+[GridSFM] checkpoint missing=0 unexpected=0
+[Dataset]   share_ybus=True: cached shared Ybus from first row (N=2224, |Y|_pu max=2.048e+05); subsequent rows will skip dense Y reconstruction
+[Dataset]   share_grid=True: cached 21 grid-only tensors from first row (Ybus + Branch_y_* + topology + vn_kv + ...); subsequent rows skip parquet decode + per-unit math for these fields
+[debias] per-bus offset fitted on 12339 training scenarios; rms dvm 2.95890e-02 pu
+[manifold] 12339 train scenarios, 2224 buses; k=16 captures 98.801% of |V| and 99.684% of theta variance
+[probe] batch=16 success=True {'peak_allocated_bytes': 1528721920, 'peak_reserved_bytes': 1698693120, 'actual_batch': 16}
+[probe] batch=32 success=True {'peak_allocated_bytes': 2962619392, 'peak_reserved_bytes': 3219128320, 'actual_batch': 32}
+[probe] batch=64 success=True {'peak_allocated_bytes': 5830421504, 'peak_reserved_bytes': 6434062336, 'actual_batch': 64}
+[probe] batch=128 success=True {'peak_allocated_bytes': 11566025728, 'peak_reserved_bytes': 12723421184, 'actual_batch': 128}
+[probe] batch=256 success=True {'peak_allocated_bytes': 23037236224, 'peak_reserved_bytes': 25287458816, 'actual_batch': 256}
+[probe] batch=512 success=True {'peak_allocated_bytes': 45979657216, 'peak_reserved_bytes': 50457477120, 'actual_batch': 512}
+[probe] batch=1024 success=True {'peak_allocated_bytes': 91864499200, 'peak_reserved_bytes': 99386130432, 'actual_batch': 1024}
+[probe] batch=2048 success=False 
+[probe] batch=1536 success=False 
+[probe] batch=1280 success=False 
+[probe] batch=1152 success=False 
+[probe] batch=1088 success=True {'peak_allocated_bytes': 97600105472, 'peak_reserved_bytes': 99092529152, 'actual_batch': 1088}
+[probe] batch=1120 success=False 
+[probe] batch=1104 success=True {'peak_allocated_bytes': 99034011648, 'peak_reserved_bytes': 99344187392, 'actual_batch': 1104}
+[probe] batch=1112 success=False 
+[probe] batch=1108 success=False 
+[probe] batch=1106 success=False 
+[probe] batch=1105 success=True {'peak_allocated_bytes': 99123636736, 'peak_reserved_bytes': 99428073472, 'actual_batch': 1105}
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 12 22:32:26 CEST 2026
+= Job-ID             : 844065 on helma as 843941_1
+= Job-Name           : gb_inf_batch_probe
+= Job-Command        : /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/probe_gbnetwork_inference_batch_h100_20260912.sh
+= Initial workdir    : /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC
+= Queue/Partition    : h100
+= Slurm account      : b313dc with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 04:00:00
+= Elapsed runtime    : 00:13:20
+= Total RAM usage    : 13.4 GiB of assigned 175 GiB (7.7%)
+= Node list          : h11-11
+= Subm/Elig/Start/End: 2026-09-12T21:51:18 / 2026-09-12T21:51:18 / 2026-09-12T22:19:06 / 2026-09-12T22:32:26
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              79.9G   104.9G   209.7G        N/A     127K     500K   1,000K        N/A    
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:C6:00.0, 1461980, 16 %, 9 %, 95566 MiB, 780892 ms

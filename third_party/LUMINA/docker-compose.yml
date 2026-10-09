@@ -1,0 +1,84 @@
+# =============================================================================
+# lumina-inference Docker Compose
+# =============================================================================
+# Usage:
+#   docker compose up inference        # Run default inference check
+#   docker compose up test             # Run test suite
+#   docker compose run inference python examples/flexible_ingestion.py
+#
+# GPU support:
+#   docker compose --profile gpu up inference-gpu
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # CPU inference service
+  # ---------------------------------------------------------------------------
+  inference:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BASE_IMAGE: python:3.11-slim
+    image: lumina-inference:latest
+    container_name: lumina-inference
+    volumes:
+      - ./data:/app/data          # Mount local data directory
+      - model-cache:/app/.cache   # Persist HuggingFace model cache
+    environment:
+      - HF_HOME=/app/.cache/huggingface
+      - PYTHONUNBUFFERED=1
+    command: >
+      python -c "
+      import lumina_inference
+      print(f'lumina-inference v{lumina_inference.__version__}')
+      print('Available ingestion functions:')
+      for fn in ['load_from_dict', 'load_from_json_file', 'load_from_json_string',
+                 'load_from_matpower', 'build_hetero_data', 'process_opf_dict']:
+          print(f'  - {fn}')
+      print('Ready for inference.')
+      "
+
+  # ---------------------------------------------------------------------------
+  # Test runner
+  # ---------------------------------------------------------------------------
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: lumina-inference:latest
+    container_name: lumina-inference-test
+    command: pytest tests/test_flexible_ingestion.py -v --tb=short
+
+  # ---------------------------------------------------------------------------
+  # GPU inference service (requires NVIDIA Container Toolkit)
+  # ---------------------------------------------------------------------------
+  inference-gpu:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BASE_IMAGE: pytorch/pytorch:2.3.1-cuda12.1-cudnn9-runtime
+    image: lumina-inference:gpu
+    container_name: lumina-inference-gpu
+    profiles:
+      - gpu
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    volumes:
+      - ./data:/app/data
+      - model-cache:/app/.cache
+    environment:
+      - HF_HOME=/app/.cache/huggingface
+      - PYTHONUNBUFFERED=1
+      - NVIDIA_VISIBLE_DEVICES=all
+    command: python -c "import torch; print(f'CUDA available: {torch.cuda.is_available()}')"
+
+volumes:
+  model-cache:
+    driver: local

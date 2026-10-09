@@ -1,0 +1,9 @@
+[logging] stdout/stderr will also be saved to: /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/mix_n1_20260905/armB/logs/pignn_g3_mix_armB_s42_training_log.txt
+MODEL:GNSMsg_EdgeSelfAttn, PINN:True, Block:True, d:4, d_hi:24, n_heads:8, K:40, Runname:pignn_g3_mix_armB_s42, PARQUET:['/home/hpc/b313dc/b313dc11/data_staging/mix_n1_20260905/armB_control_plus_n1.parquet'], BATCH:6, EP:40, LR:1e-05, model_seed:42, split_seed:42, init_checkpoint:none, no_cache_dense_ybus:False, lazy_parquet:True, row_group_cache_size:4, physics_weight:1.0, physics_loss_form:logcosh, physics_residual_norm:graph, residual_feature_norm:signed_log, edge_feature_norm:none, relative_stiffness_feature:False, two_hop_attention_mode:none, global_context_mode:attn_post, global_context_gate_mode:scalar_tanh, range_num_masters:1, range_master_dim:24, range_num_heads:8, range_positional_encoding:hop_slack_rbf, range_pe_dim:10, exact_physics_weight:0.0, exact_physics_residual_norm:local_ybus, correction_target_norm:none, correction_target_norm_eps:1e-05, physics_final_weight:0.0, DthetaMax:0.3, DvmFrac:0.1, khop_K:3, khop_sigma:1.5, khop_norm:row, khop_source:yabs, dataset_complex_dtype:complex128, known_operator:kol-off, solver_update_mode:direct, preconditioner_optimizer:author_adam
+Using device: cuda:0
+Indexing parquet lazily from /home/hpc/b313dc/b313dc11/data_staging/mix_n1_20260905/armB_control_plus_n1.parquet ...
+[Dataset] /home/hpc/b313dc/b313dc11/data_staging/mix_n1_20260905/armB_control_plus_n1.parquet
+[Dataset]   parquet S_base = 1.000e+08 VA (= 100 MVA)
+[Dataset]   per-unit S_base matches target (100 MVA); no rebase
+Indexed 7653 valid rows from /home/hpc/b313dc/b313dc11/data_staging/mix_n1_20260905/armB_control_plus_n1.parquet across 154 row groups (removed 0 diverged rows)
+Final combined dataset shape: (7653, streamed rows) | removed 0 diverged rows total

@@ -1,0 +1,350 @@
+### Starting TaskPrologue of job 4224532 on a0223 at Sun Sep 13 07:52:24 CEST 2026
+Running on cores 32-47 with governor schedutil
+Sun Sep 13 07:52:24 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A40                     On  |   00000000:41:00.0 Off |                  Off |
+|  0%   49C    P8             23W /  300W |       0MiB /  49140MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+Indexing parquet lazily from /tmp/4224532.alex/GBnetwork.parquet ...
+[Dataset] /tmp/4224532.alex/GBnetwork.parquet
+[Dataset]   parquet S_base = 1.000e+08 VA (= 100 MVA)
+[Dataset]   per-unit S_base matches target (100 MVA); no rebase
+Indexed 37022 valid rows from /tmp/4224532.alex/GBnetwork.parquet across 1852 row groups (removed 0 diverged rows)
+Final combined dataset shape: (37022, streamed rows) | removed 0 diverged rows total
+[Dataset]   share_ybus=True: cached shared Ybus from first row (N=2224, |Y|_pu max=2.048e+05); subsequent rows will skip dense Y reconstruction
+[Dataset]   share_grid=True: cached 21 grid-only tensors from first row (Ybus + Branch_y_* + topology + vn_kv + ...); subsequent rows skip parquet decode + per-unit math for these fields
+[manifold] 12339 train scenarios, 2224 buses; k=16 captures 98.801% of |V| and 99.684% of theta variance
+[model] LUMINA HGT layers=6 hidden=128 heads=2 dropout=0.0
+[model] bus input widened to 13 (+6)
+[init] normal_(0, 0.02) applied to 66 weight matrices
+[init] terminal bus head zeroed (Linear, (2, 128)): flat-voltage start
+[lumina] checkpoint missing=0 unexpected=0
+[debias] per-bus offset fitted on 12339 training scenarios; rms dvm 2.02462e-02 pu
+[reproduce] 16/128
+[reproduce] 32/128
+[reproduce] 48/128
+[reproduce] 64/128
+[reproduce] 80/128
+[reproduce] 96/128
+[reproduce] 112/128
+[reproduce] 128/128
+{
+  "protocol": {
+    "source": "jacobian_subspace_alignment.py frozen protocol",
+    "rank": 16,
+    "scenarios": 128,
+    "directions_per_scenario": 32,
+    "seed": 20260909,
+    "state": "[theta(non-slack, radians), |V|(PQ)]",
+    "residual": "[DeltaP(non-slack), DeltaQ(PQ)]",
+    "jacobian": "analytic complex128 JVP",
+    "random_direction": "iid N(0,I), unit-normalized before P; Pq and (I-P)q unit-normalized for gain",
+    "basis": "separate train-only magnitude/angle SVD, restricted to unknown coordinates then QR orthonormalized",
+    "gauge": "same circular wrapped angle convention as manifold basis; no degrees inside J",
+    "tolerance": 2.220446049250313e-16
+  },
+  "dimensions": {
+    "buses": 2224,
+    "state": 4069,
+    "subspace_ranks": {
+      "angle": 16,
+      "magnitude": 16,
+      "combined": 32
+    }
+  },
+  "basis_explained_variance": {
+    "magnitude": 0.9880053751661676,
+    "angle": 0.9968392019907943
+  },
+  "selected_test_indices": [
+    33868,
+    13658,
+    26877,
+    7343,
+    29502,
+    3472,
+    20307,
+    26043,
+    29381,
+    5380,
+    1179,
+    21055,
+    35171,
+    881,
+    27804,
+    32110,
+    19430,
+    8617,
+    9312,
+    26514,
+    22704,
+    36690,
+    19216,
+    32120,
+    24008,
+    33099,
+    35234,
+    27523,
+    28593,
+    5806,
+    6740,
+    7484,
+    20433,
+    10627,
+    683,
+    23199,
+    19498,
+    7649,
+    3611,
+    9627,
+    7586,
+    26058,
+    2604,
+    12960,
+    20545,
+    25812,
+    5674,
+    8052,
+    11147,
+    18549,
+    9178,
+    33585,
+    20344,
+    4408,
+    26684,
+    22535,
+    2348,
+    17733,
+    28005,
+    35836,
+    410,
+    570,
+    14739,
+    34056,
+    35442,
+    10706,
+    29989,
+    28056,
+    9630,
+    16456,
+    22504,
+    5216,
+    31018,
+    36383,
+    3041,
+    30383,
+    32168,
+    1219,
+    27377,
+    30447,
+    14084,
+    27123,
+    18506,
+    7644,
+    34280,
+    22469,
+    14922,
+    33124,
+    23925,
+    30609,
+    16396,
+    17952,
+    17177,
+    3228,
+    29901,
+    36949,
+    10562,
+    6122,
+    11209,
+    13197,
+    5350,
+    13143,
+    36700,
+    11684,
+    7504,
+    15065,
+    12396,
+    10056,
+    4140,
+    35737,
+    12505,
+    8252,
+    23016,
+    14008,
+    6803,
+    36117,
+    27422,
+    30306,
+    2342,
+    30411,
+    32787,
+    26430,
+    16700,
+    17201,
+    19122,
+    22372,
+    22457,
+    7790
+  ],
+  "random_direction": {
+    "summary": {
+      "gain_parallel": {
+        "mean": 9.602029271571284,
+        "std": 2.1981667162752805,
+        "median": 9.18322933284314,
+        "p05": 6.771918171557213,
+        "p25": 8.01647304080316,
+        "p75": 10.809518919507479,
+        "p95": 13.830900181115139,
+        "min": 4.686975824233932,
+        "max": 20.232844040915058,
+        "n": 4096
+      },
+      "gain_perp": {
+        "mean": 14889.860605930211,
+        "std": 3389.494433729565,
+        "median": 14429.956102388376,
+        "p05": 10098.084231364453,
+        "p25": 12485.580617148815,
+        "p75": 16913.629225943798,
+        "p95": 21149.33674333093,
+        "min": 7068.825021614173,
+        "max": 31236.40278362483,
+        "n": 4096
+      },
+      "raw_jp": {
+        "mean": 0.8461786617873136,
+        "std": 0.22158385204493086,
+        "median": 0.8121487377379144,
+        "p05": 0.5514642778789487,
+        "p25": 0.6875107260598923,
+        "p75": 0.9685032413276384,
+        "p95": 1.2677479878446707,
+        "min": 0.3729590776936219,
+        "max": 2.0356421596345227,
+        "n": 4096
+      },
+      "raw_jperp": {
+        "mean": 14831.064366747556,
+        "std": 3376.620208797125,
+        "median": 14367.532387499807,
+        "p05": 10066.05305873374,
+        "p25": 12444.825351565667,
+        "p75": 16851.687624406295,
+        "p95": 21064.312079610063,
+        "min": 7039.087940273963,
+        "max": 31074.03915381996,
+        "n": 4096
+      },
+      "norm_parallel": {
+        "mean": 0.08815147460201739,
+        "std": 0.011143580979265738,
+        "median": 0.087862251251,
+        "p05": 0.07003077575415255,
+        "p25": 0.08066273513155761,
+        "p75": 0.09561524134476451,
+        "p95": 0.10712416640030467,
+        "min": 0.0528680212284145,
+        "max": 0.13028284153966282,
+        "n": 4096
+      },
+      "norm_perp": {
+        "mean": 0.9960442651752812,
+        "std": 0.000995238131814908,
+        "median": 0.9961326341427272,
+        "p05": 0.9942456501753244,
+        "p25": 0.9954183671303595,
+        "p75": 0.9967414525145811,
+        "p95": 0.9975448309387962,
+        "min": 0.9914768687167397,
+        "max": 0.9986015082761451,
+        "n": 4096
+      }
+    },
+    "R1_ratio_of_pooled_medians": 1571.3378790161219,
+    "R2_median_paired_ratio": 1562.5632758031215
+  },
+  "actual_calibrated_error": {
+    "LUMINA": {
+      "gain_parallel": {
+        "n": 128,
+        "p05": 3.863448391860538,
+        "p25": 4.113825086327322,
+        "median": 4.305429158157802,
+        "p75": 4.510445661081267,
+        "p95": 7.011328206992939,
+        "mean": 4.595951970467634,
+        "std": 0.9714868955432746
+      },
+      "gain_perp": {
+        "n": 128,
+        "p05": 24.68417764834408,
+        "p25": 26.251456617435537,
+        "median": 28.014344837551302,
+        "p75": 30.438721507479922,
+        "p95": 36.04089853737411,
+        "mean": 28.79911409530407,
+        "std": 3.5552539040008853
+      },
+      "ratio_of_medians": 6.506748528069621,
+      "excluded_parallel": 0,
+      "excluded_perp": 0,
+      "linearization": {
+        "n": 128,
+        "excluded": 0,
+        "ratio": {
+          "n": 128,
+          "p05": 0.9358460031029696,
+          "p25": 0.9667217316605826,
+          "median": 1.0087707938926704,
+          "p75": 1.0338584943020872,
+          "p95": 1.057938509684406,
+          "mean": 1.0030714277709722,
+          "std": 0.0393657509820935
+        },
+        "correlation": 0.9926804909400443
+      }
+    }
+  }
+}
+=== JOB_STATISTICS ===
+=== current date     : Sun Sep 13 08:02:46 CEST 2026
+= Job-ID             : 4224532 on alex
+= Job-Name           : lumina_jac_audit2
+= Job-Command        : /home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/jacobian_reproducibility_lumina_gbv06z_alex_a40_20260913.sh
+= Initial workdir    : /home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC
+= Queue/Partition    : a40
+= Slurm account      : iwi5 with QOS=normal
+= Requested resources:  for 06:00:00
+= Elapsed runtime    : 00:10:23
+= Total RAM usage    : 8.8 GiB of assigned  GiB (%)
+= Node list          : a0223
+= Subm/Elig/Start/End: 2026-09-13T07:52:08 / 2026-09-13T07:52:08 / 2026-09-13T07:52:23 / 2026-09-13T08:02:46
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+!!! /home/hpc             142.7G   104.9G   209.7G  -28997days     196K     500K   1,000K        N/A !!!
+    /home/woody           470.2G  1000.0G  1500.0G        N/A     467K   5,000K   7,500K        N/A    
+    /home/vault           368.8G  1048.6G  2097.2G        N/A      70K     200K     400K        N/A    
+    /lustre                 4.0K     0.0K     0.0K        N/A       1       80K     250K        N/A    
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA A40, 00000000:41:00.0, 3735684, 4 %, 3 %, 1054 MiB, 596526 ms

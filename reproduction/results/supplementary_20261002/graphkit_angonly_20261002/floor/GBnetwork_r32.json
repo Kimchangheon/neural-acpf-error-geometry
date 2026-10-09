@@ -1,0 +1,37 @@
+{
+  "protocol": {
+    "rank": 32,
+    "split_seed": 42,
+    "evaluation_split": "test",
+    "basis": "manifold_basis(train third), first k columns",
+    "projection": "project_state",
+    "pb": "pb_per_scenario"
+  },
+  "n_scenarios": 12344,
+  "metrics": {
+    "truth": {
+      "vmag_rmse": 0.0,
+      "angle_rmse_deg": 0.0,
+      "mean_pb": 5.3329952947604414e-12,
+      "max_pb": 1.4016200951517916e-08
+    },
+    "P32_truth": {
+      "vmag_rmse": 0.002177237774968112,
+      "angle_rmse_deg": 0.3316334883063327,
+      "mean_pb": 0.039991958347424125,
+      "max_pb": 3.930943035405237
+    },
+    "Pmag32_truth": {
+      "vmag_rmse": 0.002177237774968112,
+      "angle_rmse_deg": 0.0,
+      "mean_pb": 0.017089636620756785,
+      "max_pb": 2.817530910546547
+    },
+    "Pang32_truth": {
+      "vmag_rmse": 0.0,
+      "angle_rmse_deg": 0.3316334883063327,
+      "mean_pb": 0.03811701995251402,
+      "max_pb": 3.9388725207754303
+    }
+  }
+}

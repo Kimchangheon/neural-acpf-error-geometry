@@ -1,0 +1,82 @@
+{
+  "protocol": {
+    "split": "random_split seed=42",
+    "rank": 64,
+    "calibration": "train-only per-bus magnitude and circular-angle offsets",
+    "pb": "complex128 GENCO-style per-bus norm, all bus-scenario pairs",
+    "max_pb": "maximum individual bus PB over the test split",
+    "split_seed": 42
+  },
+  "result": {
+    "model": "graphkit",
+    "rank": 64,
+    "n_scenarios": 12344,
+    "calibration_offset_rms_vmag": 0.001140947401252621,
+    "metrics": {
+      "raw": {
+        "vmag_rmse": 0.003840708744074405,
+        "angle_rmse_deg": 0.24411476400547114,
+        "mean_pb": 0.04111057963059987,
+        "max_pb": 6.354583852292825,
+        "within_r2": 0.9758735899371881,
+        "within_slope": 0.9558730632078273
+      },
+      "C": {
+        "vmag_rmse": 0.003667293091153823,
+        "angle_rmse_deg": 0.2394653546716959,
+        "mean_pb": 0.038510695152240176,
+        "max_pb": 6.332996208137495,
+        "within_r2": 0.9758735899352919,
+        "within_slope": 0.95587306320503
+      },
+      "P64": {
+        "vmag_rmse": 0.003445051224931783,
+        "angle_rmse_deg": 0.35292851227709504,
+        "mean_pb": 0.039583798911698886,
+        "max_pb": 3.2727997523947185,
+        "within_r2": 0.9798365178083208,
+        "within_slope": 0.9504543892088914
+      },
+      "CSP64": {
+        "vmag_rmse": 0.003396380607017759,
+        "angle_rmse_deg": 0.35050334499985425,
+        "mean_pb": 0.039473447832703935,
+        "max_pb": 3.269529804487584,
+        "within_r2": 0.9798365178084197,
+        "within_slope": 0.9504543892089139
+      },
+      "Pmag64": {
+        "vmag_rmse": 0.003445051224931783,
+        "angle_rmse_deg": 0.24411476400547114,
+        "mean_pb": 0.038464070897706655,
+        "max_pb": 6.22584097859528,
+        "within_r2": 0.9798365178083208,
+        "within_slope": 0.9504543892088914
+      },
+      "CSPmag64": {
+        "vmag_rmse": 0.003396380607017759,
+        "angle_rmse_deg": 0.2394653546716959,
+        "mean_pb": 0.03666834094059793,
+        "max_pb": 6.205361453576151,
+        "within_r2": 0.9798365178084197,
+        "within_slope": 0.9504543892089139
+      },
+      "Pang64": {
+        "vmag_rmse": 0.003840708744074405,
+        "angle_rmse_deg": 0.35292851227709504,
+        "mean_pb": 0.055517869516194585,
+        "max_pb": 5.301387360161873,
+        "within_r2": 0.9758735899371881,
+        "within_slope": 0.9558730632078273
+      },
+      "CSPang64": {
+        "vmag_rmse": 0.003667293091153823,
+        "angle_rmse_deg": 0.35050334499985425,
+        "mean_pb": 0.05401160507216453,
+        "max_pb": 5.033709749807039,
+        "within_r2": 0.9758735899352919,
+        "within_slope": 0.95587306320503
+      }
+    }
+  }
+}

@@ -1,0 +1,12 @@
+grid=case39
+buses=39
+parquet=case39_ppcY_backbone_dc_compile_ppNR_ls0.60-1.40_u0clean_sgenpert_pvqvstart_siNR_37000_NR_branchrows_directSI.parquet
+checkpoint=/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/ckpt/pfv2_graphkit_S_v2init/pfv2_graphkit_case39_b64_init_best.pt
+checkpoint_sha256=6564c7ff3bc1b28f3c7476974078d9bd26685d186457729d371901789b6b7651
+batch=64
+recipe=init_recipe both; LR 1e-4; 120 epochs; seed 42
+split=random_split(seed=42; train=0.3333; valid=0.3333; test=remainder)
+calibration=train-only per-bus magnitude/circular-angle offset
+basis=train-only NR magnitude and gauge-aligned angle SVD
+rank=16
+pb=complex128 GENCO structural-zero; all bus-scenario pairs

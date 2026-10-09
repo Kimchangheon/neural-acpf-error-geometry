@@ -1,0 +1,695 @@
+\documentclass{article}
+
+\PassOptionsToPackage{numbers}{natbib}
+\usepackage[preprint]{neurips_2026}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{nicefrac}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{longtable}
+
+\definecolor{good}{RGB}{0,110,60}
+\definecolor{warn}{RGB}{175,105,0}
+\definecolor{bad}{RGB}{175,0,0}
+
+\newcommand{\dok}[1]{\textcolor{good}{#1}}
+\newcommand{\dwarn}[1]{\textcolor{warn}{#1}}
+\newcommand{\dbad}[1]{\textcolor{bad}{#1}}
+\newcommand{\pu}{\,\text{pu}}
+
+\title{The \texttt{\_ppNR\_} Dataset Family, v2\\
+\large 31 grids under one configuration: clean DC start, perturbed static
+generation, and a PV-bus reactive entry consistent with the stored voltage}
+
+\author{Changhun Kim}
+\date{August 16, 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This document describes the \textbf{v2} \texttt{\_ppNR\_} dataset family: 31
+parquet files covering 31 power grids from 4 to 9{,}241 buses, every one
+generated under an \emph{identical} configuration for the first time.  The v1
+family documented previously was internally inconsistent in three ways, each of
+which is measured and corrected here.  (i)~The 28 PPC grids carried
+$5^\circ/0.02\pu$ noise on \texttt{u\_start} while the 3 CGMES grids did not;
+the noise is now off everywhere, because it degrades \texttt{u\_start} as a
+predictor of \texttt{u\_newton} by $35$--$134\%$ while adding no information.
+(ii)~\texttt{net.sgen} was never perturbed, freezing $56.2\%$ of scheduled
+generation on case24\_ieee\_rts, $34.5\%$ on case89pegase, $17.2\%$ on LVN heo1
+and $100\%$ on SimBench across all scenarios; static generation now follows the
+load scale and the dispatch jitter.  (iii)~The PV-bus reactive entry of
+\texttt{S\_start} was back-computed at a flat start voltage that is \emph{not}
+the \texttt{u\_start} stored beside it, inconsistently so per grid; it is now
+recomputed from \texttt{u\_start}.  We also document the per-grid load-scale
+feasibility cliff that explains every shortfall yield in v1 to within one
+percentage point, and a systematic DC-versus-AC angle bias that accumulates
+with distance from the slack.
+\end{abstract}
+
+
+% ===================================================================
+\section{Location and Selection}
+\label{sec:sel}
+% ===================================================================
+
+All files reside in a single directory on the FAU Fritz cluster:
+
+\begin{center}
+\texttt{/home/vault/iwi5/iwi5295h/PIGNN-Attn-LS/ScenarioSynthesis\_PPC/out/}
+\end{center}
+
+\noindent
+\textbf{The v1 selection rule no longer works.}  Selecting on the
+\texttt{\_ppNR\_} solver tag alone now matches several generations of the same
+grids.  The v2 family is selected by its configuration tag:
+
+\begin{center}
+\texttt{ls .../out/*\_u0clean\_sgenpert\_pvqvstart\_*directSI.parquet}
+\end{center}
+
+\noindent
+This yields exactly 31 files.  The tag is authoritative: it is emitted by the
+filename builder only when all three of \texttt{--rand\_u\_start} (absent),
+\texttt{--perturb\_sgen} and \texttt{--pv\_q\_from\_vstart} hold, so no earlier
+generation can be selected by accident.  Anything matching \texttt{\_cNR\_} is a
+different family entirely --- it was labelled with the in-repo custom solver,
+not pandapower --- and is excluded automatically.
+
+
+% ===================================================================
+\section{Filename Scheme}
+% ===================================================================
+
+Filenames encode the full experimental configuration so that runs differing in
+any controlled variable cannot collide:
+
+\begin{center}
+\small
+\texttt{<grid>\_<ybus>\_<preset>\_<start>\_<solver>\_<load>\_}\\
+\texttt{<u0>[\_<flags>]\_<unit>\_<rows>\_NR\_branchrows\_directSI.parquet}
+\end{center}
+
+\noindent
+For example:
+
+\begin{center}
+\scriptsize
+\texttt{case118\_ppcY\_backbone\_dc\_compile\_ppNR\_ls0.60-1.40\_}\\
+\texttt{u0clean\_sgenpert\_pvqvstart\_siNR\_37000\_NR\_branchrows\_directSI.parquet}
+\end{center}
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Field} & \textbf{Meaning} \\
+\midrule
+\texttt{ppcY}            & Y-bus taken from the pandapower PPC (not re-stamped) \\
+\texttt{backbone}        & scenario preset (Section~\ref{sec:pert}) \\
+\texttt{dc\_compile}     & initial voltage from a DC power-flow solve \\
+\texttt{ppNR}            & label solver = pandapower Newton--Raphson \\
+\texttt{ls0.60-1.40}     & effective global load-scale range ($\pm40\%$) \\
+\texttt{u0clean}         & \textbf{no start-point jitter} (Section~\ref{sec:u0}) \\
+\texttt{sgenpert}        & \texttt{net.sgen} is perturbed (Section~\ref{sec:sgen}) \\
+\texttt{pvqvstart}       & PV-bus $Q$ from \texttt{u\_start} (Section~\ref{sec:pvq}) \\
+\texttt{siNR}            & NR solved and stored in SI units (not per-unit) \\
+\texttt{37000}           & \textbf{true row count} in the file \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{The row-count field is now trustworthy.}
+In v1 it was built from \texttt{--runs}, which counts \emph{attempts}.  With
+\texttt{--drop\_nonconverged} the two differ, so
+\texttt{case145\_...\_36000\_...} actually held $7{,}885$ rows and
+\texttt{case300\_...\_36000\_...} held $27{,}994$.  Merged array datasets were
+named by the merger and did carry true counts, so the two halves of the v1
+corpus meant different things by the same field.  The driver now renames the
+file to the true retained count on close, and this is verified against the
+parquet metadata for all 31 files.
+
+
+% ===================================================================
+\section{Perturbation: the \texttt{backbone} Preset}
+\label{sec:pert}
+% ===================================================================
+
+Every file uses \texttt{--scenario\_level backbone} with no CLI overrides of the
+load range.  This is a \emph{fixed-Y-bus} perturbation family: topology and
+admittance are untouched, so all rows of a grid share one admittance matrix and
+the dataset remains \texttt{share\_grid}-compatible.
+
+\begin{center}
+\begin{tabular}{lcl}
+\toprule
+\textbf{Quantity} & \textbf{Value} & \textbf{Effect} \\
+\midrule
+Global load scale        & $[0.60,\ 1.40]$      & light $\to$ heavy $\to$ near-collapse \\
+Scale gen.\ with load    & yes                  & keeps slack burden bounded \\
+\textbf{Scale sgen with load} & \textbf{yes}    & \textbf{new in v2} (Section~\ref{sec:sgen}) \\
+Per-bus load $P$ jitter  & $\sigma_P = 0.10$    & decorrelates buses \\
+Per-bus load $Q$ jitter  & $\sigma_Q = 0.15$    & reactive less predictable than active \\
+Generator jitter         & $\sigma_G = 0.05$    & dispatch variation, \texttt{gen} \emph{and} \texttt{sgen} \\
+PV voltage setpoint      & $[0.95,\ 1.05]$\,pu  & realistic setpoint band \\
+Start-point jitter       & \textbf{off}         & \textbf{changed in v2} (Section~\ref{sec:u0}) \\
+\midrule
+Line outage probability  & $0.0$                & \textbf{topology fixed} \\
+Admittance jitter        & $0.0$                & \textbf{Y-bus fixed} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+Note the ordering, which matters for Section~\ref{sec:u0}: every quantity above
+is applied to the network \emph{before} the DC power flow that produces
+\texttt{u\_start}.  They perturb the \emph{scenario}, and \texttt{u\_start} and
+\texttt{u\_newton} move together in response.
+
+\paragraph{Correction to the v1 report.}
+The v1 document asserted that ``narrowing [the load range] to $\pm20\%$ or
+$\pm10\%$ \dots changed convergence by less than $6\%$, establishing that
+solver choice rather than perturbation magnitude governs yield.''  That
+measurement was made with the custom solver.  Under pandapower NR the load
+range governs yield almost completely, as Section~\ref{sec:cliff} shows.
+
+
+% ===================================================================
+\section{What Changed in v2, and Why}
+% ===================================================================
+
+\subsection{The start-point jitter is off}
+\label{sec:u0}
+
+In v1 the 28 PPC files were generated while \texttt{rand\_u\_start} was read
+from the preset, which sets it on ($5^\circ$ angle jitter on all non-slack
+buses, $0.02\pu$ magnitude jitter on PQ buses).  The generator was later
+changed to make \texttt{rand\_u\_start} CLI-only and default off, so the three
+CGMES files, generated afterwards, had a clean DC start.  The v1 report flagged
+this as ``the one substantive inconsistency in the family.''
+
+\paragraph{It is not merely an inconsistency; the jitter is harmful.}
+The learning task is $\texttt{u\_start} \mapsto \texttt{u\_newton}$, and
+$\texttt{u\_newton}$ is a function of $(S, Y)$ alone --- it does not depend on
+the initial guess.  Since the model already receives $S$ and $Y$,
+\texttt{u\_start} carries no information about the target.  Its entire value is
+being a \emph{cheap approximation of the answer}, which makes corrupting it a
+pure loss.  Measured mean angle error of \texttt{u\_start} against
+\texttt{u\_newton}, with the per-grid bias of Section~\ref{sec:dcbias} removed:
+
+\begin{center}
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Grid} & \textbf{clean} & \textbf{jittered} & \textbf{degradation} \\
+\midrule
+case118        & $1.145^\circ$ & $2.675^\circ$ & \dbad{$+134\%$} \\
+case300        & $1.959^\circ$ & $3.216^\circ$ & \dbad{$+64\%$} \\
+case1354pegase & $2.997^\circ$ & $4.041^\circ$ & \dbad{$+35\%$} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+The jitter is also the wrong instrument for start-point diversity.  A DC power
+flow is a linear solve, $\theta = B^{-1}P$; it takes no initial guess, so noise
+applied \emph{before} it is simply overwritten.  What does reach the DC
+solution is the scenario perturbation of Section~\ref{sec:pert} --- and PV-bus
+magnitudes already carry it, since the DC start sets $|V| = 1.0\pu$ everywhere
+and then overwrites generator buses with their (jittered) setpoints.  Only PQ
+magnitudes were flat, so the $\pm2\%$ magnitude jitter was adding noise to a
+constant, and the $\pm5^\circ$ angle jitter was corrupting the one genuinely
+informative component.
+
+\paragraph{Verification.}
+Because a clean DC start leaves every PQ bus at exactly $1.0\pu$, the absence of
+jitter is an exact check rather than a threshold.  Across all 31 files the
+maximum deviation of $|u_{\text{start}}|$ from $1.0\pu$ at PQ buses is
+$\sim\!10^{-16}$, i.e.\ machine epsilon.
+
+\paragraph{An A/B pair is retained.}
+\texttt{case118} and \texttt{case300} exist in both arms --- clean and jittered,
+identical in every other respect --- so the claim above can be tested on a
+trained model rather than argued.  These four files are kept outside the v2
+family and are not selected by the tag in Section~\ref{sec:sel}.
+
+
+\subsection{Static generation is perturbed}
+\label{sec:sgen}
+
+\texttt{net.sgen} holds static generators: wind, PV plants, CHP --- PQ
+injections with a specified $p$ and $q$.  In v1 the perturbation code never
+referenced \texttt{net.sgen} at all.  The global load scale and the dispatch
+jitter reached \texttt{net.gen} and \texttt{net.load} only, so \emph{static
+generation was identical in all $36{,}000$ scenarios of every grid}.
+
+This is negligible where sgen is negligible and decisive where it is not:
+
+\begin{center}
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Grid} & \textbf{sgen units} & \textbf{sgen MW} & \textbf{share of scheduled generation} \\
+\midrule
+SimBench          & 121   & $3{,}715.6$  & \dbad{$100.0\%$} \\
+case24\_ieee\_rts & 22    & $1{,}632.2$  & \dbad{$56.2\%$} \\
+case89pegase      & 6     & $2{,}430.8$  & \dbad{$34.5\%$} \\
+case3120sp        & 257   & $5{,}235.7$  & \dbad{$25.1\%$} \\
+case6495rte       & 1{,}157 & $19{,}139.4$ & \dwarn{$17.9\%$} \\
+case6470rte       & 1{,}125 & $19{,}428.9$ & \dwarn{$17.5\%$} \\
+case6515rte       & 1{,}158 & $20{,}810.2$ & \dwarn{$17.5\%$} \\
+LVN heo1          & 33    & $36.9$       & \dwarn{$17.2\%$} \\
+case5             & 1     & $170.0$      & \dwarn{$17.0\%$} \\
+case9241pegase    & 434   & $23{,}055.8$ & \dwarn{$6.8\%$} \\
+case2848rte       & 300   & $2{,}743.1$  & $5.0\%$ \\
+case2869pegase    & 180   & $6{,}497.6$  & $4.7\%$ \\
+case1354pegase    & 52    & $1{,}086.3$  & $1.5\%$ \\
+case300           & 8     & $321.8$      & $1.4\%$ \\
+case1888rte       & 82    & $679.9$      & $1.1\%$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+Thirteen of 28 PPC grids and 2 of 3 CGMES grids exceed $1\%$.  \textbf{SimBench
+is the extreme case}: with \texttt{net.gen} empty and all $3{,}716$\,MW in
+\texttt{sgen}, sweeping the load scale from $0.60$ to $1.40$ moved its total
+injection from $3{,}669.9$ to $3{,}588.2$\,MW --- a $2.2\%$ swing where the
+preset intends $\pm40\%$.  Its $36{,}000$ v1 rows are close to duplicates of one
+another, which is also why it converged $100\%$ of the time.
+
+\paragraph{Semantics.}  Static generation now follows the same global scale as
+\texttt{net.gen}, with $q$ scaled alongside $p$ so the unit's power factor is
+preserved, and receives the same per-unit dispatch jitter with $p$ and $q$ drawn
+independently (matching how loads are treated).  Unlike $p$, $q$ is signed and
+is not clamped: an sgen may legitimately absorb reactive power.
+
+\paragraph{Verification.}  Comparing injection summed over sgen buses across
+rows, v1 versus v2:
+
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+\textbf{Grid} & \textbf{v1 spread} & \textbf{v2 spread} \\
+\midrule
+case89pegase    & \dbad{$0.0\%$} & \dok{$78.7\%$} \\
+case2848rte     & $9.7\%$        & \dok{$79.7\%$} \\
+case6470rte     & $15.2\%$       & \dok{$55.1\%$} \\
+case24\_ieee\_rts & $30.9\%$     & \dok{$86.2\%$} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+case89pegase is the cleanest demonstration: its sgen buses carry no load, so in
+v1 their injection was constant to the digit ($2430.8$--$2430.8$\,MW).  The v2
+spread of $\sim\!80\%$ is what a $[0.60, 1.40]$ scale implies.
+
+\paragraph{Effect on yield.}  Measured at $n{=}60$ per grid, perturbing sgen
+moves convergence by less than the sampling noise on every PPC grid
+($\pm5\%$, mostly $0\%$).  SimBench is the exception, falling from $100\%$ to
+$85$--$95\%$ --- which is not a regression but the grid finally having an
+operating point that moves.
+
+\subsection{The PV-bus reactive entry now matches \texttt{u\_start}}
+\label{sec:pvq}
+
+At a PV bus, $Q$ is not a specified quantity, and what \texttt{S\_start} carried
+in v1 was not a placeholder either.  The pipeline compiles the PPC with
+
+\begin{center}
+\texttt{pp.runpp(net, init="flat", max\_iteration=1, tolerance\_mva=1e9)}
+\end{center}
+
+\noindent
+whose enormous tolerance makes it converge immediately, after which pypower's
+\texttt{pfsoln} back-computes each generator's $Q_g$ from whatever voltage the
+PPC then holds --- $V_0$: flat magnitudes with the generator setpoints applied,
+zero angles.  \texttt{makeSbus} folds that into \texttt{s\_multi}.  Verified to
+machine precision on case118, case300 and case1354pegase:
+\[
+\texttt{s\_multi.imag}[\text{PV}] \;=\; \operatorname{Im}\!\left[V_0 \,
+\overline{\mathbf{Y}V_0}\right]
+\qquad (10^{-16}\ \text{to}\ 10^{-13}\pu).
+\]
+
+\noindent
+The problem is that $V_0$ is \emph{not} \texttt{u\_start}.  With
+\texttt{start\_mode=dc\_compile}, \texttt{u\_start} carries DC angles, so the
+stored reactive entry describes a different operating point from the voltage
+shipped beside it --- and inconsistently per grid: the correlation between
+\texttt{s\_multi.imag}[PV] and $Q(\texttt{u\_start})$ is $0.911$ on case118 but
+$0.568$ on case300.  A consumer of the data cannot see this.
+
+In v2 the entry is recomputed as
+\[
+Q_{\text{start}}[\text{PV}] \;=\; \operatorname{Im}\!\left[u_{\text{start}} \,
+\overline{\mathbf{Y}\,u_{\text{start}}}\right],
+\]
+so the column means the same thing on every grid: \emph{the reactive injection
+this network implies at the initial voltage you were given}.  Active power at PV
+buses is untouched --- $P$ there \emph{is} specified.  This uses only
+\texttt{u\_start} and $Y$, never \texttt{u\_newton}, so it is not label leakage.
+
+\paragraph{Verification.}  Rebuilding $Y$ from the stored branch columns with
+the dataloader's own routine and evaluating the identity gives a maximum
+relative deviation of $\sim\!10^{-14}$ across all files with PV buses.
+Grids with no PV buses at all --- SimBench has 3 slack and 91 PQ, since all its
+generation is \texttt{sgen} --- are unaffected by this change; their fix is
+Section~\ref{sec:sgen}.
+
+
+% ===================================================================
+\section{Why Some Grids Retain Fewer Rows}
+\label{sec:cliff}
+% ===================================================================
+
+Every grid has a sharp \emph{global load-scale threshold} above which the AC
+power flow does not converge: $100\%$ below, $0\%$ above, with no gradual
+falloff.  Measured by sweeping the load scale with all jitter disabled:
+
+\begin{center}
+\begin{tabular}{lccrr}
+\toprule
+\textbf{Grid} & \textbf{last $100\%$ scale} & \textbf{first $0\%$} &
+$P(\text{scale} < \text{cliff})$ & \textbf{v1 yield} \\
+\midrule
+case6515rte     & $1.00$ & $1.05$ & $56.3\%$ & $55.9\%$ \\
+case9241pegase  & $1.00$ & $1.05$ & $53.1\%$ & $50.8\%$ \\
+case145         & $1.05$ & $1.10$ & $59.4\%$ & $21.9\%$ \\
+case6495rte     & $1.10$ & $1.15$ & $65.6\%$ & $64.8\%$ \\
+case6470rte     & $1.15$ & $1.20$ & $71.9\%$ & $71.0\%$ \\
+case300         & $1.30$ & $1.40$ & $93.8\%$ & $77.8\%$ \\
+case1354pegase  & $1.30$ & $1.40$ & $93.8\%$ & $90.6\%$ \\
+case1888rte     & $>1.40$ & --- & $100\%$ & $100\%$ \\
+case2869pegase  & $>1.40$ & --- & $100\%$ & $100\%$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+The one-parameter model ``yield $=$ probability the load scale lands below the
+cliff'' reproduces five of the seven shortfall yields to within one percentage
+point.  This is genuine infeasibility, not solver fragility.
+
+Two grids carry a second mechanism.  \textbf{case145} sits on its own cliff, so
+per-bus load jitter alone pushes samples across it: at scale $1.00$ it converges
+$100\%$ of the time with no jitter but $63/30/17\%$ at
+$\sigma_P = 0.05/0.10/0.15$.  \textbf{case9241pegase} is sensitive to the PV
+\emph{setpoint}: at scale $1.00$, a fixed $1.0\pu$ setpoint converges $100\%$ of
+the time while the preset's $U(0.95,1.05)$ gives $53\%$; per-bus load jitter is
+irrelevant there.
+
+A mechanism that was \emph{ruled out}: per-bus $Q$ jitter flipping a load's
+sign.  That requires $z < -1/\sigma_Q = -6.67$, probability $1.3\times10^{-11}$;
+the measured rate is $0.000$ on every grid.  Per-bus jitter also averages out in
+aggregate, so large grids see \emph{less} total load variation, not more --- bus
+count alone is not the driver.
+
+\paragraph{Consequence for v2.}  Because the boundary is sharp in load scale,
+the retained rows of a shortfall grid are already samples from
+$U(0.60, \text{cliff})$ rather than $U(0.60, 1.40)$; oversampling and narrowing
+the range give nearly the same data.  v2 oversamples so that all 31 grids keep
+one identical preset, with \texttt{--runs} set to
+$37{,}000 / (\text{measured yield})$.
+
+
+% ===================================================================
+\section{A Systematic DC-versus-AC Angle Bias}
+\label{sec:dcbias}
+% ===================================================================
+
+\texttt{u\_start} and \texttt{u\_newton} agree exactly at the slack
+($0.00^\circ$) but differ at every other bus by a large, grid-specific amount:
+a mean of $2.05^\circ$ on case118, $18.57^\circ$ on case300 and $16.77^\circ$ on
+case1888rte.  Removing that offset leaves a residual of only $1$--$2^\circ$.
+
+\textbf{This is not a gauge artifact.}  A global phase rotation would preserve
+every angle \emph{difference}; here the differences themselves change (up to
+$9.87^\circ$ on individual branches).  It is the intrinsic modelling error of DC
+power flow, integrated along the network.  DC assumes $|V| = 1\pu$,
+$\sin\theta \approx \theta$ and $R = 0$; the lossless assumption is directly
+visible in the slack injection, which is $47.7$\,MW in DC against $472.4$\,MW in
+AC on case300 --- the entire $424.7$\,MW of network losses is missing.  Every
+branch's angle drop is therefore slightly wrong, \emph{with a consistent sign},
+and bus angles are sums of branch drops along a path from the slack.  Measured
+against hop distance:
+
+\begin{center}
+\begin{tabular}{crr}
+\toprule
+\textbf{hops from slack} & \textbf{case300 mean $d$} & \textbf{case118 mean $d$} \\
+\midrule
+0 (slack) & $0.00^\circ$  & $0.00^\circ$ \\
+1         & $2.74^\circ$  & $1.10^\circ$ \\
+2         & $11.07^\circ$ & $1.46^\circ$ \\
+4         & $14.96^\circ$ & $2.29^\circ$ \\
+8         & $17.03^\circ$ & $3.91^\circ$ \\
+12        & $19.93^\circ$ & --- \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+$\mathrm{corr}(\text{hop}, d) = 0.742$ on case300 and $0.695$ on case118.  Mean
+per-branch error is only $0.442^\circ$ on case300; twelve hops of it accumulate
+to $19.93^\circ$.  case300 is worst because its slack is a stub with a single
+incident branch, its diameter is 17 hops, and it spans 13 voltage levels down to
+$0.6$\,kV, where $R \sim X$ and the DC assumption fails hardest.
+
+\textbf{Implication.}  The bias is physically real and cannot be normalised
+away; \texttt{u\_start} and \texttt{u\_newton} are each correct states of their
+own model.  But it means the model must learn a grid-specific, distance-dependent
+correction between its input and its target, and the magnitude of that
+correction varies with grid diameter, voltage spread and loss fraction --- which
+makes it a genuine obstacle to cross-grid transfer.  It also masks smaller
+effects: the start-jitter degradation in Section~\ref{sec:u0} is invisible until
+this offset is removed.
+
+
+% ===================================================================
+\section{Generation Procedure}
+% ===================================================================
+
+All 31 files come from \texttt{main\_datagen\_multiproc\_improved.py} with
+\texttt{--label\_solver pandapower\_nr}, \texttt{--start\_mode dc\_compile},
+\texttt{--K 40}, \texttt{--convergence\_mode misinf},
+\texttt{--drop\_nonconverged}, \texttt{--no\_save\_y\_matrix},
+\texttt{--perturb\_sgen} and \texttt{--pv\_q\_from\_vstart}, and \emph{without}
+\texttt{--rand\_u\_start}.  The 28 PPC grids additionally pass
+\texttt{--use\_force\_shunt\_when\_no\_trafo}.
+
+Unlike v1, every grid ran as a \textbf{single-node job} rather than a chunked
+array with a merge step.  Chunked runs need the chunk files and the merged file
+on disk simultaneously, and the vault filesystem was at its soft quota; measured
+throughput made one node sufficient for all 31.
+
+The three CGMES grids pass \texttt{--cgmes\_path},
+\texttt{--cgmes\_version 2.4.15} and \texttt{--cgmes\_ignore\_errors}.  SimBench
+and ENTSO-E use \texttt{--no\_cgmes\_model\_a\_cleanup}; LVN heo1 uses
+\texttt{--cgmes\_model\_a\_cleanup}, \texttt{--use\_force\_shunt\_when\_no\_trafo}
+and \textbf{\texttt{--base\_sn\_mva 100}}.  The last is mandatory: every LVN
+CGMES export carries \texttt{net.sn\_mva}${}=1$, at which the specified
+injections reach ${\sim}162{,}000\pu$ and pandapower's NR cannot reach its
+tolerance at any iteration count.
+
+Every sample is attempted independently: a fresh perturbation is drawn, a DC
+power flow provides the initial voltage, pandapower NR solves the AC problem,
+and the row is written only if it converged.  \textbf{Non-converged samples are
+discarded, not stored}, which is why \texttt{--runs} exceeds the retained count
+wherever the grid has a feasibility cliff.
+
+
+% ===================================================================
+\section{Row Schema}
+% ===================================================================
+
+Each row is one complete power-flow scenario: 30 columns, ZSTD-compressed.
+Array-valued fields are stored as serialised NumPy buffers (\texttt{binary}),
+so a row is self-contained and the grid topology is repeated per row rather
+than normalised out.
+
+\begin{center}
+\small
+\begin{tabular}{lll}
+\toprule
+\textbf{Group} & \textbf{Columns} & \textbf{Type} \\
+\midrule
+Sizes    & \texttt{bus\_number}, \texttt{branch\_number} & int32 \\
+Base     & \texttt{gridtype}, \texttt{U\_base}, \texttt{S\_base}, \texttt{vn\_kv} & string/double \\
+Bus      & \texttt{bus\_typ}, \texttt{Y\_shunt\_bus} & binary \\
+Branch   & \texttt{Branch\_f\_bus}, \texttt{Branch\_t\_bus}, \texttt{Branch\_status}, & binary \\
+         & \texttt{Branch\_tau}, \texttt{Branch\_shift\_deg}, \texttt{Is\_trafo}, & \\
+         & \texttt{Branch\_hv\_is\_f}, \texttt{Branch\_n} & \\
+Admittance & \texttt{Branch\_y\_series\_from/\_to/\_ft}, & binary \\
+           & \texttt{Branch\_y\_shunt\_from/\_to}, \texttt{Y\_Lines}, \texttt{Y\_C\_Lines} & \\
+\midrule
+\textbf{Input}  & \texttt{u\_start}, \texttt{S\_start} & binary \\
+\textbf{Label}  & \texttt{u\_newton}, \texttt{S\_newton} & binary \\
+\textbf{Diag.}  & \texttt{converged}, \texttt{final\_misinf}, \texttt{nr\_iterations} & int8/double/int32 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+The learning task is $\texttt{u\_start} \mapsto \texttt{u\_newton}$.  Only the
+converged \emph{endpoint} is stored, not the NR iterate trajectory.
+\texttt{nr\_iterations} is $0$ throughout --- the pandapower label path does not
+report an iteration count --- so it carries no information here.
+\texttt{Y\_matrix} is absent by design; the admittance is reconstructed from the
+branch columns at load time.
+
+\paragraph{\texttt{S\_start} is not load-only.}  It is the signed injection
+before the solve: perturbed load everywhere, plus each unit's scheduled dispatch
+at controllable buses, plus --- at PV buses --- the reactive entry of
+Section~\ref{sec:pvq}.  At non-controllable buses \texttt{S\_start} equals
+\texttt{S\_newton} to ${\sim}10^{-6}$\,MW; at slack and PV buses they differ by
+construction, because slack injection and PV reactive power are solver outputs.
+
+
+% ===================================================================
+\section{Contents}
+% ===================================================================
+
+Table~\ref{tab:contents} lists every file.  \emph{Attempts} is \texttt{--runs};
+\emph{yield} is retained rows over attempts.
+
+{\footnotesize
+\setlength{\tabcolsep}{3.5pt}
+\begin{longtable}{@{}l r r r r r r c l l@{}}
+\caption{The 31 v2 \texttt{\_ppNR\_} datasets, ordered by network size.}
+\label{tab:contents}\\
+\toprule
+\textbf{Grid} & \textbf{Buses} & \textbf{Br.} & \textbf{Rows} & \textbf{Att.} &
+\textbf{Yield} & \textbf{MB} & \textbf{kV lv.} & \textbf{kV range} & \textbf{Src} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Grid} & \textbf{Buses} & \textbf{Br.} & \textbf{Rows} & \textbf{Att.} &
+\textbf{Yield} & \textbf{MB} & \textbf{kV lv.} & \textbf{kV range} & \textbf{Src} \\
+\midrule
+\endhead
+% --- generated by collect_v2_table.py, do not hand-edit ---
+case4gs                    & 4 & 4 & 37{,}000 & 37{,}000 & 100.0\% & 8.2 & 1 & 230 & PPC \\
+case5                      & 5 & 6 & 37{,}000 & 37{,}000 & 100.0\% & 11.0 & 1 & 230 & PPC \\
+case6ww                    & 6 & 11 & 37{,}000 & 37{,}000 & 100.0\% & 13.2 & 1 & 230 & PPC \\
+case9                      & 9 & 9 & 37{,}000 & 37{,}000 & 100.0\% & 18.0 & 1 & 345 & PPC \\
+case14                     & 14 & 20 & 37{,}000 & 37{,}000 & 100.0\% & 30.8 & 4 & 0.208--135 & PPC \\
+case24\_ieee\_rts          & 24 & 38 & 37{,}000 & 37{,}000 & 100.0\% & 52.4 & 2 & 138--230 & PPC \\
+GBreducednetwork           & 29 & 99 & 37{,}000 & 37{,}000 & 100.0\% & 65.6 & 3 & 132--400 & PPC \\
+case30                     & 30 & 41 & 37{,}000 & 37{,}000 & 100.0\% & 63.5 & 1 & 135 & PPC \\
+case\_ieee30               & 30 & 41 & 37{,}000 & 37{,}000 & 100.0\% & 64.2 & 4 & 1--132 & PPC \\
+case33bw                   & 33 & 32 & 37{,}000 & 37{,}000 & 100.0\% & 74.0 & 1 & 12.66 & PPC \\
+case39                     & 39 & 46 & 37{,}000 & 37{,}000 & 100.0\% & 82.2 & 1 & 345 & PPC \\
+case57                     & 57 & 80 & 37{,}034 & 37{,}100 & 99.8\% & 122.0 & 6 & 115--500 & PPC \\
+case89pegase               & 89 & 210 & 36{,}999 & 37{,}000 & 100.0\% & 175.9 & 3 & 150--380 & PPC \\
+SimBench                   & 94 & 131 & 38{,}649 & 45{,}000 & 85.9\% & 188.7 & 3 & 110--380 & CGMES \\
+case118                    & 118 & 186 & 37{,}000 & 37{,}000 & 100.0\% & 263.1 & 3 & 138--345 & PPC \\
+case145                    & 145 & 453 & 36{,}918 & 170{,}000 & 21.7\% & 290.5 & 7 & 18--500 & PPC \\
+iceland                    & 189 & 206 & 37{,}112 & 37{,}500 & 99.0\% & 361.7 & 15 & 0.22--220 & PPC \\
+case\_illinois200          & 200 & 245 & 37{,}000 & 37{,}000 & 100.0\% & 424.1 & 3 & 13.8--230 & PPC \\
+case300                    & 300 & 411 & 37{,}930 & 48{,}000 & 79.0\% & 659.4 & 13 & 0.6--345 & PPC \\
+LVN\_heo1                  & 722 & 796 & 37{,}000 & 37{,}000 & 100.0\% & 1{,}310.7 & 8 & 3--380 & CGMES \\
+case1354pegase             & 1{,}354 & 1{,}991 & 37{,}038 & 41{,}000 & 90.3\% & 2{,}785.6 & 2 & 220--380 & PPC \\
+case1888rte                & 1{,}888 & 2{,}531 & 37{,}000 & 37{,}000 & 100.0\% & 3{,}943.5 & 20 & 3--380 & PPC \\
+GBnetwork                  & 2{,}224 & 3{,}207 & 37{,}022 & 38{,}800 & 95.4\% & 4{,}162.6 & 8 & 6.6--400 & PPC \\
+case2848rte                & 2{,}848 & 3{,}776 & 37{,}000 & 37{,}000 & 100.0\% & 5{,}906.2 & 20 & 3--380 & PPC \\
+case2869pegase             & 2{,}869 & 4{,}582 & 37{,}099 & 37{,}100 & 100.0\% & 6{,}027.2 & 4 & 110--380 & PPC \\
+case3120sp                 & 3{,}120 & 3{,}693 & 37{,}191 & 37{,}600 & 98.9\% & 6{,}616.5 & 6 & 16--400 & PPC \\
+ENTSO\_E\_RealGridTest     & 6{,}051 & 8{,}202 & 37{,}000 & 37{,}000 & 100.0\% & 12{,}475.1 & 8 & 17--380 & CGMES \\
+case6470rte                & 6{,}470 & 9{,}005 & 37{,}895 & 52{,}000 & 72.9\% & 13{,}779.4 & 19 & 3--380 & PPC \\
+case6495rte                & 6{,}495 & 9{,}019 & 37{,}889 & 58{,}000 & 65.3\% & 13{,}844.3 & 21 & 3--380 & PPC \\
+case6515rte                & 6{,}515 & 9{,}037 & 37{,}211 & 67{,}000 & 55.5\% & 13{,}621.2 & 21 & 3--380 & PPC \\
+case9241pegase             & 9{,}241 & 16{,}049 & 38{,}508 & 75{,}000 & 51.3\% & 20{,}589.8 & 9 & 110--750 & PPC \\
+\midrule
+\textbf{Total (31)} & & & \textbf{1{,}153{,}495} & \textbf{1{,}410{,}100} & \textbf{81.8\%} & \textbf{108{,}030.5} & & & \\
+\bottomrule
+\end{longtable}
+}
+
+
+% ===================================================================
+\section{Verification}
+% ===================================================================
+
+All 31 files were checked directly against the stored bytes, not against the
+flags that were passed:
+
+\begin{itemize}[leftmargin=*]
+\item \textbf{Row count} matches the filename field and the parquet metadata;
+  every grid retains at least $36{,}900$ rows.
+\item \textbf{\texttt{converged} $=1$} for every row of every file.
+\item \textbf{Loader columns} \texttt{u\_start}, \texttt{u\_newton},
+  \texttt{S\_start}, \texttt{S\_newton} present in all 31.
+\item \textbf{Clean start:} $\max\bigl||u_{\text{start}}|/V_{\text{base}} - 1\bigr|$
+  over PQ buses is ${\sim}10^{-16}$.
+\item \textbf{PV-bus $Q$:} $\operatorname{Im}[u_{\text{start}}\overline{\mathbf{Y}u_{\text{start}}}]$
+  reproduced to ${\sim}10^{-14}$ relative, with $\mathbf{Y}$ rebuilt from the
+  stored branch columns.
+\item \textbf{sgen perturbation:} injection summed over sgen buses spans
+  ${\sim}80\%$ of its mean, against $0.0$--$30.9\%$ in v1.
+\end{itemize}
+
+
+% ===================================================================
+\section{Known Caveats}
+% ===================================================================
+
+\begin{itemize}[leftmargin=*]
+\item \textbf{The DC-versus-AC angle bias of Section~\ref{sec:dcbias} remains},
+  because it is physically real.  It is grid-specific and distance-dependent,
+  and is the largest single obstacle to cross-grid transfer in this corpus.
+\item \textbf{Yields are not uniform.}  Grids with a low feasibility cliff spend
+  many attempts per retained row, and their retained rows sample
+  $U(0.60,\text{cliff})$, not $U(0.60,1.40)$.  The load-scale marginal therefore
+  differs per grid even though the \emph{attempt} distribution is identical.
+\item \textbf{\texttt{final\_misinf} is written at sampling time} from the
+  in-memory Y-bus against the specified injection vector, not recomputed from
+  the stored file, and it is in SI units (VA) --- read it relative to
+  $S_{\text{base}}$.
+\item \textbf{LVN heo1 carries asymmetric branch impedance}
+  (\texttt{BR\_R\_ASYM}, \texttt{BR\_X\_ASYM}), so $Y_{ft} \neq Y_{tf}$.
+  Consumers building their own $Y$ must derive each direction from the from/to
+  admittances scaled by the voltage-base ratio rather than reusing
+  \texttt{Branch\_y\_series\_ft} for both; the naive reconstruction gives a
+  $9\%$ relative residual on LVN against $10^{-9}$ when done correctly.
+\end{itemize}
+
+
+% ===================================================================
+\section{Summary}
+% ===================================================================
+
+\begin{itemize}[leftmargin=*]
+\item \textbf{31 files, $1{,}153{,}495$ rows, $108.0$\,GB}, selected by the
+  \texttt{u0clean\_sgenpert\_pvqvstart} tag.  $1{,}410{,}100$ scenarios were
+  attempted for an overall yield of $81.8\%$, and \emph{every} grid retains at
+  least $36{,}918$ rows --- against v1, where six grids fell between $18$k and
+  $33$k.  This is the first internally consistent generation of this corpus.
+\item \textbf{Clean DC start} everywhere.  The removed jitter degraded
+  \texttt{u\_start} by $35$--$134\%$ as a predictor of \texttt{u\_newton} while
+  adding no information; a retained A/B pair on case118 and case300 lets this be
+  tested rather than assumed.
+\item \textbf{Static generation is perturbed}, fixing a defect that froze
+  $100\%$ of SimBench's generation, $56\%$ of case24\_ieee\_rts's and $17\%$ of
+  LVN heo1's across all scenarios.
+\item \textbf{PV-bus $Q$ is consistent with the stored voltage}, so the column
+  means the same thing on every grid.
+\item \textbf{Row counts in filenames are true counts}, verified against parquet
+  metadata --- they were attempt counts on the single-node half of v1.
+\item \textbf{Shortfall yields are explained}: each grid has a sharp load-scale
+  feasibility cliff, and a one-parameter model built from it reproduces five of
+  seven v1 yields to within one percentage point.
+\end{itemize}
+
+\end{document}

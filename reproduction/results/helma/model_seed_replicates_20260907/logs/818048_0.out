@@ -1,0 +1,18 @@
+=== JOB_STATISTICS ===
+=== current date     : Mon Sep  7 15:53:48 CEST 2026
+= Job-ID             : 818049 on helma as 818048_0
+= Job-Name           : gb_seedrep
+= Job-Command        : /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/gbnetwork_model_seed_replicates_a40_20260907.sh
+= Initial workdir    : /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC
+= Queue/Partition    : h100
+= Slurm account      : b313dc with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 1-00:00:00
+= Elapsed runtime    : 00:03:45
+= Total RAM usage    : 0.0 GiB of assigned 175 GiB (0.0%)
+= Node list          : h13-12
+= Subm/Elig/Start/End: 2026-09-07T15:46:35 / 2026-09-07T15:46:35 / 2026-09-07T15:46:36 / 2026-09-07T15:50:21
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              85.5G   104.9G   209.7G        N/A     125K     500K   1,000K        N/A    
+======================

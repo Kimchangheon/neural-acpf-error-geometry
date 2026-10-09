@@ -1,0 +1,89 @@
+### Starting TaskPrologue of job 825792 on h14-06 at Wed Sep  9 13:08:02 CEST 2026
+Running on cores 96-127 with governor performance
+Wed Sep  9 13:08:02 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.91.07              Driver Version: 595.91.07      CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:C6:00.0 Off |                    0 |
+| N/A   36C    P0             69W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+[task] family=g3 seed=43 checkpoint=/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/g3_ref_s43_ablation_20260829/ckpt/pignn_global_GBnetwork_g3_ref_s43_40_best_model.ckpt
+[protocol] seed-42 split; train-only calibration and bases; k=16; complex128 PB
+[variants] restore_known (full P16 then PV/slack |V| + slack theta setpoints); unknown_only (P16 only on PQ |V| and non-slack theta)
+Indexing parquet lazily from /home/hpc/b313dc/b313dc11/data_staging/controlled_geometry_20260905/GBnetwork.parquet ...
+[Dataset] /home/hpc/b313dc/b313dc11/data_staging/controlled_geometry_20260905/GBnetwork.parquet
+[Dataset]   parquet S_base = 1.000e+08 VA (= 100 MVA)
+[Dataset]   per-unit S_base matches target (100 MVA); no rebase
+Indexed 37022 valid rows from /home/hpc/b313dc/b313dc11/data_staging/controlled_geometry_20260905/GBnetwork.parquet across 1852 row groups (removed 0 diverged rows)
+Final combined dataset shape: (37022, streamed rows) | removed 0 diverged rows total
+[Dataset]   share_ybus=True: cached shared Ybus from first row (N=2224, |Y|_pu max=2.048e+05); subsequent rows will skip dense Y reconstruction
+[Dataset]   share_grid=True: cached 21 grid-only tensors from first row (Ybus + Branch_y_* + topology + vn_kv + ...); subsequent rows skip parquet decode + per-unit math for these fields
+[debias] per-bus offset fitted on 12339 training scenarios; rms dvm 2.63528e-02 pu
+[manifold] 12339 train scenarios, 2224 buses; k=16 captures 98.801% of |V| and 99.684% of theta variance
+[unknown-only basis] 12339 train scenarios; |V| coordinates=1846, theta coordinates=2223; k=16 captures 98.801%/99.684%
+[g3] evaluated 25/772 batches
+[g3] evaluated 50/772 batches
+[g3] evaluated 75/772 batches
+[g3] evaluated 100/772 batches
+[g3] evaluated 125/772 batches
+[g3] evaluated 150/772 batches
+[g3] evaluated 175/772 batches
+[g3] evaluated 200/772 batches
+[g3] evaluated 225/772 batches
+[g3] evaluated 250/772 batches
+[g3] evaluated 275/772 batches
+[g3] evaluated 300/772 batches
+[g3] evaluated 325/772 batches
+[g3] evaluated 350/772 batches
+[g3] evaluated 375/772 batches
+[g3] evaluated 400/772 batches
+[g3] evaluated 425/772 batches
+[g3] evaluated 450/772 batches
+[g3] evaluated 475/772 batches
+[g3] evaluated 500/772 batches
+[g3] evaluated 525/772 batches
+[g3] evaluated 550/772 batches
+[g3] evaluated 575/772 batches
+[g3] evaluated 600/772 batches
+[g3] evaluated 625/772 batches
+[g3] evaluated 650/772 batches
+[g3] evaluated 675/772 batches
+[g3] evaluated 700/772 batches
+[g3] evaluated 725/772 batches
+[g3] evaluated 750/772 batches
+=== JOB_STATISTICS ===
+=== current date     : Wed Sep  9 13:41:29 CEST 2026
+= Job-ID             : 825792 on helma as 825787_2
+= Job-Name           : gb_known_csp16
+= Job-Command        : /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/gbnetwork_known_state_csp_k16_helma_20260909.sh
+= Initial workdir    : /home/hpc/b313dc/b313dc11
+= Queue/Partition    : h100
+= Slurm account      : b313dc with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 06:00:00
+= Elapsed runtime    : 00:33:29
+= Total RAM usage    : 8.2 GiB of assigned 175 GiB (4.7%)
+= Node list          : h14-06
+= Subm/Elig/Start/End: 2026-09-09T13:05:46 / 2026-09-09T13:05:46 / 2026-09-09T13:08:00 / 2026-09-09T13:41:29
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc             103.7G   104.9G   209.7G        N/A     125K     500K   1,000K        N/A    
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:C6:00.0, 1280927, 20 %, 2 %, 866 MiB, 1994170 ms

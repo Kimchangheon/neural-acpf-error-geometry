@@ -1,0 +1,18 @@
+{
+  "rule": "minimize unweighted mean validation Mean PB over C+NR1 and CSP16+NR1 across two models x three seeds",
+  "candidates": {
+    "0.25": 0.06634624392073028,
+    "0.5": 0.044217731656333546,
+    "0.75": 0.02211013596704187,
+    "1.0": 0.00198719625388701
+  },
+  "selected_eta": 1.0,
+  "inputs": [
+    "/home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_multiproc_gbnetwork_20260910/json/g3_s41_validation.json",
+    "/home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_multiproc_gbnetwork_20260910/json/g3_s42_validation.json",
+    "/home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_multiproc_gbnetwork_20260910/json/g3_s43_validation.json",
+    "/home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_multiproc_gbnetwork_20260910/json/gridsfm_s41_validation.json",
+    "/home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_multiproc_gbnetwork_20260910/json/gridsfm_s42_validation.json",
+    "/home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_multiproc_gbnetwork_20260910/json/gridsfm_s43_validation.json"
+  ]
+}

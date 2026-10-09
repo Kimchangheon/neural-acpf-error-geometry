@@ -1,0 +1,59 @@
+### Starting TaskPrologue of job 4222181 on a0425 at Sat Sep 12 22:33:36 CEST 2026
+Running on cores 96-111 with governor schedutil
+Sat Sep 12 22:33:36 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A40                     On  |   00000000:C1:00.0 Off |                  Off |
+|  0%   32C    P8             22W /  300W |       0MiB /  49140MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+[protocol] validation only; seed-42 split; train-only calibration/basis; k=16
+Indexing parquet lazily from /home/hpc/b313dc/b313dc11/data_staging/controlled_geometry_20260905/GBnetwork.parquet ...
+[Dataset] /home/hpc/b313dc/b313dc11/data_staging/controlled_geometry_20260905/GBnetwork.parquet
+[Dataset]   parquet S_base = 1.000e+08 VA (= 100 MVA)
+[Dataset]   per-unit S_base matches target (100 MVA); no rebase
+Indexed 37022 valid rows from /home/hpc/b313dc/b313dc11/data_staging/controlled_geometry_20260905/GBnetwork.parquet across 1852 row groups (removed 0 diverged rows)
+Final combined dataset shape: (37022, streamed rows) | removed 0 diverged rows total
+[graphkit] checkpoint missing=0 unexpected=0
+[Dataset]   share_ybus=True: cached shared Ybus from first row (N=2224, |Y|_pu max=2.048e+05); subsequent rows will skip dense Y reconstruction
+[Dataset]   share_grid=True: cached 21 grid-only tensors from first row (Ybus + Branch_y_* + topology + vn_kv + ...); subsequent rows skip parquet decode + per-unit math for these fields
+[debias] per-bus offset fitted on 12339 training scenarios; rms dvm 5.79422e-03 pu
+[manifold] 12339 train scenarios, 2224 buses; k=16 captures 98.801% of |V| and 99.684% of theta variance
+=== JOB_STATISTICS ===
+=== current date     : Sun Sep 13 00:54:44 CEST 2026
+= Job-ID             : 4222181 on alex as 4222181_2
+= Job-Name           : gk120_nr1_val_a40
+= Job-Command        : /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/nr1_graphkit_e120_validation_alex_a40_20260912.sh
+= Initial workdir    : /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC
+= Queue/Partition    : a40
+= Slurm account      : b313dc with QOS=normal
+= Requested resources:  for 12:00:00
+= Elapsed runtime    : 02:21:09
+= Total RAM usage    : 19.1 GiB of assigned  GiB (%)
+= Node list          : a0425
+= Subm/Elig/Start/End: 2026-09-12T22:33:34 / 2026-09-12T22:33:35 / 2026-09-12T22:33:35 / 2026-09-13T00:54:44
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              88.0G   104.9G   209.7G        N/A     127K     500K   1,000K        N/A    
+    /home/vault           781.8G  1048.6G  2097.2G        N/A      60K     200K     400K        N/A    
+    /home/atuin          4506.8M     0.0K     0.0K        N/A       3                           N/A    
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA A40, 00000000:C1:00.0, 369776, 4 %, 3 %, 2114 MiB, 8450811 ms

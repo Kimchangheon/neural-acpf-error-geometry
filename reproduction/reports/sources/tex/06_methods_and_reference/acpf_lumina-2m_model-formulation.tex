@@ -1,0 +1,254 @@
+\documentclass[10pt]{article}
+\usepackage[a4paper,margin=20mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype}
+\usepackage{amsmath,amssymb,mathtools,bm}
+\usepackage{booktabs,tabularx,array}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\setlist{nosep,leftmargin=1.5em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\definecolor{navy}{HTML}{183B56}
+\definecolor{orange}{HTML}{B65A25}
+\definecolor{soft}{HTML}{FBF4EF}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\wrap}{\operatorname{wrap}}
+\newcommand{\LN}{\operatorname{LN}}
+\newcommand{\MLP}{\operatorname{MLP}}
+\newcommand{\code}[1]{\texttt{#1}}
+\title{\vspace{-1.4em}\color{navy}\textbf{LUMINA-2M as an AC Power-Flow Surrogate}\\
+\large Exact formulation of the released HGT and PPC adaptation}
+\author{Implementation note for \code{train\_valid\_test\_lumina.py}}
+\date{August 2026}
+
+\begin{document}
+\maketitle
+\vspace{-1.5em}
+\begin{center}
+\fcolorbox{orange}{soft}{\parbox{0.93\linewidth}{
+\textbf{Scope.} This document describes the released LUMINA Heterogeneous Graph
+Transformer loaded from \code{argonne/LUMINA-2M}, adapted to the PPC AC-PF
+parquets. LUMINA was pretrained for AC-OPF-style heterogeneous inputs; here its
+bus voltage output is fine-tuned or retrained against Newton PF solutions.
+Optional known-operator postprocessing is excluded.
+}}
+\end{center}
+
+\section{AC-PF Target}
+
+For voltage \(\underline V_i=v_i e^{\mathrm j\theta_i}\),
+\begin{equation}
+ \underline{\bm S}^{\rm calc}(\bm v,\bm\theta)
+ =\underline{\bm V}\odot\overline{\bm Y\underline{\bm V}}.
+\end{equation}
+The mismatch is
+\begin{equation}
+ \Delta\bm P=\bm P^{\rm set}-\Re\underline{\bm S}^{\rm calc},\qquad
+ \Delta\bm Q=\bm Q^{\rm set}-\Im\underline{\bm S}^{\rm calc}.
+\end{equation}
+The adapted LUMINA model learns
+\begin{equation}
+ f_\Theta(\mathcal G,\underline{\bm S}^{\rm set})
+ \longmapsto(\hat{\bm v},\hat{\bm\theta})
+ \approx(\bm v^\star,\bm\theta^\star).
+\end{equation}
+
+\section{Adapted Heterogeneous Graph}
+
+LUMINA uses four node types:
+\begin{equation}
+ \mathcal V=\mathcal V_b\cup\widetilde{\mathcal V}_g\cup
+ \mathcal V_d\cup\mathcal V_s,
+\end{equation}
+representing buses, proxy generators, loads, and shunts. It uses eight directed
+relation types:
+\begin{align}
+ &b\xrightarrow{\rm ac\ line}b,\qquad
+ b\xrightarrow{\rm transformer}b,\\
+ &\tilde g\mathrel{\overset{\rm generator\ link}{\rightleftarrows}}b,\qquad
+ d\mathrel{\overset{\rm load\ link}{\rightleftarrows}}b,\qquad
+ s\mathrel{\overset{\rm shunt\ link}{\rightleftarrows}}b.
+\end{align}
+The source LUMINA schema supports physical generator nodes. Since the PPC PF
+parquet is bus-aggregated, the adapter constructs one proxy generator on every
+PV/REF bus.
+
+\subsection{Node features}
+
+The bus row is
+\begin{equation}
+ \bm x_i^b=[V_{n,i}^{\rm kV},v_i^{\min},v_i^{\max},
+ \mathbb 1_{\rm PQ},\mathbb 1_{\rm PV},\mathbb 1_{\rm REF},
+ \mathbb 1_{\rm ISO}]\in\R^7.
+\end{equation}
+The generator, load, and shunt rows are
+\begin{align}
+ \bm x_{\tilde g_i}^g&=[m_{\rm base},P_g,P_g^{\min},P_g^{\max},Q_g,
+ Q_g^{\min},Q_g^{\max},v_g^{\rm set},c_2,c_1,c_0]\in\R^{11},\\
+ \bm x_{d_i}^d&=[P_{d,i},Q_{d,i}]\in\R^2,\\
+ \bm x_{s_i}^s&=[B_i^{\rm sh},G_i^{\rm sh}]\in\R^2.
+\end{align}
+In the PF adaptation,
+\begin{itemize}
+ \item \(P_g,Q_g\) may be filled with the known bus-level injection
+       (\code{gen\_setpoint\_mode=known});
+ \item generator limits are synthesized around that injection and costs are zero;
+ \item \(v_g^{\rm set}=v_i^0\) at proxy-generator buses;
+ \item load channels are the clipped negative net injection;
+ \item the unspecified \(Q\) slot at PV/REF buses is zeroed before graph construction.
+\end{itemize}
+
+The bus row itself does \emph{not} include \((v_i^0,\theta_i^0)\). Only the
+generator setpoint channel exposes \(v_i^0\) at PV/REF buses. Therefore the
+manual-flat versus DC-start angle is not directly provided to released LUMINA.
+
+\subsection{Branch attributes supplied by the adapter}
+
+AC-line and transformer rows follow the PGLib/OPF schema:
+\begin{align}
+ \bm e_{ij}^{\ell}&=[\theta^{\min},\theta^{\max},b_{fr},b_{to},r,x,
+ S_A,S_B,S_C]\in\R^9,\\
+ \bm e_{ij}^{\tau}&=[\theta^{\min},\theta^{\max},r,x,S_A,S_B,S_C,
+ \tau,\phi,b_{fr},b_{to}]\in\R^{11}.
+\end{align}
+They are reconstructed from PPC branch admittance, tap, phase shift, and shunts.
+
+\paragraph{Implementation-critical fact.}
+The released \code{HGT.forward} accepts an \code{edge\_attr\_dict} argument but
+does not pass it into \code{HGTConv}. Consequently, the present LUMINA model uses
+branch attributes only indirectly through graph construction/classification;
+the numerical values \((r,x,b,\tau,\phi)\) do not enter message attention. The
+relations distinguish ``AC line'' from ``transformer'', but two lines with the
+same endpoints and different impedance are indistinguishable to the HGT core.
+
+\section{Type Projections}
+
+Each node type \(t\in\{b,g,d,s\}\) has its own input projection:
+\begin{equation}
+ \bm h_i^{t,(0)}=\operatorname{ReLU}(W_{\rm in}^{t}\bm x_i^t+\bm b_{\rm in}^{t}).
+\end{equation}
+The released checkpoint configuration uses
+\begin{equation}
+ d=128,\qquad L=6,\qquad H=2,\qquad p_{\rm drop}=0.2439835578.
+\end{equation}
+
+\section{Heterogeneous Graph Transformer Layers}
+
+Let relation \(r=(s,\varrho,t)\) connect source type \(s\) to target type \(t\).
+For head \(h\), HGT forms type-specific queries, keys, and values:
+\begin{equation}
+ \bm q_i^{t,h}=W_Q^{t,h}\bm h_i^t,\qquad
+ \bm k_j^{s,h}=W_K^{s,h}\bm h_j^s,\qquad
+ \bm v_j^{s,h}=W_V^{s,h}\bm h_j^s.
+\end{equation}
+The relation transforms key/value information and supplies a learned relation
+prior. An operator-level form is
+\begin{align}
+ e_{ji}^{r,h}&=\frac{(\bm q_i^{t,h})^\top A_r^h\bm k_j^{s,h}}
+ {\sqrt{d_h}}+\mu_r^h,\\
+ \alpha_{ji}^{r,h}&=\operatorname{softmax}_{(r',u):u\to i}(e_{ui}^{r',h}),\\
+ \bm m_i^{t,h}&=\sum_{r=(s,\cdot,t)}\sum_{j\in\mathcal N_r(i)}
+ \alpha_{ji}^{r,h}M_r^h\bm v_j^{s,h}.
+\end{align}
+Thus different relations learn different transformations even when they share a
+target node type. The heads are combined, transformed by a target-type output
+map, and mixed with a type-specific skip path:
+\begin{equation}
+ \bm h_i^{t,(\ell+1)}=\operatorname{ReLU}
+ \left(\operatorname{HGTConv}^{(\ell)}_t
+ (\{\bm h^{(\ell)}\},\{\mathcal E_r\})_i\right).
+\end{equation}
+Dropout follows the input projection and every HGT layer during training.
+
+Unlike GraphKit's HGNS, LUMINA has no layerwise voltage decoding, no branch-flow
+calculation, and no AC residual feedback inside its forward pass.
+
+\section{Terminal Output Heads}
+
+Only after the sixth HGT layer, two type-specific linear heads are applied:
+\begin{align}
+ [z_{\theta,i},z_{v,i}]&=W_{\rm out}^{b}\bm h_i^{b,(L)}+\bm b_{\rm out}^{b},\\
+ [z_{P,g},z_{Q,g}]&=W_{\rm out}^{g}\bm h_g^{g,(L)}+\bm b_{\rm out}^{g}.
+\end{align}
+With min--max scaling enabled, the magnitude and generator outputs are bounded:
+\begin{align}
+ \hat v_i&=v_i^{\min}+(v_i^{\max}-v_i^{\min})\sigma(z_{v,i}),\\
+ \hat P_g&=P_g^{\min}+(P_g^{\max}-P_g^{\min})\sigma(z_{P,g}),\\
+ \hat Q_g&=Q_g^{\min}+(Q_g^{\max}-Q_g^{\min})\sigma(z_{Q,g}).
+\end{align}
+The angle is not bounded by min--max scaling; the adapter wraps it:
+\begin{equation}
+ \hat\theta_i=\operatorname{atan2}(\sin z_{\theta,i},\cos z_{\theta,i}).
+\end{equation}
+The AC-PF path consumes
+\begin{equation}
+ \widehat{\bm V}_{\rm state}=\{(\hat v_i,\hat\theta_i)\}_{i=1}^{N}.
+\end{equation}
+The generator output head is unused under the default voltage-only PF objective.
+The forward function also does not pin known PF quantities: it predicts
+magnitude at PV/REF buses and angle at the REF bus, and supervision must learn
+those identities.
+
+\section{External AC-PF Physics Loss}
+
+The supervised term is
+\begin{equation}
+ \mathcal L_{\rm state}=\frac1N\sum_i
+ \left[(\hat v_i-v_i^\star)^2+
+ \wrap(\hat\theta_i-\theta_i^\star)^2\right].
+\end{equation}
+Let
+\begin{equation}
+ \mathcal M_P=\mathcal V_b\setminus\mathcal V_{\rm REF},\qquad
+ \mathcal M_Q=\mathcal V_{\rm PQ}.
+\end{equation}
+The external physics term uses the exact PPC \(\bm Y\), independent of the HGT
+edge representation:
+\begin{equation}
+ \mathcal L_{\rm phys}=\frac1{|\mathcal M_P|+|\mathcal M_Q|}
+ \left[\sum_{i\in\mathcal M_P}\rho(\Delta P_i)+
+ \sum_{i\in\mathcal M_Q}\rho(\Delta Q_i)\right],
+\end{equation}
+with default
+\begin{equation}
+ \rho(r)=\log\cosh(\operatorname{clip}(r,-30,30)).
+\end{equation}
+The standard objective is
+\begin{equation}
+ \boxed{\mathcal L=\mathcal L_{\rm state}+10^{-2}\mathcal L_{\rm phys}.}
+\end{equation}
+Therefore LUMINA can still learn impedance-sensitive AC behavior through the
+external loss gradient, even though impedance is absent from its message
+features. It must infer much of that behavior from topology, relation type,
+nominal voltage, injections, and repeated-grid training examples.
+
+Training physics is evaluated through complex64 casts in the script; reported
+validation/test residual metrics use the complex128 dataset/Ybus path.
+
+\section{Interpretive Summary}
+\begingroup\small
+\begin{tabularx}{\linewidth}{>{\bfseries}p{0.25\linewidth}X}
+\toprule
+Property & LUMINA PF adaptation \\
+\midrule
+Graph & Bus, proxy-generator, load, and shunt nodes with eight directed relation types.\\
+Electrical edge encoding & Line/transformer attributes are constructed, but the released HGT forward currently ignores numerical edge attributes.\\
+Neural core & Six HGTConv layers, hidden width 128, two heads, and dropout about 0.244.\\
+Voltage decoder & One terminal bus head; magnitude sigmoid-scaled to the voltage band and angle wrapped.\\
+PF constraints inside forward & No PQ/PV/REF pinning, no branch-flow operator, and no residual feedback.\\
+Physics outside forward & Exact-Ybus robust AC-PF loss and complex128 evaluation metrics.\\
+Start-state use & Start magnitude appears only as proxy-generator \(v_g^{\rm set}\); start angle is omitted.\\
+Pretraining & Released LUMINA-2M weights may be loaded and fine-tuned.\\
+\bottomrule
+\end{tabularx}
+
+\section*{Code provenance}
+The formulation follows \code{lumina\_inference/model/hetero\_model.py}, the
+released \code{lumina\_config.json}, and the AC-PF adapter in
+\code{train\_valid\_test\_lumina.py}, as present in the local workspace in
+August 2026.
+\endgroup
+
+\end{document}

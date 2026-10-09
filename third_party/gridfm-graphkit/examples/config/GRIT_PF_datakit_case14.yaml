@@ -1,0 +1,108 @@
+callbacks:
+  patience: 100
+  tol: 0
+task:
+  task_name: PowerFlow
+data:
+  baseMVA: 100
+  mask_type: rnd        # or determinstic
+  mask_ratio: 0.5       # for random masking only
+  mask_value: 0
+  normalization: HeteroDataMVANormalizer
+  networks:
+  - case14_ieee
+  scenarios:
+  - 5000
+  test_ratio: 0.1
+  val_ratio: 0.1
+  workers: 4
+  posenc_RRWP:
+    enable: false
+    ksteps: 21
+    cache: true
+    # topk: Number of highest-ranked neighbors to retain per node based on
+    # the L2 norm of their multi-step random walk probability vector.
+    # Original graph edges and self-loops are always retained regardless of
+    # rank.  This provides sparse attention that interpolates between:
+    #   topk=0 (or omitted): full RRWP - all N^2 pairs (dense attention)
+    #   topk=K: each node attends to its K structurally most important
+    #           neighbors plus the original graph edges
+    # For case14 (14 buses), topk=5 retains ~36% of all pairs + graph edges,
+    # providing global reach while being significantly sparser than full.
+    topk: 5
+  posenc_RWSE:
+    enable: true
+    cache: true   # cache the computed positional encoding at first pass (if false computes every access)
+    kernel:
+      times: 21
+model:
+  attention_head: 8
+  dropout: 0.1
+  # edge_dim must match the bus-bus edge feature count after transforms
+  # (P_E, Q_E, YFF_TT_R, YFF_TT_I, YFT_TF_R, YFT_TF_I, TAP, ANG_MIN, ANG_MAX, RATE_A)
+  edge_dim: 10
+  hidden_size: 496
+  # input_dim = bus feature count + aggregated PG (used by GRIT core FeatureEncoder)
+  input_dim: 16
+  # Hetero adapter head dimensions
+  input_bus_dim: 16
+  input_gen_dim: 6
+  output_bus_dim: 6    # [VM, VA, PG, QG, PD, QD]
+  output_gen_dim: 0    # PG predicted at bus level; no per-generator head needed
+  num_layers: 7
+  type: GRIT
+  act: relu
+  encoder:
+    node_encoder: true
+    edge_encoder: true
+    node_encoder_name: RWSE
+    node_encoder_bn: true
+    edge_encoder_bn: true
+    posenc_RWSE:
+      # kernel.times is synced automatically from data.posenc_RWSE.kernel.times
+      pe_dim: 20
+      raw_norm_type: batchnorm
+  gt:
+    layer_type: GritTransformer
+    # dim_hidden is synced automatically from model.hidden_size
+    layer_norm: false
+    batch_norm: true
+    update_e: true
+    attn_dropout: 0.2
+    attn:
+      clamp: 5.
+      act: relu
+      # full_attn: false because the Top-K RRWP sparsification already
+      # determines the attention pattern.  The RRWPLinearEdgeEncoder will
+      # merge the sparse RRWP edges with original graph edges without
+      # padding to a fully-connected graph.
+      full_attn: false  # true only for full RRWP
+      edge_enhance: true
+      O_e: true
+      norm_e: true
+      signed_sqrt: true
+      bn_momentum: 0.1
+      bn_no_runner: false
+optimizer:
+  beta1: 0.9
+  beta2: 0.999
+  learning_rate: 0.0001
+  lr_decay: 0.7
+  lr_patience: 10
+seed: 0
+training:
+  batch_size: 8
+  epochs: 500
+  loss_weights:
+  - 0.99
+  - 0.01
+  losses:
+  - PBE
+  - MaskedReconstructionMSE
+  loss_args:
+  - {}
+  - {}
+  accelerator: auto
+  devices: auto
+  strategy: auto
+verbose: true

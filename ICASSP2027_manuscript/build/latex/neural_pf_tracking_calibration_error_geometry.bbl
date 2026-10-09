@@ -7,6 +7,13 @@ R.~D. Zimmerman, C.~E. Murillo-S{\'a}nchez, and R.~J. Thomas,
 \newblock {\em IEEE Transactions on Power Systems}, vol. 26, no. 1, pp. 12--19,
   Feb. 2011.
 
+\bibitem{conrad2026congestion}
+Timon Conrad, Marco Pr{\"o}ll, David Riebesel, and Johann J{\"a}ger,
+\newblock ``Framework for congestion management using particle swarm
+  optimisation,''
+\newblock in {\em Proc. 61st Int. Universities Power Engineering Conf. (UPEC)},
+  2026.
+
 \bibitem{bolz2023contingency}
 V.~Bolz, J.~Rue{\ss}, and A.~Zell,
 \newblock ``Data-driven graph convolutional neural networks for power system
@@ -33,19 +40,6 @@ G.~Cheng, Y.~Lin, A.~Abur, A.~G{\'o}mez-Exp{\'o}sito, and W.~Wu,
 \newblock {\em IEEE Transactions on Smart Grid}, vol. 15, no. 1, pp.
   1129--1151, 2024.
 
-\bibitem{owerko2024unsupervised}
-D.~Owerko, F.~Gama, and A.~Ribeiro,
-\newblock ``Unsupervised optimal power flow using graph neural networks,''
-\newblock in {\em Proc. IEEE Int. Conf. Acoust., Speech Signal Process.
-  (ICASSP)}, 2024, pp. 6885--6889.
-
-\bibitem{xu2025opformer}
-K.~Xu, X.~Dai, and L.~Qiu,
-\newblock ``{OPFormer}: Real-time optimal power flow with {CNN}-based
-  transformer,''
-\newblock in {\em Proc. IEEE Int. Conf. Acoust., Speech Signal Process.
-  (ICASSP)}, 2025, pp. 1--5.
-
 \bibitem{donon2020graphsolver}
 B.~Donon, R.~Cl{\'e}ment, B.~Donnot, A.~Marot, I.~Guyon, and M.~Schoenauer,
 \newblock ``Neural networks for power flow: Graph neural solver,''
@@ -58,11 +52,11 @@ N.~Lin, S.~Orfanoudakis, N.~Ordonez~Cardenas, J.~S. Giraldo, and P.~P. Vergara,
 \newblock {\em International Journal of Electrical Power \& Energy Systems},
   vol. 160, pp. 110112, 2024.
 
-\bibitem{wen2026pigat}
-T.~Wen, W.~Wang, J.~Chen, and Z.~Wang,
-\newblock ``Power flow surrogate for power systems with high renewable
-  penetration via a physics-informed graph attention network,''
-\newblock {\em Energies}, vol. 19, no. 13, pp. 2972, 2026.
+\bibitem{owerko2024unsupervised}
+D.~Owerko, F.~Gama, and A.~Ribeiro,
+\newblock ``Unsupervised optimal power flow using graph neural networks,''
+\newblock in {\em Proc. IEEE Int. Conf. Acoust., Speech Signal Process.
+  (ICASSP)}, 2024, pp. 6885--6889.
 
 \bibitem{jiang2025upinn}
 B.~Jiang, C.~Qin, and Q.~Wang,
@@ -71,11 +65,11 @@ B.~Jiang, C.~Qin, and Q.~Wang,
 \newblock {\em IEEE Transactions on Power Systems}, vol. 40, no. 5, pp.
   4407--4410, 2025.
 
-\bibitem{chzhen2026fab}
-M.~Chzhen and P.~L. Donti,
-\newblock ``Improving feasibility via fast autoencoder-based projections,''
-\newblock in {\em International Conference on Learning Representations (ICLR)},
-  2026.
+\bibitem{wen2026pigat}
+T.~Wen, W.~Wang, J.~Chen, and Z.~Wang,
+\newblock ``Power flow surrogate for power systems with high renewable
+  penetration via a physics-informed graph attention network,''
+\newblock {\em Energies}, vol. 19, no. 13, pp. 2972, 2026.
 
 \bibitem{nguyen2025fsnet}
 H.~T. Nguyen and P.~L. Donti,
@@ -88,6 +82,12 @@ H.~T. Nguyen and P.~L. Donti,
 P.~L. Donti, D.~Rolnick, and J.~Z. Kolter,
 \newblock ``{DC3}: A learning method for optimization with hard constraints,''
 \newblock in {\em International Conference on Learning Representations}, 2021.
+
+\bibitem{chzhen2026fab}
+M.~Chzhen and P.~L. Donti,
+\newblock ``Improving feasibility via fast autoencoder-based projections,''
+\newblock in {\em International Conference on Learning Representations (ICLR)},
+  2026.
 
 \bibitem{yang2026gridsfm}
 W.~Yang, A.~Britto Mattos~Lima, T.~V. Spina, S.~Fowers, B.~Zhang, and C.~White,
@@ -117,13 +117,6 @@ S.~de~Jongh, F.~Gielnik, F.~Mueller, L.~Schmit, M.~Suriyah, and T.~Leibfried,
 \newblock ``Physics-informed geometric deep learning for inference tasks in
   power systems,''
 \newblock {\em Electric Power Systems Research}, vol. 211, pp. 108362, 2022.
-
-\bibitem{zheng2022glassoformer}
-Y.~Zheng, C.~Hu, G.~Lin, M.~Yue, B.~Wang, and J.~Xin,
-\newblock ``{GLassoformer}: A query-sparse transformer for post-fault power
-  grid voltage prediction,''
-\newblock in {\em Proc. IEEE Int. Conf. Acoust., Speech Signal Process.
-  (ICASSP)}, 2022, pp. 3968--3972.
 
 \bibitem{karim2026domainadaptation}
 R.~Karim et~al.,
@@ -163,6 +156,12 @@ C.~Kim et~al.,
 \newblock in {\em Proc. IEEE Int. Conf. Acoust., Speech Signal Process.
   (ICASSP)}, 2026.
 
+\bibitem{bose2026newtons}
+Shourya Bose, Helgi Hilmarsson, and Dhruv Suri,
+\newblock ``Newton's lantern: A reinforcement learning framework for finetuning
+  ac power flow warm start models,''
+\newblock {\em arXiv preprint arXiv:2605.11102}, 2026.
+
 \bibitem{goodwin2026geometry}
 A.~Goodwin, J.~Maack, and D.~Sigler,
 \newblock ``Power flow geometry and approximation,''
@@ -175,17 +174,18 @@ S.~Park, W.~Chen, T.~W.~K. Mak, and P.~Van~Hentenryck,
 \newblock {\em IEEE Transactions on Power Systems}, vol. 39, no. 2, pp.
   4350--4359, Mar. 2024.
 
+\bibitem{chevalier2022accelerated}
+Samuel Chevalier, Luca Schenato, and Luca Daniel,
+\newblock ``Accelerated probabilistic power flow in electrical distribution
+  networks via model order reduction and neumann series expansion,''
+\newblock {\em IEEE Transactions on Power Systems}, vol. 37, no. 3, pp.
+  2151--2163, 2022.
+
 \bibitem{thurner2018pandapower}
 L.~Thurner et~al.,
 \newblock ``{pandapower}---an open-source python tool for convenient modeling,
   analysis, and optimization of electric power systems,''
 \newblock {\em IEEE Transactions on Power Systems}, vol. 33, no. 6, pp.
   6510--6521, Nov. 2018.
-
-\bibitem{piloto2024canos}
-L.~Piloto et~al.,
-\newblock ``{CANOS}: A fast and scalable neural {AC-OPF} solver robust to
-  {$N$--1} perturbations,''
-\newblock {\em arXiv preprint arXiv:2403.17660}, 2024.
 
 \end{thebibliography}

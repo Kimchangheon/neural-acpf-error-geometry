@@ -1,0 +1,68 @@
+### Starting TaskPrologue of job 844268 on h12-05 at Sat Sep 12 23:10:47 CEST 2026
+Running on cores 32-63 with governor performance
+Sat Sep 12 23:10:47 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:26:00.0 Off |                    0 |
+| N/A   36C    P0             68W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+[benchmark] family=pignn_gc seed=43 checkpoint=/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/g3_ref_s43_ablation_20260829/ckpt/pignn_global_GBnetwork_g3_ref_s43_40_best_model.ckpt
+Indexing parquet lazily from /home/hpc/b313dc/b313dc11/data_staging/controlled_geometry_20260905/GBnetwork.parquet ...
+[Dataset] /home/hpc/b313dc/b313dc11/data_staging/controlled_geometry_20260905/GBnetwork.parquet
+[Dataset]   parquet S_base = 1.000e+08 VA (= 100 MVA)
+[Dataset]   per-unit S_base matches target (100 MVA); no rebase
+Indexed 37022 valid rows from /home/hpc/b313dc/b313dc11/data_staging/controlled_geometry_20260905/GBnetwork.parquet across 1852 row groups (removed 0 diverged rows)
+Final combined dataset shape: (37022, streamed rows) | removed 0 diverged rows total
+[Dataset]   share_ybus=True: cached shared Ybus from first row (N=2224, |Y|_pu max=2.048e+05); subsequent rows will skip dense Y reconstruction
+[Dataset]   share_grid=True: cached 21 grid-only tensors from first row (Ybus + Branch_y_* + topology + vn_kv + ...); subsequent rows skip parquet decode + per-unit math for these fields
+[debias] per-bus offset fitted on 12339 training scenarios; rms dvm 2.63738e-02 pu
+[manifold] 12339 train scenarios, 2224 buses; k=16 captures 98.801% of |V| and 99.684% of theta variance
+[time] mode=Raw repeat=0 seconds=267.889168
+[time] mode=Raw repeat=1 seconds=268.727219
+[time] mode=Raw repeat=2 seconds=271.103684
+[time] mode=C repeat=0 seconds=268.565566
+[time] mode=C repeat=1 seconds=268.726920
+[time] mode=C repeat=2 seconds=270.227005
+[time] mode=P16 repeat=0 seconds=269.377942
+[time] mode=P16 repeat=1 seconds=269.241120
+[time] mode=P16 repeat=2 seconds=269.749670
+[time] mode=CSP16 repeat=0 seconds=273.417451
+[time] mode=CSP16 repeat=1 seconds=269.538443
+[time] mode=CSP16 repeat=2 seconds=268.830670
+=== JOB_STATISTICS ===
+=== current date     : Sun Sep 13 00:46:38 CEST 2026
+= Job-ID             : 844268 on helma as 843942_2
+= Job-Name           : gb_inf_walltime
+= Job-Command        : /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/benchmark_gbnetwork_inference_h100_20260912.sh
+= Initial workdir    : /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC
+= Queue/Partition    : h100
+= Slurm account      : b313dc with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 08:00:00
+= Elapsed runtime    : 01:35:57
+= Total RAM usage    : 44.0 GiB of assigned 175 GiB (25.1%)
+= Node list          : h12-05
+= Subm/Elig/Start/End: 2026-09-12T21:51:18 / 2026-09-12T22:51:29 / 2026-09-12T23:10:41 / 2026-09-13T00:46:38
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              87.9G   104.9G   209.7G        N/A     127K     500K   1,000K        N/A    
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:26:00.0, 1761173, 50 %, 18 %, 95568 MiB, 5729680 ms

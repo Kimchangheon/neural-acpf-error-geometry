@@ -1,0 +1,86 @@
+### Starting TaskPrologue of job 819736 on h12-01 at Tue Sep  8 01:52:08 CEST 2026
+Running on cores 32-63 with governor performance
+Tue Sep  8 01:52:08 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:26:00.0 Off |                    0 |
+| N/A   36C    P0             70W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+Indexing parquet lazily from /home/hpc/b313dc/b313dc11/data_staging/controlled_geometry_20260905/GBnetwork.parquet ...
+[Dataset] /home/hpc/b313dc/b313dc11/data_staging/controlled_geometry_20260905/GBnetwork.parquet
+[Dataset]   parquet S_base = 1.000e+08 VA (= 100 MVA)
+[Dataset]   per-unit S_base matches target (100 MVA); no rebase
+Indexed 37022 valid rows from /home/hpc/b313dc/b313dc11/data_staging/controlled_geometry_20260905/GBnetwork.parquet across 1852 row groups (removed 0 diverged rows)
+Final combined dataset shape: (37022, streamed rows) | removed 0 diverged rows total
+[graphkit] checkpoint missing=0 unexpected=0
+[Dataset]   share_ybus=True: cached shared Ybus from first row (N=2224, |Y|_pu max=2.048e+05); subsequent rows will skip dense Y reconstruction
+[Dataset]   share_grid=True: cached 21 grid-only tensors from first row (Ybus + Branch_y_* + topology + vn_kv + ...); subsequent rows skip parquet decode + per-unit math for these fields
+[debias] per-bus offset fitted on 12339 training scenarios; rms dvm 3.28729e-02 pu
+[manifold] 12339 train scenarios, 2224 buses; k=16 captures 98.801% of |V| and 99.684% of theta variance
+[graphkit] evaluated 25/772 batches
+[graphkit] evaluated 50/772 batches
+[graphkit] evaluated 75/772 batches
+[graphkit] evaluated 100/772 batches
+[graphkit] evaluated 125/772 batches
+[graphkit] evaluated 150/772 batches
+[graphkit] evaluated 175/772 batches
+[graphkit] evaluated 200/772 batches
+[graphkit] evaluated 225/772 batches
+[graphkit] evaluated 250/772 batches
+[graphkit] evaluated 275/772 batches
+[graphkit] evaluated 300/772 batches
+[graphkit] evaluated 325/772 batches
+[graphkit] evaluated 350/772 batches
+[graphkit] evaluated 375/772 batches
+[graphkit] evaluated 400/772 batches
+[graphkit] evaluated 425/772 batches
+[graphkit] evaluated 450/772 batches
+[graphkit] evaluated 475/772 batches
+[graphkit] evaluated 500/772 batches
+[graphkit] evaluated 525/772 batches
+[graphkit] evaluated 550/772 batches
+[graphkit] evaluated 575/772 batches
+[graphkit] evaluated 600/772 batches
+[graphkit] evaluated 625/772 batches
+[graphkit] evaluated 650/772 batches
+[graphkit] evaluated 675/772 batches
+[graphkit] evaluated 700/772 batches
+[graphkit] evaluated 725/772 batches
+[graphkit] evaluated 750/772 batches
+=== JOB_STATISTICS ===
+=== current date     : Tue Sep  8 02:09:46 CEST 2026
+= Job-ID             : 819736 on helma as 818214_4
+= Job-Name           : gb_seedmet
+= Job-Command        : /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/gbnetwork_model_seed_metrics_a40_20260907.sh
+= Initial workdir    : /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC
+= Queue/Partition    : h100
+= Slurm account      : b313dc with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 04:00:00
+= Elapsed runtime    : 00:17:38
+= Total RAM usage    : 6.9 GiB of assigned 175 GiB (3.9%)
+= Node list          : h12-01
+= Subm/Elig/Start/End: 2026-09-07T17:11:16 / 2026-09-08T01:51:47 / 2026-09-08T01:52:08 / 2026-09-08T02:09:46
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              96.6G   104.9G   209.7G        N/A     125K     500K   1,000K        N/A    
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:26:00.0, 1193521, 13 %, 9 %, 2510 MiB, 1026145 ms

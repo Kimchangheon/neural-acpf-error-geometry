@@ -1,0 +1,320 @@
+\documentclass[10pt]{article}
+\usepackage[a4paper,margin=20mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype}
+\usepackage{amsmath,amssymb,mathtools,bm}
+\usepackage{booktabs,tabularx,array}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\setlist{nosep,leftmargin=1.5em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\definecolor{navy}{HTML}{183B56}
+\definecolor{green}{HTML}{257A55}
+\definecolor{soft}{HTML}{F2F7F4}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\wrap}{\operatorname{wrap}}
+\newcommand{\LN}{\operatorname{LN}}
+\newcommand{\MLP}{\operatorname{MLP}}
+\newcommand{\mean}{\operatorname{mean}}
+\newcommand{\code}[1]{\texttt{#1}}
+\title{\vspace{-1.4em}\color{navy}\textbf{GridSFM as an AC Power-Flow Surrogate}\\
+\large Exact formulation of the released backbone and PPC adaptation}
+\author{Implementation note for \code{train\_valid\_test\_gridsfm.py}}
+\date{August 2026}
+
+\begin{document}
+\maketitle
+\vspace{-1.5em}
+\begin{center}
+\fcolorbox{green}{soft}{\parbox{0.93\linewidth}{
+\textbf{Scope.} These equations describe the released
+\code{gridsfm.GridTransformerBackbone} driven by the AC-PF branch-row adapter.
+GridSFM was originally structured for AC-OPF and ships pretrained weights; here
+its voltage heads are fine-tuned or retrained against Newton PF labels. Optional
+known-operator postprocessing is excluded.
+}}
+\end{center}
+
+\section{Target AC-PF Mapping}
+
+For \(\underline V_i=v_i e^{\mathrm j\theta_i}\), define
+\begin{equation}
+ \underline{\bm S}^{\rm calc}=\underline{\bm V}\odot
+ \overline{\bm Y\underline{\bm V}},\qquad
+ \Delta\bm P=\bm P^{\rm set}-\Re\underline{\bm S}^{\rm calc},\quad
+ \Delta\bm Q=\bm Q^{\rm set}-\Im\underline{\bm S}^{\rm calc}.
+\end{equation}
+The surrogate learns
+\begin{equation}
+ f_{\Theta}(\mathcal G,\underline{\bm S}^{\rm set},\bm V^0)
+ \longmapsto (\hat{\bm v},\hat{\bm\theta})
+ \approx(\bm v^\star,\bm\theta^\star).
+\end{equation}
+Active residuals are evaluated on non-slack buses and reactive residuals on PQ
+buses, matching the fixed-bus-type Newton system.
+
+\section{PPC-to-GridSFM Heterogeneous Graph}
+
+Before preprocessing, the adapter creates node sets
+\begin{equation}
+ \mathcal V_b,\quad \widetilde{\mathcal V}_g,\quad
+ \mathcal V_d,\quad \mathcal V_s,
+\end{equation}
+for buses, proxy generators, loads, and shunts. The released preprocessing then
+promotes branches to nodes and introduces cycle nodes:
+\begin{equation}
+ \mathcal V=\mathcal V_b\cup\widetilde{\mathcal V}_g\cup\mathcal V_d\cup
+ \mathcal V_s\cup\mathcal V_{\ell}\cup\mathcal V_{\tau}\cup\mathcal V_c.
+\end{equation}
+Here \(\mathcal V_{\ell}\) and \(\mathcal V_{\tau}\) represent AC-line and
+transformer branch rows, while \(\mathcal V_c\) represents a fundamental cycle
+basis. Native GridSFM expects physical generator rows; the PPC PF adapter instead
+creates one proxy generator per PV/REF bus.
+
+\subsection{Raw node features}
+
+For a bus \(i\),
+\begin{equation}
+ \bm x_i^b=[V_{n,i}^{\rm kV},\,t_i,\,v_i^{\min},\,v_i^{\max}]\in\R^4,
+\end{equation}
+where \(t_i\in\{1,2,3,4\}\) encodes PQ, PV, REF, or isolated. The start
+magnitude is retained separately as \(v_{i}^{\rm set}=v_i^0\).
+
+For proxy generator \(\tilde g_i\), load \(d_i\), and shunt \(s_i\),
+\begin{align}
+ \bm x_{\tilde g_i}^g&=[m_{\rm base},P_g,P_g^{\min},P_g^{\max},Q_g,
+ Q_g^{\min},Q_g^{\max},v_g^{\rm set},c_2,c_1,c_0]\in\R^{11},\\
+ \bm x_{d_i}^d&=[P_{d,i},Q_{d,i}]\in\R^2,\\
+ \bm x_{s_i}^s&=[B_i^{\rm sh},G_i^{\rm sh}]\in\R^2.
+\end{align}
+In the PF adapter, generator limits are synthesized around bus-level injections,
+costs are zero, and \(v_g^{\rm set}=v_i^0\). Reactive injection is set to zero at
+PV/REF buses before graph construction because it is not specified by fixed-type
+PF. Load channels are formed from the negative net injection and clipped at zero.
+
+\subsection{Line and transformer features}
+
+The adapter divides live branches into AC lines and transformers. An AC-line row is
+\begin{equation}
+ \bm e_{ij}^{\ell}=[\theta^{\min},\theta^{\max},b_{fr},b_{to},r,x,
+ S_A,S_B,S_C]\in\R^9,
+\end{equation}
+and a transformer row is
+\begin{equation}
+ \bm e_{ij}^{\tau}=[\theta^{\min},\theta^{\max},r,x,S_A,S_B,S_C,
+ \tau,\phi,b_{fr},b_{to}]\in\R^{11}.
+\end{equation}
+The series impedance is recovered from the PPC admittance,
+\begin{equation}
+ r+\mathrm jx=1/y_{ij},
+\end{equation}
+and transformers are identified from metadata, non-unit tap, phase shift, and
+optionally endpoint nominal-voltage mismatch.
+
+\section{Branch Promotion and Cycle Representation}
+
+Each branch row becomes a node whose initial feature is its line or transformer
+attribute. For branch \(e=(i,j)\), signed endpoint edges are created:
+\begin{equation}
+ i\xleftrightarrow{+1}e,\qquad j\xleftrightarrow{-1}e.
+\end{equation}
+Let \(B_1\) denote this oriented bus--branch incidence. A fundamental cycle
+basis is built from a spanning tree. A cycle \(c\) has features
+\begin{equation}
+ \bm x_c^c=[|c|,\sum_{e\in c}|x_e|,\sum_{e\in c}|r_e|,
+ \min_{e\in c}S_e^{\max}]\in\R^4,
+\end{equation}
+and signed cycle--branch incidence \(B_2(c,e)\in\{-1,0,+1\}\). This creates the
+sequence
+\begin{equation}
+ \text{bus (0-form)}\longleftrightarrow
+ \text{branch (1-form)}\longleftrightarrow
+ \text{cycle (2-form)}.
+\end{equation}
+
+\section{Static Physics and Positional Features}
+
+\subsection{Laplacian/DC features}
+
+Using branch susceptances \(b_{ij}\approx1/x_{ij}\), GridSFM builds
+\begin{equation}
+ L_B=\sum_{(i,j)}b_{ij}(\bm e_i-\bm e_j)(\bm e_i-\bm e_j)^\top.
+\end{equation}
+A reduced DC solve supplies
+\begin{equation}
+ L_{B,\setminus r}\bm\theta_{\rm DC}=\bm P_{\setminus r},
+\end{equation}
+with the slack balancing total injection. Bus DC features are
+\begin{equation}
+ \bm p_i^{\rm DC}=[\theta_i^{\rm DC},\,\operatorname{mean}_{j\in\mathcal N(i)}
+ |\theta_i^{\rm DC}-\theta_j^{\rm DC}-\phi_{ij}|,\,P_i^{\rm raw}]\in\R^3.
+\end{equation}
+Each branch receives
+\begin{equation}
+ [\Delta\theta_{ij}^{\rm DC},P_{ij}^{\rm DC},
+ \min(|P_{ij}^{\rm DC}|/S_{ij}^{\max},2),\operatorname{sign}P_{ij}^{\rm DC}]\in\R^4.
+\end{equation}
+Five landmark effective-resistance moments are added to each bus. A four-column
+bus-type one-hot is appended, giving \(4+5+3+4=16\) bus columns before learned
+Hodge encoding.
+
+\subsection{Learned Hodge positional encoding}
+
+For each active form \(q\in\{0,1,2\}\), let \(L_q\) be the signed Hodge
+operator induced by \(B_1\) and \(B_2\):
+\begin{equation}
+ L_0=B_1B_1^\top,\qquad
+ L_1=B_1^\top B_1+B_2^\top B_2,\qquad
+ L_2=B_2B_2^\top.
+\end{equation}
+After projecting to \(K_H=8\) channels, GridSFM performs \(T_H=4\) learned
+diffusion steps:
+\begin{equation}
+ \bm z_q^{(0)}=W_q\bm x_q,\qquad
+ \bm z_q^{(t+1)}=\bm z_q^{(t)}-\bm\alpha_{q,t}\odot L_q\bm z_q^{(t)}.
+\end{equation}
+The concatenated trajectory is mixed and normalized:
+\begin{equation}
+ \bm p_q^{\rm Hodge}=\LN\!\left(\MLP_q
+ [\bm z_q^{(0)}\Vert\cdots\Vert\bm z_q^{(T_H)}]\right).
+\end{equation}
+
+An eight-dimensional graph context also summarizes system size, load/capacity
+ratios, voltage-band width, ratings, and admittance scales:
+\begin{equation}
+ \bm g_{\rm ctx}\in\R^8.
+\end{equation}
+
+\section{GridTransformer Blocks}
+
+Each node type is independently normalized and projected to hidden dimension
+\(d=128\). The released default has \(L=8\) blocks and \(H=4\) heads.
+
+\subsection{Per-type linear self-attention}
+
+For each node type \(t\), attention is global within each graph but only among
+nodes of that same type. With feature map \(\varphi(x)=\operatorname{ELU}(x)+1\),
+\begin{align}
+ Q&=W_Qh,\quad K=W_Kh,\quad Z=W_Vh,\\
+ \bm M_{\gamma,h}&=\sum_{j\in\gamma,t}\varphi(K_j^h)(Z_j^h)^\top,
+ &\bm k_{\gamma,h}&=\sum_{j\in\gamma,t}\varphi(K_j^h),\\
+ \operatorname{Attn}_{t,h}(i)&=
+ \frac{\varphi(Q_i^h)^\top\bm M_{\gamma(i),h}}
+ {\varphi(Q_i^h)^\top\bm k_{\gamma(i),h}+\epsilon}.
+\end{align}
+This Performer-style expression is linear in the number of nodes rather than
+dense quadratic attention. The residual update is
+\begin{equation}
+ h_t\leftarrow h_t+W_O\mathop{\Vert}_{h=1}^{H}\operatorname{Attn}_{t,h}.
+\end{equation}
+
+\subsection{Typed local message passing and FFN}
+
+For signed incidence relations, GridSFM uses
+\begin{equation}
+ m_{u\to v}=s_{uv}W_{\rm msg}^{(r)}h_u,\qquad
+ \tilde h_v=W_{\rm self}^{(r)}h_v+\operatorname{mean}_{u\in\mathcal N_r(v)}m_{u\to v}.
+\end{equation}
+For generator/load/shunt association relations it uses relation-specific
+GraphSAGE mean aggregation. Relation outputs with the same target type are
+summed by HeteroConv:
+\begin{equation}
+ h_v\leftarrow h_v+\sum_{r:\operatorname{dst}(r)=t(v)}\tilde h_v^{(r)}.
+\end{equation}
+Each block closes with a pre-normalized residual feed-forward network:
+\begin{equation}
+ h_v\leftarrow h_v+W_2^{t(v)}\operatorname{GELU}
+ (W_1^{t(v)}\LN(h_v)).
+\end{equation}
+
+\section{Fusion and Terminal Heads}
+
+After all blocks, relation-aware mean aggregates are fused into bus embeddings:
+\begin{equation}
+ h_i^{\rm grid,b}=\LN\!\left(W_bh_i^b+W_{\ell}\bar h_i^{\ell}
+ +W_{\tau}\bar h_i^{\tau}+W_g\bar h_i^g+W_d\bar h_i^d
+ +W_s\bar h_i^s+W_c\bar h_i^c\right).
+\end{equation}
+Generator embeddings fuse their associated bus. A global embedding is obtained
+from mean and maximum pools of buses, line branches, transformer branches, and
+cycles.
+
+GridSFM applies its heads once, after fusion. Generator predictions are bounded
+around their intervals:
+\begin{align}
+ \hat P_g&=\operatorname{clip}_{[P_g^{\min},P_g^{\max}]}
+ \left(\tfrac12(P_g^{\min}+P_g^{\max})+H_P(h_g)\right),\\
+ \hat Q_g&=\operatorname{clip}_{[Q_g^{\min},Q_g^{\max}]}
+ \left(\tfrac12(Q_g^{\min}+Q_g^{\max})+H_Q(h_g)\right).
+\end{align}
+\par\nopagebreak[4]
+\textbf{Voltage-angle head.} The prediction combines a cached DC prior with a
+learned residual:
+\begin{equation}
+ \hat\theta_i=\operatorname{anchor}\left[
+ \pi\tanh(\theta_i^{\rm DC}/\pi)+s_\theta\tanh(H_\theta(h_i)/s_\theta)
+ \right].
+\end{equation}
+The magnitude head receives the start/setpoint magnitude explicitly:
+\begin{equation}
+ \hat v_i=\operatorname{clip}_{[v_i^{\min},v_i^{\max}]}
+ H_v([h_i\Vert v_i^{\rm set}]).
+\end{equation}
+Finally, exact \(\pi\)-model formulas compute predicted line/transformer flows
+from \((\hat v,\hat\theta,\hat P_g,\hat Q_g)\), and a separate feasibility head
+uses 24 pooled stress features. The AC-PF adapter consumes only
+\((\hat v,\hat\theta)\).
+
+\paragraph{Gradient caveat.}
+The DC prior is computed from \(\hat P_g\) through a detached CPU/SciPy path.
+Under the default voltage-only PF loss, the generator head therefore receives no
+gradient through the angle prior. Its pretrained behavior is retained, but PF
+fine-tuning updates it only if a separate generator-head loss is enabled.
+
+\section{AC-PF Training Loss and Metrics}
+
+The voltage-state loss is
+\begin{equation}
+ \mathcal L_{\rm state}=\frac1N\sum_i
+ \left[(\hat v_i-v_i^\star)^2+\wrap(\hat\theta_i-\theta_i^\star)^2\right].
+\end{equation}
+With \(\mathcal M_P=\mathcal V\setminus\mathcal V_{\rm REF}\) and
+\(\mathcal M_Q=\mathcal V_{\rm PQ}\),
+\begin{equation}
+ \mathcal L_{\rm phys}=\frac{1}{|\mathcal M_P|+|\mathcal M_Q|}
+ \left[\sum_{i\in\mathcal M_P}\rho(\Delta P_i)+
+ \sum_{i\in\mathcal M_Q}\rho(\Delta Q_i)\right],
+\end{equation}
+where \(\rho(r)=\log\cosh(\operatorname{clip}(r,-30,30))\) by default. The
+training objective is
+\begin{equation}
+ \boxed{\mathcal L=\mathcal L_{\rm state}+10^{-2}\mathcal L_{\rm phys}.}
+\end{equation}
+The script computes training physics through complex64 tensors but uses the
+complex128 dataset/Ybus path for reported validation and test residual metrics.
+
+\section{Interpretive Summary}
+\begin{tabularx}{\linewidth}{>{\bfseries}p{0.25\linewidth}X}
+\toprule
+Property & GridSFM PF adaptation \\
+\midrule
+Graph & Seven node types: bus, proxy generator, load, shunt, AC branch, transformer branch, and cycle.\\
+Topology encoding & Signed incidence, fundamental cycles, static Laplacian/DC features, and learned Hodge diffusion.\\
+Neural core & Eight blocks of per-type linear attention, typed local GNN aggregation, and residual FFNs.\\
+Voltage decoder & One terminal head; angle is DC prior plus learned residual, magnitude is bounded.\\
+Physics inside forward & DC prior, exact branch-flow calculation, and terminal stress/feasibility features; no iterative AC residual feedback.\\
+Physics outside forward & Exact-Ybus robust AC-PF loss and complex128 evaluation metrics.\\
+Pretraining & Released GridSFM checkpoint may be loaded and fine-tuned.\\
+\bottomrule
+\end{tabularx}
+
+\section*{Code provenance}
+The formulation follows \path{gridsfm/model.py}, \path{gridsfm/blocks.py},
+\path{gridsfm/cycle_basis.py}, \path{gridsfm/hodge_pe.py},
+\path{gridsfm/pe_features.py}, \path{gridsfm/dc_prior.py}, and the AC-PF
+adapter in \path{train_valid_test_gridsfm.py}, as present in August 2026.
+
+\end{document}

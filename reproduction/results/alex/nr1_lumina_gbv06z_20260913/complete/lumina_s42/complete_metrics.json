@@ -1,0 +1,75 @@
+{
+  "protocol": {
+    "eta": 1.0,
+    "input": "existing frozen C/CSP16 caches; no neural inference",
+    "nr": "one custom Newton correction; PQ magnitude/non-slack angle updates",
+    "pb": "existing complex128 GENCO structural-zero PB",
+    "test_split": "seed=42"
+  },
+  "model": "lumina",
+  "seed": "42",
+  "n_test": 12344,
+  "nr_runtime": {
+    "C_NR1": {
+      "wall_seconds": 2378.5749180599814,
+      "sum_solve_seconds": 37655.54965245951,
+      "failures": 0,
+      "n_scenarios": 12344,
+      "eta": 1.0
+    },
+    "CSP16_NR1": {
+      "wall_seconds": 2383.722313131031,
+      "sum_solve_seconds": 37702.44264459453,
+      "failures": 0,
+      "n_scenarios": 12344,
+      "eta": 1.0
+    }
+  },
+  "metric_scoring_wall_seconds": 442.6929815079784,
+  "metrics": {
+    "C": {
+      "vmag_rmse": 0.017680502330369725,
+      "angle_rmse_deg": 1.3734766507352532,
+      "within_r2": 0.4479357129358878,
+      "within_slope": 0.35750393304353373,
+      "mean_pb": 0.22800249571278802,
+      "max_pb": 38.84918319307431,
+      "scenario_max_pb_p50": 5.8518960717998905,
+      "scenario_max_pb_p95": 11.614940237343417,
+      "scenario_max_pb_p99": 14.006283859815888
+    },
+    "CSP16": {
+      "vmag_rmse": 0.015491624868184607,
+      "angle_rmse_deg": 1.2149555588213414,
+      "within_r2": 0.8924092309725186,
+      "within_slope": 0.34952410099480513,
+      "mean_pb": 0.06596861651263582,
+      "max_pb": 4.511247811427421,
+      "scenario_max_pb_p50": 1.5359231092497576,
+      "scenario_max_pb_p95": 2.6207194001846115,
+      "scenario_max_pb_p99": 3.238146027534793
+    },
+    "C_NR1": {
+      "vmag_rmse": 0.008687339751230738,
+      "angle_rmse_deg": 0.628669163487035,
+      "within_r2": 0.9328995018534088,
+      "within_slope": 0.9332708018653854,
+      "mean_pb": 0.008935684917949226,
+      "max_pb": 2.4735629575354143,
+      "scenario_max_pb_p50": 0.2549389482129333,
+      "scenario_max_pb_p95": 1.3739788466473928,
+      "scenario_max_pb_p99": 1.7865528012921912
+    },
+    "CSP16_NR1": {
+      "vmag_rmse": 0.0010567710254192817,
+      "angle_rmse_deg": 0.08377749516057295,
+      "within_r2": 0.9991034041156794,
+      "within_slope": 0.9826980382651893,
+      "mean_pb": 0.0016943757461682794,
+      "max_pb": 0.7205317930525403,
+      "scenario_max_pb_p50": 0.11293773034499703,
+      "scenario_max_pb_p95": 0.3154673712368042,
+      "scenario_max_pb_p99": 0.42791700505455726
+    }
+  }
+}

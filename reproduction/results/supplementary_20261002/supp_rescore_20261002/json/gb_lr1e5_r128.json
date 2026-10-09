@@ -1,0 +1,82 @@
+{
+  "protocol": {
+    "split": "random_split seed=42",
+    "rank": 128,
+    "calibration": "train-only per-bus magnitude and circular-angle offsets",
+    "pb": "complex128 GENCO-style per-bus norm, all bus-scenario pairs",
+    "max_pb": "maximum individual bus PB over the test split",
+    "split_seed": 42
+  },
+  "result": {
+    "model": "graphkit",
+    "rank": 128,
+    "n_scenarios": 12344,
+    "calibration_offset_rms_vmag": 0.0011409464822365915,
+    "metrics": {
+      "raw": {
+        "vmag_rmse": 0.0038407079268854565,
+        "angle_rmse_deg": 0.24411488717538762,
+        "mean_pb": 0.04111035672009798,
+        "max_pb": 6.3510164803346605,
+        "within_r2": 0.9758735969117464,
+        "within_slope": 0.9558730472943462
+      },
+      "C": {
+        "vmag_rmse": 0.0036672926520023774,
+        "angle_rmse_deg": 0.23946538218551514,
+        "mean_pb": 0.03851011885200026,
+        "max_pb": 6.329360920141182,
+        "within_r2": 0.9758735969097784,
+        "within_slope": 0.9558730472916646
+      },
+      "P128": {
+        "vmag_rmse": 0.0033396392093942976,
+        "angle_rmse_deg": 0.3157496662810197,
+        "mean_pb": 0.03641859655711492,
+        "max_pb": 3.4729204353380707,
+        "within_r2": 0.9811669516242477,
+        "within_slope": 0.953211412734916
+      },
+      "CSP128": {
+        "vmag_rmse": 0.0032801888332800724,
+        "angle_rmse_deg": 0.31295195711966134,
+        "mean_pb": 0.03629786523105029,
+        "max_pb": 3.4644454693972473,
+        "within_r2": 0.9811669516242117,
+        "within_slope": 0.9532114127349282
+      },
+      "Pmag128": {
+        "vmag_rmse": 0.0033396392093942976,
+        "angle_rmse_deg": 0.24411488717538762,
+        "mean_pb": 0.03662518401635194,
+        "max_pb": 6.190431465760921,
+        "within_r2": 0.9811669516242477,
+        "within_slope": 0.953211412734916
+      },
+      "CSPmag128": {
+        "vmag_rmse": 0.0032801888332800724,
+        "angle_rmse_deg": 0.23946538218551514,
+        "mean_pb": 0.03481798764578548,
+        "max_pb": 6.171006928101996,
+        "within_r2": 0.9811669516242117,
+        "within_slope": 0.9532114127349282
+      },
+      "Pang128": {
+        "vmag_rmse": 0.0038407079268854565,
+        "angle_rmse_deg": 0.3157496662810197,
+        "mean_pb": 0.051807840513252525,
+        "max_pb": 5.251769093955112,
+        "within_r2": 0.9758735969117464,
+        "within_slope": 0.9558730472943462
+      },
+      "CSPang128": {
+        "vmag_rmse": 0.0036672926520023774,
+        "angle_rmse_deg": 0.31295195711966134,
+        "mean_pb": 0.05028330562595213,
+        "max_pb": 4.984803078594403,
+        "within_r2": 0.9758735969097784,
+        "within_slope": 0.9558730472916646
+      }
+    }
+  }
+}

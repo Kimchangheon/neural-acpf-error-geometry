@@ -1,0 +1,1042 @@
+[
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/summarize_gk_both_3seed.py",
+    "destination": "code/summarize_gk_both_3seed.py",
+    "sha256": "1cfcdc88846b6023846bfe6ea96d8ef99b25c056d132e9ea2334c9605028bea6"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/rescore_slope_r2.py",
+    "destination": "code/rescore_slope_r2.py",
+    "sha256": "9e7be83e055463c604be9d10de905cb3d917980f3099e05242b310f6f9b420a0"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/gridfm_graphkit_adapter.py",
+    "destination": "code/gridfm_graphkit_adapter.py",
+    "sha256": "3f85ba0f88eda7577135b5e0dc0a4fde7b89b52b321bd38b81c66f304fddb2ec"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/pf_known_mask.py",
+    "destination": "code/pf_known_mask.py",
+    "sha256": "d25068b12473d8bbb6e5605e60e4c6da2b48684a1c2290fb7e9c29266d26a76c"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/pf_anchors.py",
+    "destination": "code/pf_anchors.py",
+    "sha256": "31db351837dbfffc93c903c95bc64a7fff4818ca945a1736b6687847a6a6201f"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/vmag_prior.py",
+    "destination": "code/vmag_prior.py",
+    "sha256": "0f548718fcb80ef3d19cb9d862db355321f9cbd0bac457ca096acc0a1f3a7ef2"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/train_valid_test_gridfm.py",
+    "destination": "code/train_valid_test_gridfm.py",
+    "sha256": "aa67d6fa0de64dd70a0970d214b6f39864c89d8c58aad29abbfef9e7f0b96eea"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/genco_ls.py",
+    "destination": "code/genco_ls.py",
+    "sha256": "7d887910ab0b537750e347cf4967440587f3380da650c937a7b011169b3298a3"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/gridfm_projected_dpf_hybrid.py",
+    "destination": "code/gridfm_projected_dpf_hybrid.py",
+    "sha256": "5e1cecc95ee5fd8f2238413c09646c4d4467caff6e165d5d7f6c6b3d552fc098"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/collate_blockdiag_optimized_complex_columns.py",
+    "destination": "code/collate_blockdiag_optimized_complex_columns.py",
+    "sha256": "4d5274809a11ab571e8cdd0c5d4c0f6e018adc199d79994c94eacbeb14ec76f9"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/supervised_voltage_loss.py",
+    "destination": "code/supervised_voltage_loss.py",
+    "sha256": "1e83e573df097cd6db00b18b89a05c00bc4b36b486fd569c8aac078037ac479c"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/known_operator_pf.py",
+    "destination": "code/known_operator_pf.py",
+    "sha256": "1d7e7ef012eab6b8354ae4a3adf1c4ca1aae687d99cedcb89d1bac7a55d5962a"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/opf_task.py",
+    "destination": "code/opf_task.py",
+    "sha256": "80ba826029c22607b5e4c8d8732c10449ce98f5b652d18c138faf823782bccb4"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/ddp_utils.py",
+    "destination": "code/ddp_utils.py",
+    "sha256": "e7baaa4847349da7ec2740656cc20748593ae87747e25128197a08ca01def4a5"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/preload_dataset.py",
+    "destination": "code/preload_dataset.py",
+    "sha256": "c6d43c9b15631a12da0344b1cb7bc960b9d1cf5885104f777dd31e4ad101b201"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/grad_accum.py",
+    "destination": "code/grad_accum.py",
+    "sha256": "d94bf2f072f66e4d61ba043476536b0fdc534e8f30ff6806070398e4af7a67b4"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/Dataset_optimized_complex_columns.py",
+    "destination": "code/Dataset_optimized_complex_columns.py",
+    "sha256": "45dcc8ed7615afba15c455653ba4be69d8bb6846fd98f11501388938f82f4ed1"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/read_npy_columns_optimized.py",
+    "destination": "code/read_npy_columns_optimized.py",
+    "sha256": "eba1ec512da95e8eab21762b14513172beb6a9f2c1217d394bfe5afde9eee016"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/opfdata_pipeline.py",
+    "destination": "code/opfdata_pipeline.py",
+    "sha256": "a2172fc038485bed9bd768a956ff21b9de2138e06ff9aee2489e95f992148af9"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/prediction_diagnostics.py",
+    "destination": "code/prediction_diagnostics.py",
+    "sha256": "563a996b3b6a8487d9c9d9f00128ff8f7f9cfcf44655352811387924e9140799"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/train_valid_test_lumina.py",
+    "destination": "code/train_valid_test_lumina.py",
+    "sha256": "b6273b49c9a2bae7f19de6ac11c4905b349caa9206cf19746203f2d5d6f20906"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/train_valid_test_gridsfm.py",
+    "destination": "code/train_valid_test_gridsfm.py",
+    "sha256": "b5fe62f44fea84bf7cc804680df71bc2bd78f0770ad518d864433d2411524a00"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/manifold_projection.py",
+    "destination": "code/manifold_projection.py",
+    "sha256": "f54e56b0ca86548fbd373bd71d1951a9a670d876abd96d1405eb22fa7702ac27"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/train_valid_test.py",
+    "destination": "code/train_valid_test.py",
+    "sha256": "5bb98a3fe2de407ca202c80bfe2e34d620659b3176b917fb8a1b28297a47aed9"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/GNSMsg_SelfAttention_armijo.py",
+    "destination": "code/GNSMsg_SelfAttention_armijo.py",
+    "sha256": "2febf8cb6dbb93211d92237b4afaefd23a88e3812fdb48e8c58fc0b720a8661c"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/helm_known_operator_pf.py",
+    "destination": "code/helm_known_operator_pf.py",
+    "sha256": "3de65ec12f5b6a51c25732851032564f92dbcbb01ac2a3dcb1e9df760b087e3b"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/helper.py",
+    "destination": "code/helper.py",
+    "sha256": "b328cfe5d654de30c89394d5841f4cd38eff50407753eafb1e020f2ff59a60b3"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/GNSMsg_armijo.py",
+    "destination": "code/GNSMsg_armijo.py",
+    "sha256": "023c1ba26d610faa1a3c8bccace1b27cc245d275ff6988d991692202f76f25bb"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/GNSMsg_SelfAttention_armijo_khop.py",
+    "destination": "code/GNSMsg_SelfAttention_armijo_khop.py",
+    "sha256": "3174f4a4de2553019c592e8de7bbf0a81cf3897f2dc777570c7ec5483d86accb"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/summarize_gridsfm_31grid_csp16.py",
+    "destination": "code/summarize_gridsfm_31grid_csp16.py",
+    "sha256": "5dc9a4be1b7757c268ddbefad27eab9ce86d5934a70f849b6f317d74acc4d300"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/benchmark_inference_walltime.py",
+    "destination": "code/benchmark_inference_walltime.py",
+    "sha256": "a1e5cb6f679cf000a849f14b0e4387c65a859e8634c36d0509d2b3f03f9415c2"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/diagnose_residual_distributions.py",
+    "destination": "code/diagnose_residual_distributions.py",
+    "sha256": "716179ae0f58a082c185a9424a7b6067b7663086806d692d4f83f643a08b4e19"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/controlled_error_geometry.py",
+    "destination": "code/controlled_error_geometry.py",
+    "sha256": "e417de7ad6909c4e5e64bc542b6388e27b87128c836a81150812d0222a821e0a"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/select_nr1_eta_graphkit.py",
+    "destination": "code/select_nr1_eta_graphkit.py",
+    "sha256": "7b2c692e22760fe1d1b2f7291c0031b281c0ab9923c1de8d285d7097b1b0888f"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/select_nr1_eta.py",
+    "destination": "code/select_nr1_eta.py",
+    "sha256": "56471b7c954846257742ec34d00cfb8807c03fc35f263bf8b169344ed399268c"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/nr1_metric_complete_rescore.py",
+    "destination": "code/nr1_metric_complete_rescore.py",
+    "sha256": "6901ee517a8231e40866bc17d92d1491dae6862905cbc7b8e657e854834866f9"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/nr1_multiprocess_baseline.py",
+    "destination": "code/nr1_multiprocess_baseline.py",
+    "sha256": "8342e84efe9ab9b6ca15afa9bfd124229732e669d820aecfd011c1ebf3070f2f"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/output_intervention_metrics.py",
+    "destination": "code/output_intervention_metrics.py",
+    "sha256": "4b4d7c561080e2eddbb065ee4482f8a75365741d031d66296a52b3e394e2cc0c"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/gbcorr_csp_posthoc.py",
+    "destination": "code/gbcorr_csp_posthoc.py",
+    "sha256": "0c594b7fedb7ffc8f965d210532af632bd3060d399fb97efacb1a9b18ec1728d"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/evaluate_scalar_shrinkage.py",
+    "destination": "code/evaluate_scalar_shrinkage.py",
+    "sha256": "603a4010dff71f6a7504571b18761f92d111f29bda5560f472d79410183840a4"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/compare_solution_basis_controls.py",
+    "destination": "code/compare_solution_basis_controls.py",
+    "sha256": "0e588d4ca280c8739b5294200087449d55a9f760e0e945d24810324a34868bea"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/basis_reconstruction_matched_controls.py",
+    "destination": "code/basis_reconstruction_matched_controls.py",
+    "sha256": "ec9f300e425be44f1f1d4b631521b849d9f6f8d9aa8aee9b0dc373739135a9a6"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/off_subspace_conditional_association.py",
+    "destination": "code/off_subspace_conditional_association.py",
+    "sha256": "c10de60b40f74703ab4178a922cf750244e10b63c09fcdc4c2b4248c1c499535"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/jacobian_subspace_reproducibility.py",
+    "destination": "code/jacobian_subspace_reproducibility.py",
+    "sha256": "a0400dafa0639b6763bb299c17f4293b9a486934641b88ca571359a569eb4035"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/jacobian_subspace_alignment.py",
+    "destination": "code/jacobian_subspace_alignment.py",
+    "sha256": "0ab9b350b78c4bd447576bebb78350ca1dbf9e130de1a2f8d36d0c88fdb66867"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/csp_posthoc_diagnostics.py",
+    "destination": "code/csp_posthoc_diagnostics.py",
+    "sha256": "8842344d6b0f5f62f27aca3178ab13e16809f59c0b6845cd16c70e1c45c238b2"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/csp_projection_block_ablation.py",
+    "destination": "code/csp_projection_block_ablation.py",
+    "sha256": "118900426f8a12ab51ada630f6b3b1d732e9c295ba37a2fc8aa9ff45cbe50375"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/ScenarioSynthesis_PPC/audit_chunks.py",
+    "destination": "ScenarioSynthesis_PPC/audit_chunks.py",
+    "sha256": "29a0ed4ed30c0d46fa8ee405ee6a90aa3a1ac1d91c66c20ad4af75c561d7cde2"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/ScenarioSynthesis_PPC/reencode_rowgroups.py",
+    "destination": "ScenarioSynthesis_PPC/reencode_rowgroups.py",
+    "sha256": "c5c262c38652cf2fa84d2557bac985b46094c6dff07abf64f568fe7ee65375e0"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/ScenarioSynthesis_PPC/build_snapshot_sgen_bounds.py",
+    "destination": "ScenarioSynthesis_PPC/build_snapshot_sgen_bounds.py",
+    "sha256": "04b01e7471cd725a083df1e4ebf48dd2b46dbc11c4a9c3b051e2440725623174"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/ScenarioSynthesis_PPC/explore_cgmes_snapshot_envelope.py",
+    "destination": "ScenarioSynthesis_PPC/explore_cgmes_snapshot_envelope.py",
+    "sha256": "2537284bf4d7a23965991fac05f8c411dfdcbaa8afacc8ca7ebc13201bbe9aa2"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/ScenarioSynthesis_PPC/case_generator_all_test_cases_pandapower_consider_ppc_branch_row.py",
+    "destination": "ScenarioSynthesis_PPC/case_generator_all_test_cases_pandapower_consider_ppc_branch_row.py",
+    "sha256": "00d54f6903201514751b3c45655d276b0243cd2ad04fefbd916483e1e021898e"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/ScenarioSynthesis_PPC/quick_check_nr_convergence_all_cases.py",
+    "destination": "ScenarioSynthesis_PPC/quick_check_nr_convergence_all_cases.py",
+    "sha256": "564a8690a60022c8a47e7a93e40e093ea1fde8556160ef15edec800e4ed9f0f3"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/ScenarioSynthesis_PPC/compare_three_starts_rte.py",
+    "destination": "ScenarioSynthesis_PPC/compare_three_starts_rte.py",
+    "sha256": "e5e07b408db5689b2a5395dbd42c2556199e371dd51e6eefd83a34fe57dbaa48"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/ScenarioSynthesis_PPC/convert_opf_backbone_parquet.py",
+    "destination": "ScenarioSynthesis_PPC/convert_opf_backbone_parquet.py",
+    "sha256": "a624e25d1a5aee727d926b2e8cb6c59a815012f716661503889d3d4c16148d18"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/ScenarioSynthesis_PPC/newton_raphson_improved.py",
+    "destination": "ScenarioSynthesis_PPC/newton_raphson_improved.py",
+    "sha256": "39c9202a58e98cce756323326dadf4031165a569ffe5dd37cd29a57f8cbbd6fe"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/ScenarioSynthesis_PPC/compare_initial_vs_pandapower_solved_mismatch_rte.py",
+    "destination": "ScenarioSynthesis_PPC/compare_initial_vs_pandapower_solved_mismatch_rte.py",
+    "sha256": "2c5015fb869261e6910acbecee3a399bbc8013b8ad4b7f7ab0fb737081b1ee97"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/ScenarioSynthesis_PPC/merge_chunked_parquets.py",
+    "destination": "ScenarioSynthesis_PPC/merge_chunked_parquets.py",
+    "sha256": "bcf543641a49a102b187a336eedddb7a9aef1470d66bda130ce1021ca6853bef"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/ScenarioSynthesis_PPC/check_custom_nr_convergence_cgmes.py",
+    "destination": "ScenarioSynthesis_PPC/check_custom_nr_convergence_cgmes.py",
+    "sha256": "02b95d0dbfc945d4568fe32fc7d250860bbcc3254d95c12d556cc35730555e59"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/ScenarioSynthesis_PPC/test_newton_trajectory.py",
+    "destination": "ScenarioSynthesis_PPC/test_newton_trajectory.py",
+    "sha256": "46e8213c3125a251a047600e7954a61f0ece236fee3dcb0eea69bd3c9ef10cba"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/ScenarioSynthesis_PPC/main_datagen_opf_snapshot_envelope.py",
+    "destination": "ScenarioSynthesis_PPC/main_datagen_opf_snapshot_envelope.py",
+    "sha256": "e5159f6dda437fa2ca505ae5412ce6cd5cd0253c5ed8f0cd3830e1c2e26a0279"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/ScenarioSynthesis_PPC/verify_v2_family.py",
+    "destination": "ScenarioSynthesis_PPC/verify_v2_family.py",
+    "sha256": "6d7e41dc6b030145e6c446a6f790fe1dfae8a718809031d591ad69ba9e74e6e4"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/ScenarioSynthesis_PPC/main_datagen_lvn_snapshot_envelope.py",
+    "destination": "ScenarioSynthesis_PPC/main_datagen_lvn_snapshot_envelope.py",
+    "sha256": "c35d6516696ce4834ab3bdf55e899bb4493699d2cc219b03959cc3b4efe1a57a"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/ScenarioSynthesis_PPC/perturbation_options.py",
+    "destination": "ScenarioSynthesis_PPC/perturbation_options.py",
+    "sha256": "4204316fb54e1708d0587f057e7c578872ca3dfb2b348d13075bec2e4588ccd1"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/ScenarioSynthesis_PPC/compare_compiletime_vs_converged_ppc_rte.py",
+    "destination": "ScenarioSynthesis_PPC/compare_compiletime_vs_converged_ppc_rte.py",
+    "sha256": "8bce747cb4f9118d0c8c9eb9bc3ab813513b17e5ad8e0cff02b8d84daf46653a"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/ScenarioSynthesis_PPC/inventory_out.py",
+    "destination": "ScenarioSynthesis_PPC/inventory_out.py",
+    "sha256": "a2cf48853dd29f4b621a6c0649824b73df746954d94292b26b5b4963d73b0980"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/ScenarioSynthesis_PPC/main_datagen_opf.py",
+    "destination": "ScenarioSynthesis_PPC/main_datagen_opf.py",
+    "sha256": "60714227a0503a0d3c4c3f5e1c683abe5de983ea3af086187d78e146f67937de"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/ScenarioSynthesis_PPC/test_sgen_and_pvq.py",
+    "destination": "ScenarioSynthesis_PPC/test_sgen_and_pvq.py",
+    "sha256": "728cd26ab850396aed41d1d9e509605d0b12d5cc247b7d4d721dd2fb77b0dc26"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/ScenarioSynthesis_PPC/add_nr_trajectories_to_parquet.py",
+    "destination": "ScenarioSynthesis_PPC/add_nr_trajectories_to_parquet.py",
+    "sha256": "faa7a5413657a40a6d4beeeaebc2c5374d16dfb8297c2c31593da7b5af0841f5"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/ScenarioSynthesis_PPC/case_generator_lvn_snapshot_envelope.py",
+    "destination": "ScenarioSynthesis_PPC/case_generator_lvn_snapshot_envelope.py",
+    "sha256": "ed9902009d2a8cc66fe59b349ee7e43cc3c12b311fc009c28a4aac6ef34e7105"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/ScenarioSynthesis_PPC/diagnose_yield.py",
+    "destination": "ScenarioSynthesis_PPC/diagnose_yield.py",
+    "sha256": "5aa2a4ad4cc908f9fefdada98a1c110cb0a9f19035a204bdd483b239b0c7b78c"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/ScenarioSynthesis_PPC/collect_v2_table.py",
+    "destination": "ScenarioSynthesis_PPC/collect_v2_table.py",
+    "sha256": "67bd0e0f1245944c2451a206ffa0bd54b9463fc6bd1f388bc7a76b3b38bf248f"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/ScenarioSynthesis_PPC/main_datagen_multiproc_improved.py",
+    "destination": "ScenarioSynthesis_PPC/main_datagen_multiproc_improved.py",
+    "sha256": "bf53f36e10c95694e808cd70ebf5627a8dfa1fbf218f11878e36a20894dbdec1"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/CONTROLLED_ERROR_GEOMETRY_PROTOCOL.md",
+    "destination": "docs/historical/CONTROLLED_ERROR_GEOMETRY_PROTOCOL.md",
+    "sha256": "9015f2a7bad05112ea125dbb9c6220d2c3a1c77b4fddf410db426b7a94c3edcd"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/PF_V2_FOUR_MODEL_GUIDE.md",
+    "destination": "docs/historical/PF_V2_FOUR_MODEL_GUIDE.md",
+    "sha256": "1814e24fddf6945b01bc1428d0921322f2fce2ba3fd8bfb60f811d675a2d5994"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/PF_SURROGATE_USAGE.md",
+    "destination": "docs/historical/PF_SURROGATE_USAGE.md",
+    "sha256": "e51a83fb18cc939e96a2e1708aba522f99cbd49e6046317f6b37ea46a9b14566"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/PIGNN_INFERENCE_GUIDE.md",
+    "destination": "docs/historical/PIGNN_INFERENCE_GUIDE.md",
+    "sha256": "7844f37744ef752d16de15a1aff7f9b4b337e0ff4dac34da484d61cdbac7dfd8"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/controlled_geometry_20260905/json/g3_test_k16.json",
+    "destination": "results/local/controlled_geometry_20260905/json/g3_test_k16.json",
+    "sha256": "72f1898a028ae5bd9095d01a45c6c07c08f8c9a796d28fd34abb02a95c1926ca"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/controlled_geometry_20260905/json/graphkit_test_k16.json",
+    "destination": "results/local/controlled_geometry_20260905/json/graphkit_test_k16.json",
+    "sha256": "85407e6ef3fc6138bead346ef7d4904a38d9024c87acb7be71dfffcfd1f1ec5a"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/controlled_geometry_20260905/json/gridsfm_test_k16.json",
+    "destination": "results/local/controlled_geometry_20260905/json/gridsfm_test_k16.json",
+    "sha256": "02e67d71ef3922300f49041b66de93fdec3d0f10681a9eebe970784df54c96d5"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/controlled_geometry_20260905/json/lumina_test_k16.json",
+    "destination": "results/local/controlled_geometry_20260905/json/lumina_test_k16.json",
+    "sha256": "92fda139b4a36ae57fa26e3957438994fba6fdf5d9fca01d6bf04772340e82dc"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/gridsfm_31grid_csp16_20260907/audit.csv",
+    "destination": "results/local/gridsfm_31grid_csp16_20260907/audit.csv",
+    "sha256": "19cbf3a9603ce4c6709f67cd612508c3d7492510046baa082c7bc67628cb59da"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/gridsfm_31grid_csp16_20260907/grid_metrics.csv",
+    "destination": "results/local/gridsfm_31grid_csp16_20260907/grid_metrics.csv",
+    "sha256": "19cbf3a9603ce4c6709f67cd612508c3d7492510046baa082c7bc67628cb59da"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/gridsfm_31grid_csp16_20260907/gridsfm_raw_vs_csp16_discrete3.pdf",
+    "destination": "results/local/gridsfm_31grid_csp16_20260907/gridsfm_raw_vs_csp16_discrete3.pdf",
+    "sha256": "9de3bbcee63099a347350ada521086f0f31b71524b00023c2275d93dff33f40c"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/gridsfm_31grid_csp16_20260907/gridsfm_raw_vs_csp16_paired.pdf",
+    "destination": "results/local/gridsfm_31grid_csp16_20260907/gridsfm_raw_vs_csp16_paired.pdf",
+    "sha256": "6806c5022a5a3b91f09a205c05a4eab192a71904fe5084c2c3806147cebfac94"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/gridsfm_31grid_csp16_20260907/gridsfm_raw_vs_csp16_paired.png",
+    "destination": "results/local/gridsfm_31grid_csp16_20260907/gridsfm_raw_vs_csp16_paired.png",
+    "sha256": "7fd5ef070c6e183ecbd22a2d51dde56d579ce3b19dd71263dd2d7585af3d426b"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/gridsfm_31grid_csp16_20260907/gridsfm_raw_vs_csp16_unpaired.pdf",
+    "destination": "results/local/gridsfm_31grid_csp16_20260907/gridsfm_raw_vs_csp16_unpaired.pdf",
+    "sha256": "3e75d4f8beb1b22e921c619a0767e43cf40cb87ff2f1d07e56daa605bbb927ab"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/gridsfm_31grid_csp16_20260907/gridsfm_raw_vs_csp16_unpaired.png",
+    "destination": "results/local/gridsfm_31grid_csp16_20260907/gridsfm_raw_vs_csp16_unpaired.png",
+    "sha256": "bc9c3f3a0882b9a5eccbf8f9d498f6b5f1b75ed3a180dc2aee58c90e167aeee7"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/gridsfm_31grid_csp16_20260907/summary.json",
+    "destination": "results/local/gridsfm_31grid_csp16_20260907/summary.json",
+    "sha256": "9fdb98eb5a4aa88c1f72b2fb019f82f5182e8d3be89015d647ca737cf01859a2"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/basis_reconstruction_matched_20260914/pignn_g3_s42_basis_reconstruction_matched.json",
+    "destination": "results/local/basis_reconstruction_matched_20260914/pignn_g3_s42_basis_reconstruction_matched.json",
+    "sha256": "d0000145b0b969d4fd0f13cdb26b97ed5ef4be1c02da6f7bf48f4278489fec15"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/off_subspace_conditional_association_20260914/json/g3_s42.json",
+    "destination": "results/local/off_subspace_conditional_association_20260914/json/g3_s42.json",
+    "sha256": "9dd6e17ebfd52de35116884eecc76366a1fd4b94518abf264c7f70a39b6d74be"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/off_subspace_conditional_association_20260914/json/graphkit_s42.json",
+    "destination": "results/local/off_subspace_conditional_association_20260914/json/graphkit_s42.json",
+    "sha256": "1619c75116b2edf76f70994ca8d93bc4c19d69fd02cdca192f5915dfe5c444fc"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/off_subspace_conditional_association_20260914/json/gridsfm_s42.json",
+    "destination": "results/local/off_subspace_conditional_association_20260914/json/gridsfm_s42.json",
+    "sha256": "eec547f27b4e7e4d7389a248656d4cee6d724b14663bd7756cc8e06b325fc531"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/off_subspace_conditional_association_20260914/json/lumina_s42.json",
+    "destination": "results/local/off_subspace_conditional_association_20260914/json/lumina_s42.json",
+    "sha256": "5be85776b5d217cbe27676a3354d0cfe7a24516b15c8e4b9e2cdf955f54d73b8"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/off_subspace_conditional_association_20260914/summary.csv",
+    "destination": "results/local/off_subspace_conditional_association_20260914/summary.csv",
+    "sha256": "9dc9b6e35e7ab7ffaf3b6314f165603412e109e9e45271c997f600f86fffcfe4"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/csp_posthoc_diagnostics_gbnetwork_20260910/gbnetwork_csp_posthoc_k16.csv",
+    "destination": "results/local/csp_posthoc_diagnostics_gbnetwork_20260910/gbnetwork_csp_posthoc_k16.csv",
+    "sha256": "deb7e888f2acddfa4e26e9623a4af88fc7269c18335fbfe6fd2a24fabab8ffc6"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/csp_posthoc_diagnostics_gbnetwork_20260910/gbnetwork_csp_posthoc_k16.json",
+    "destination": "results/local/csp_posthoc_diagnostics_gbnetwork_20260910/gbnetwork_csp_posthoc_k16.json",
+    "sha256": "b0b93b663bb00b5a548fc8390a6af6b208ada70067b7cd293331351000bc8f75"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/csp_projection_block_ablation_norestore_20260910/json/g3_s41_blocks_k16_norestore.json",
+    "destination": "results/local/csp_projection_block_ablation_norestore_20260910/json/g3_s41_blocks_k16_norestore.json",
+    "sha256": "2ee0dbc0c60790d70c30a18cc4e2b04866631976c14f91c5d16a5ded41b78851"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/csp_projection_block_ablation_norestore_20260910/json/g3_s42_blocks_k16_norestore.json",
+    "destination": "results/local/csp_projection_block_ablation_norestore_20260910/json/g3_s42_blocks_k16_norestore.json",
+    "sha256": "291f252a1cf42a913135fc535e53746935ce9c919e34e970eb4825355ddfa9bb"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/csp_projection_block_ablation_norestore_20260910/json/g3_s43_blocks_k16_norestore.json",
+    "destination": "results/local/csp_projection_block_ablation_norestore_20260910/json/g3_s43_blocks_k16_norestore.json",
+    "sha256": "419bf795651f784b2dac5f492af695c0fcf4253f750e4dd3eed0a43b0384ddaa"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/csp_projection_block_ablation_norestore_20260910/json/gridsfm_s41_blocks_k16_norestore.json",
+    "destination": "results/local/csp_projection_block_ablation_norestore_20260910/json/gridsfm_s41_blocks_k16_norestore.json",
+    "sha256": "7b600d96d8121282fc6fb391328e9c425ff478002e977792ea1e32630d272c2a"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/csp_projection_block_ablation_norestore_20260910/json/gridsfm_s42_blocks_k16_norestore.json",
+    "destination": "results/local/csp_projection_block_ablation_norestore_20260910/json/gridsfm_s42_blocks_k16_norestore.json",
+    "sha256": "5eeac849ee815b694feb4ee4cb2c9592beae43d75a7dd3638c8a321b5562179a"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/csp_projection_block_ablation_norestore_20260910/json/gridsfm_s43_blocks_k16_norestore.json",
+    "destination": "results/local/csp_projection_block_ablation_norestore_20260910/json/gridsfm_s43_blocks_k16_norestore.json",
+    "sha256": "e75e2ea5502bffba8b92a255e82bcfc16087cbf795e4902788ab9700b535985e"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/jacobian_reproducibility_gbnetwork_20260910/json/jacobian_reproducibility_k16.json",
+    "destination": "results/local/jacobian_reproducibility_gbnetwork_20260910/json/jacobian_reproducibility_k16.json",
+    "sha256": "06ff4eaa9f3331c15288c819dbd49b4a5bd7257aeffcfb07e32faab4e998df80"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_multiproc_gbnetwork_20260910/complete/g3_s41/complete_metrics.csv",
+    "destination": "results/local/nr1_multiproc_gbnetwork_20260910/complete/g3_s41/complete_metrics.csv",
+    "sha256": "68f75f68ae34391ec51a5d0face3feaea47c7999912521aa437cdb061fabdcb3"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_multiproc_gbnetwork_20260910/complete/g3_s41/complete_metrics.json",
+    "destination": "results/local/nr1_multiproc_gbnetwork_20260910/complete/g3_s41/complete_metrics.json",
+    "sha256": "818cd5baf767b3e9a721c63a56ee69b1ecd24d91a51b51fe8f01ef782387853a"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_multiproc_gbnetwork_20260910/complete/g3_s42/complete_metrics.csv",
+    "destination": "results/local/nr1_multiproc_gbnetwork_20260910/complete/g3_s42/complete_metrics.csv",
+    "sha256": "eb29d7d5834678daddd232f581e1ce8be4195ba9cbb7d6c556b4a0284ec54ca3"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_multiproc_gbnetwork_20260910/complete/g3_s42/complete_metrics.json",
+    "destination": "results/local/nr1_multiproc_gbnetwork_20260910/complete/g3_s42/complete_metrics.json",
+    "sha256": "6404ae72be51c66e65309804890d25e9e876e6ed02e1207aa1c094a926f23658"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_multiproc_gbnetwork_20260910/complete/g3_s43/complete_metrics.csv",
+    "destination": "results/local/nr1_multiproc_gbnetwork_20260910/complete/g3_s43/complete_metrics.csv",
+    "sha256": "2992a5b282c632ac1a8dc3ee799e2d0e3968584d6ea67575b7446a50e1489366"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_multiproc_gbnetwork_20260910/complete/g3_s43/complete_metrics.json",
+    "destination": "results/local/nr1_multiproc_gbnetwork_20260910/complete/g3_s43/complete_metrics.json",
+    "sha256": "1c603a17ea43968cf0e0b6ec7bfeb3361e4106440be2f54da90091b63342964a"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_multiproc_gbnetwork_20260910/complete/gridsfm_s41/complete_metrics.csv",
+    "destination": "results/local/nr1_multiproc_gbnetwork_20260910/complete/gridsfm_s41/complete_metrics.csv",
+    "sha256": "16f7311c816920eebe0aaeb36fd853f152aa6f0b1e1fbfdaedee014ef8b0ef7a"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_multiproc_gbnetwork_20260910/complete/gridsfm_s41/complete_metrics.json",
+    "destination": "results/local/nr1_multiproc_gbnetwork_20260910/complete/gridsfm_s41/complete_metrics.json",
+    "sha256": "cbb844d7cb1a79abead8052d2f317494b5b32c813fea7e4a6f02a92bc616066b"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_multiproc_gbnetwork_20260910/complete/gridsfm_s42/complete_metrics.csv",
+    "destination": "results/local/nr1_multiproc_gbnetwork_20260910/complete/gridsfm_s42/complete_metrics.csv",
+    "sha256": "760989746b6e1dcb21d4cfdf4a67e258ff7ef68da29ece0394ed95f89879944e"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_multiproc_gbnetwork_20260910/complete/gridsfm_s42/complete_metrics.json",
+    "destination": "results/local/nr1_multiproc_gbnetwork_20260910/complete/gridsfm_s42/complete_metrics.json",
+    "sha256": "e4b56dc566687c0e6e845812b44a23fdaf4d994d0165cb7fed379eed20b65020"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_multiproc_gbnetwork_20260910/complete/gridsfm_s43/complete_metrics.csv",
+    "destination": "results/local/nr1_multiproc_gbnetwork_20260910/complete/gridsfm_s43/complete_metrics.csv",
+    "sha256": "550b3e04ea3b6d9cf0a7924dad18374d0b58ecff15e84f5c8c8d765e50efcb18"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_multiproc_gbnetwork_20260910/complete/gridsfm_s43/complete_metrics.json",
+    "destination": "results/local/nr1_multiproc_gbnetwork_20260910/complete/gridsfm_s43/complete_metrics.json",
+    "sha256": "374b00034bd7d445b9817bb58c00967a19eec242ad838b9f91a85d40490c6fbd"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_multiproc_gbnetwork_20260910/complete_json/complete_metrics.json",
+    "destination": "results/local/nr1_multiproc_gbnetwork_20260910/complete_json/complete_metrics.json",
+    "sha256": "374b00034bd7d445b9817bb58c00967a19eec242ad838b9f91a85d40490c6fbd"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_multiproc_gbnetwork_20260910/complete_metrics_json/g3_s41.json",
+    "destination": "results/local/nr1_multiproc_gbnetwork_20260910/complete_metrics_json/g3_s41.json",
+    "sha256": "818cd5baf767b3e9a721c63a56ee69b1ecd24d91a51b51fe8f01ef782387853a"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_multiproc_gbnetwork_20260910/complete_metrics_json/g3_s42.json",
+    "destination": "results/local/nr1_multiproc_gbnetwork_20260910/complete_metrics_json/g3_s42.json",
+    "sha256": "6404ae72be51c66e65309804890d25e9e876e6ed02e1207aa1c094a926f23658"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_multiproc_gbnetwork_20260910/complete_metrics_json/g3_s43.json",
+    "destination": "results/local/nr1_multiproc_gbnetwork_20260910/complete_metrics_json/g3_s43.json",
+    "sha256": "1c603a17ea43968cf0e0b6ec7bfeb3361e4106440be2f54da90091b63342964a"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_multiproc_gbnetwork_20260910/complete_metrics_json/gridsfm_s41.json",
+    "destination": "results/local/nr1_multiproc_gbnetwork_20260910/complete_metrics_json/gridsfm_s41.json",
+    "sha256": "cbb844d7cb1a79abead8052d2f317494b5b32c813fea7e4a6f02a92bc616066b"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_multiproc_gbnetwork_20260910/json/g3_s41_test.json",
+    "destination": "results/local/nr1_multiproc_gbnetwork_20260910/json/g3_s41_test.json",
+    "sha256": "f2fa867b0b8a311b085900f705e0dd3fab85f92d0f4f18088fe0d4b4dbca6604"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_multiproc_gbnetwork_20260910/json/g3_s42_test.json",
+    "destination": "results/local/nr1_multiproc_gbnetwork_20260910/json/g3_s42_test.json",
+    "sha256": "d892b33d90b49f3a58c96b55ce718e17cd76f4ead67d2c6fa404e705931cd39e"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_multiproc_gbnetwork_20260910/json/g3_s43_test.json",
+    "destination": "results/local/nr1_multiproc_gbnetwork_20260910/json/g3_s43_test.json",
+    "sha256": "c99cbc319e3e179b9f04461fd891cfcf3c15ab5488457f3fbd499626d80e5f5e"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_multiproc_gbnetwork_20260910/json/gridsfm_s41_test.json",
+    "destination": "results/local/nr1_multiproc_gbnetwork_20260910/json/gridsfm_s41_test.json",
+    "sha256": "8c0025c7314eec3ac692b9ba21acc2c7ad741363028ab9df5d34ef6502d3af5c"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_multiproc_gbnetwork_20260910/json/gridsfm_s42_test.json",
+    "destination": "results/local/nr1_multiproc_gbnetwork_20260910/json/gridsfm_s42_test.json",
+    "sha256": "15d1b968ec9a94a6a0a091ee2e0fbf9e20bd493c34a46c31009fda2248ab0c80"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_multiproc_gbnetwork_20260910/json/gridsfm_s43_test.json",
+    "destination": "results/local/nr1_multiproc_gbnetwork_20260910/json/gridsfm_s43_test.json",
+    "sha256": "a9093d909c619a81fea3ef4e03a76c417f6d1270ec0ea2db71cb69c18c1889a4"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_multiproc_gbnetwork_20260910/json/validation_eta_selection.json",
+    "destination": "results/local/nr1_multiproc_gbnetwork_20260910/json/validation_eta_selection.json",
+    "sha256": "84f47cb98d82d89d983e69cb6234744edacc92834b45e4b5a423517838b4d85b"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/gbcorr_csp_posthoc_20260910/gbcorr_csp_posthoc_k16.csv",
+    "destination": "results/local/gbcorr_csp_posthoc_20260910/gbcorr_csp_posthoc_k16.csv",
+    "sha256": "9c7d66cb4f81f95e124aca84d8b270577d334abdb26e69a1962d17ed8aff106c"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/gbcorr_csp_posthoc_20260910/gbcorr_csp_posthoc_k16.json",
+    "destination": "results/local/gbcorr_csp_posthoc_20260910/gbcorr_csp_posthoc_k16.json",
+    "sha256": "d3b380060f7c77c77da574ded4c0449d3c5056d0dd114fc07b182a3d90a80c08"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/pignn_g3_shrinkage_stage1_helma_20260909.sh",
+    "destination": "experiments/historical_local/pignn_g3_shrinkage_stage1_helma_20260909.sh",
+    "sha256": "28734e64aa5b1bdb7281ed7cba541bc73a5eaa56264272df80843e863759434d"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/off_subspace_conditional_association_4model_seed42_helma_20260914.sh",
+    "destination": "experiments/historical_local/off_subspace_conditional_association_4model_seed42_helma_20260914.sh",
+    "sha256": "282a6c7bbe906a20a8fdf2019b57b69bb83141ea1f4576315e29666e3d798cd7"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/nr1_graphkit_e120_test_alex_a40_20260912.sh",
+    "destination": "experiments/historical_local/nr1_graphkit_e120_test_alex_a40_20260912.sh",
+    "sha256": "607fca288f2bb7f2d2640f14b701297a60c8e82fbc95f8724af3188a9c693c6c"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/gbcorr_csp_posthoc_alex2_20260910.sh",
+    "destination": "experiments/historical_local/gbcorr_csp_posthoc_alex2_20260910.sh",
+    "sha256": "17e5ee7d93a6fc74bdb272a536a9ff3ef81947a9072eb41e47a5add05aa7be27"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/controlled_geometry_summary_k16_alex_20260907.sh",
+    "destination": "experiments/historical_local/controlled_geometry_summary_k16_alex_20260907.sh",
+    "sha256": "2ea7dd0ee5c2d8fd5a8f26b89347778142ceffe2f4a791a59d7c5e280c9e62d9"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/jacobian_subspace_alignment_gbnetwork_alex2_a40_20260909.sh",
+    "destination": "experiments/historical_local/jacobian_subspace_alignment_gbnetwork_alex2_a40_20260909.sh",
+    "sha256": "5109801578f35c1a3f0c3da0b904abd8359c83854ac35d2d69f9d1987bc7e32e"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/pignn_g3_basis_controls_gbnetwork_helma_20260909.sh",
+    "destination": "experiments/historical_local/pignn_g3_basis_controls_gbnetwork_helma_20260909.sh",
+    "sha256": "32fa0116919e871441d6ad70f5030db2339c67f229fa632c93f1875bd5f31461"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/controlled_geometry_stage2_alex_20260906.sh",
+    "destination": "experiments/historical_local/controlled_geometry_stage2_alex_20260906.sh",
+    "sha256": "2e73ef0c21d61dda9083644b2948fbd59d6d0070d124ef473d013c7e82aaadf7"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/score_gridsfm_31grid_csp16_helma.sh",
+    "destination": "experiments/historical_local/score_gridsfm_31grid_csp16_helma.sh",
+    "sha256": "c2f8e776ad3672db1c7bf17907e3c2a90b0ae235ea957393c1f87967ce9ffc16"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/csp_projection_block_ablation_alex2_20260910.sh",
+    "destination": "experiments/historical_local/csp_projection_block_ablation_alex2_20260910.sh",
+    "sha256": "628ee4e3a98b84a4548ac18181d103986947fafae3f0ebbfce3c386379b3b6d2"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/nr1_graphkit_e120_complete_alex_a40_20260912.sh",
+    "destination": "experiments/historical_local/nr1_graphkit_e120_complete_alex_a40_20260912.sh",
+    "sha256": "6a9c3627d308fc226d353eeac97519ed52386949e712070efa9a1ab3b6840136"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/gbnetwork_model_seed_metrics_a40_20260907.sh",
+    "destination": "experiments/historical_local/gbnetwork_model_seed_metrics_a40_20260907.sh",
+    "sha256": "796670cf81acc9ece8b2197b642687ca476b5010499650a7330ef88f32d51d9a"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/jacobian_reproducibility_graphkit_e120_helma_20260912.sh",
+    "destination": "experiments/historical_local/jacobian_reproducibility_graphkit_e120_helma_20260912.sh",
+    "sha256": "56cf1050c6709a742fd7d5f5149d222d477040938a3538bc8d742c096a2e1104"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/nr1_graphkit_e120_test_helma_20260912.sh",
+    "destination": "experiments/historical_local/nr1_graphkit_e120_test_helma_20260912.sh",
+    "sha256": "e135414157f884cb97aecb22bfa80d44d748582e7f3e2d6df0c254ba4f9955c4"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/csp_posthoc_diagnostics_graphkit_e120_helma_20260912.sh",
+    "destination": "experiments/historical_local/csp_posthoc_diagnostics_graphkit_e120_helma_20260912.sh",
+    "sha256": "42cd299c14dae2a4655aa71382908d002b18d35174169c206d4737f3ea699b05"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/nr1_graphkit_e120_validation_alex_a40_20260912.sh",
+    "destination": "experiments/historical_local/nr1_graphkit_e120_validation_alex_a40_20260912.sh",
+    "sha256": "7f78daac5900ec1382e2dde047cee207cfeb5e77c6100a769bbfa38855136ebb"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/benchmark_gbnetwork_inference_h100_20260912.sh",
+    "destination": "experiments/historical_local/benchmark_gbnetwork_inference_h100_20260912.sh",
+    "sha256": "f5d1b4b56d574fcb7115741d4937fa71ac47576884b1a26497771378f9503ee4"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/nr1_lumina_gbv06z_complete_alex_a40_20260913.sh",
+    "destination": "experiments/historical_local/nr1_lumina_gbv06z_complete_alex_a40_20260913.sh",
+    "sha256": "b88b17146c972c5661c3241c9c4eaf039362251449d2089c4823eb3a6700acda"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/nr1_validation_multiproc_alex2_20260910.sh",
+    "destination": "experiments/historical_local/nr1_validation_multiproc_alex2_20260910.sh",
+    "sha256": "7e560e6e00edcf04c518ed823c9ec3c0abcbe19bba4ac9473ab652eba2009942"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/nr1_lumina_gbv06z_seeds4143_test_helma_h100_20260914.sh",
+    "destination": "experiments/historical_local/nr1_lumina_gbv06z_seeds4143_test_helma_h100_20260914.sh",
+    "sha256": "fe2fbbf9810ea84ddea9b36775b8e54c1a4acd0614c3c3ae9a68f294affbb294"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/nr1_graphkit_e120_select_eta_helma_20260912.sh",
+    "destination": "experiments/historical_local/nr1_graphkit_e120_select_eta_helma_20260912.sh",
+    "sha256": "d624234aacd535a3a011d949ddeae299ae349c721a439f3d0bf29b68ea444bad"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/nr1_test_multiproc_alex2_20260911.sh",
+    "destination": "experiments/historical_local/nr1_test_multiproc_alex2_20260911.sh",
+    "sha256": "e18dfdc14adbd9ee7a850b6372f8f3fa1e5cb9e805c8e75bdfe08baaf3a2a474"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/csp_posthoc_diagnostics_gbnetwork_helma_20260910.sh",
+    "destination": "experiments/historical_local/csp_posthoc_diagnostics_gbnetwork_helma_20260910.sh",
+    "sha256": "3b1cc356a4dec6c521875042cbb0e0640e945b3b46c34b012d3877a3249bf0a6"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/csp_fullstate_vs_restore_gbnetwork_helma_20260910.sh",
+    "destination": "experiments/historical_local/csp_fullstate_vs_restore_gbnetwork_helma_20260910.sh",
+    "sha256": "b9625e70fcbf81fde30a830247ec37152b77d110e22fdb8b0078fcec09c675e3"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/score_lumina_gbv06z_h100_3seed_fullstate_k16_20260914.sh",
+    "destination": "experiments/historical_local/score_lumina_gbv06z_h100_3seed_fullstate_k16_20260914.sh",
+    "sha256": "10154d2f3ada4736597e0f7fd352f52f34c37ac309987d5f05c1e2ccde23ef95"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/nr1_lumina_gbv06z_alex_a40_20260913.sh",
+    "destination": "experiments/historical_local/nr1_lumina_gbv06z_alex_a40_20260913.sh",
+    "sha256": "4c9ea3ccafcec4fc5d9493db2ae34281c2419830937a6eaee03c2ee2b92a5ea4"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/csp_projection_block_ablation_graphkit_e120_norestore_helma_20260912.sh",
+    "destination": "experiments/historical_local/csp_projection_block_ablation_graphkit_e120_norestore_helma_20260912.sh",
+    "sha256": "ba5b66c98f2d95cbcf6a4d5921213aee70adb0b8faedb2bda0664b3bd342994f"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/nr1_graphkit_e120_select_eta_alex_a40_20260912.sh",
+    "destination": "experiments/historical_local/nr1_graphkit_e120_select_eta_alex_a40_20260912.sh",
+    "sha256": "209c8e9be44b250a1c6e263ab936ea51e7415d8abf3a258711b88427f3219bd2"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/nr1_lumina_gbv06z_select_eta_alex_a40_20260913.sh",
+    "destination": "experiments/historical_local/nr1_lumina_gbv06z_select_eta_alex_a40_20260913.sh",
+    "sha256": "999eae363290920bc2cc06c373847c9e95a1c773a2720c1d9018176e8789121c"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/csp_posthoc_diagnostics_lumina_gbv06z_alex_a40_20260913.sh",
+    "destination": "experiments/historical_local/csp_posthoc_diagnostics_lumina_gbv06z_alex_a40_20260913.sh",
+    "sha256": "28f0dc70ce12110d15134428cc635d8af09cc7be5ed79e833a80948cf7f65823"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/gbnetwork_known_state_csp_k16_helma_20260909.sh",
+    "destination": "experiments/historical_local/gbnetwork_known_state_csp_k16_helma_20260909.sh",
+    "sha256": "816daefd8d5876d313cbc77eba50854f38c4a703212c524cde41cb5f9440848e"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/nr1_graphkit_e120_validation_helma_20260912.sh",
+    "destination": "experiments/historical_local/nr1_graphkit_e120_validation_helma_20260912.sh",
+    "sha256": "67d821b5586a7abbbb7b9316572313cdebdef2929cbc65158938af7a6f4a7338"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/controlled_geometry_graphkit_e120_alex_20260911.sh",
+    "destination": "experiments/historical_local/controlled_geometry_graphkit_e120_alex_20260911.sh",
+    "sha256": "95041b5166d282f02f2065c5755b758358a5d9324d990ffa7c940c5b965bb3b9"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/score_graphkit_e120_fullstate_k16_alex2_a100_20260911.sh",
+    "destination": "experiments/historical_local/score_graphkit_e120_fullstate_k16_alex2_a100_20260911.sh",
+    "sha256": "0f22f64aa7ce6e871fd7506713f725118f33e184db72384f18da8bd9bca2de0c"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/csp_projection_block_ablation_lumina_gbv06z_alex_a40_20260913.sh",
+    "destination": "experiments/historical_local/csp_projection_block_ablation_lumina_gbv06z_alex_a40_20260913.sh",
+    "sha256": "6fda8fc19c6fe0844d59e2792ab1210324482c7a16554388ecd3ffd09c53fe3b"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/jacobian_reproducibility_gbnetwork_helma_20260910.sh",
+    "destination": "experiments/historical_local/jacobian_reproducibility_gbnetwork_helma_20260910.sh",
+    "sha256": "13b43f22a40fd2bbeda02f4987a1e374f6cfc834859ccfbf5ce059e0f8f0eb27"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/probe_gbnetwork_inference_batch_h100_20260912.sh",
+    "destination": "experiments/historical_local/probe_gbnetwork_inference_batch_h100_20260912.sh",
+    "sha256": "1edd09d3ffa79489fcdfaf57e2982913901f1fa158b0f314e14577a1fa6d7f6a"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/gbnetwork_model_seed_replicates_a40_20260907.sh",
+    "destination": "experiments/historical_local/gbnetwork_model_seed_replicates_a40_20260907.sh",
+    "sha256": "3ef0845c825ed6046107736c4bf3b60c2ce2f1e1f71cd24f9d1198e338e5f812"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/nr1_graphkit_e120_complete_helma_20260912.sh",
+    "destination": "experiments/historical_local/nr1_graphkit_e120_complete_helma_20260912.sh",
+    "sha256": "3fa1ccec94582f45e8aba33297c276a08bf4dec5c0e6528aeb0a3f7bfe42810e"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/nr1_lumina_gbv06z_seeds4143_complete_helma_h100_20260914.sh",
+    "destination": "experiments/historical_local/nr1_lumina_gbv06z_seeds4143_complete_helma_h100_20260914.sh",
+    "sha256": "cb4769196cbfee8b5cf4d573189427a86008024bbd4961180df23e388d463ed9"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/pignn_g3_shrinkage_stage1_alex2_a40_20260909.sh",
+    "destination": "experiments/historical_local/pignn_g3_shrinkage_stage1_alex2_a40_20260909.sh",
+    "sha256": "7fdcfd002baada76a7c09649f6141029899557690e090ee0dae8cb0ae8935583"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/score_graphkit_e120_fullstate_k16_helma_20260911.sh",
+    "destination": "experiments/historical_local/score_graphkit_e120_fullstate_k16_helma_20260911.sh",
+    "sha256": "550ec3d6ff698ea3cda5da3285225cf0cb22dedbe4e3f8dfae8622905520d566"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/nr1_metric_complete_alex2_20260911.sh",
+    "destination": "experiments/historical_local/nr1_metric_complete_alex2_20260911.sh",
+    "sha256": "b66cfed84ceae4bf6abfafb6219018d88f8882fe1e39214721668761a68171e7"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/csp_projection_block_ablation_helma_20260910.sh",
+    "destination": "experiments/historical_local/csp_projection_block_ablation_helma_20260910.sh",
+    "sha256": "320af1cf23d79be97da667f0d3aa21764f12a7c23b73ed30f7e34c7535bff497"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/nr1_select_eta_alex2_20260911.sh",
+    "destination": "experiments/historical_local/nr1_select_eta_alex2_20260911.sh",
+    "sha256": "c0f51265b7084d43fef2097936b4bdface763d07a10065eb7e419fc1795b8f88"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/basis_reconstruction_matched_controls_helma_20260914.sh",
+    "destination": "experiments/historical_local/basis_reconstruction_matched_controls_helma_20260914.sh",
+    "sha256": "1c84c2c28145518f4d688e5034d7e06cfef397cefeb1f5321d61f934025b6872"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/score_gridsfm_31grid_csp16_alex.sh",
+    "destination": "experiments/historical_local/score_gridsfm_31grid_csp16_alex.sh",
+    "sha256": "70f3625dfce8d7acaa7f5465482865c114f111b828eadd1cfd6e0aebd3601443"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/run_controlled_error_geometry_lme62.sh",
+    "destination": "experiments/historical_local/run_controlled_error_geometry_lme62.sh",
+    "sha256": "80102bd8d023cffab040c5d263e8bf89716a546d3b59b9f1d6add28a0ceaa22f"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/nr1_lumina_gbv06z_test_alex_a40_20260913.sh",
+    "destination": "experiments/historical_local/nr1_lumina_gbv06z_test_alex_a40_20260913.sh",
+    "sha256": "ce899990d215de6f750c9f1848a4097aa19a4bb119a2452e6b5ea9a6594fb857"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/pignn_g3_basis_controls_gbnetwork_alex2_a40_20260909.sh",
+    "destination": "experiments/historical_local/pignn_g3_basis_controls_gbnetwork_alex2_a40_20260909.sh",
+    "sha256": "5392f70f1eaa14a85f4b3e7c10bafb06b5271a76bf06a5aa22e4ff4df62f18ac"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/controlled_geometry_stage1_alex_20260906.sh",
+    "destination": "experiments/historical_local/controlled_geometry_stage1_alex_20260906.sh",
+    "sha256": "5dfa761de1e8b348db87a502275de10c3b1682b810336975c56a2af0cdb1adc4"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/score_lumina_gbv06z_3seed_fullstate_k16_alex2_20260914.sh",
+    "destination": "experiments/historical_local/score_lumina_gbv06z_3seed_fullstate_k16_alex2_20260914.sh",
+    "sha256": "2cfd7415689fd3505300c0f790f5e89ae47ac24a526fc6badf4877c283e881ad"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/benchmark_gbnetwork_inference_independent_h100_20260913.sh",
+    "destination": "experiments/historical_local/benchmark_gbnetwork_inference_independent_h100_20260913.sh",
+    "sha256": "07d75384a742f2e8f334a7d85739305444da382415477d6f9f64ef898d2cf1a8"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/jacobian_subspace_alignment_gbnetwork_helma_20260909.sh",
+    "destination": "experiments/historical_local/jacobian_subspace_alignment_gbnetwork_helma_20260909.sh",
+    "sha256": "e83e76d271d204d7d203367b766d9907d45634ec9bdcdfc6ebf6b6b71231338d"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/controlled_geometry_stage1_helma.sh",
+    "destination": "experiments/historical_local/controlled_geometry_stage1_helma.sh",
+    "sha256": "6e5b50a65e529990503827309c46ec93f6802d6ff26ea809093ce75194e5d483"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/jacobian_reproducibility_lumina_gbv06z_alex_a40_20260913.sh",
+    "destination": "experiments/historical_local/jacobian_reproducibility_lumina_gbv06z_alex_a40_20260913.sh",
+    "sha256": "64271fac759fb293dcbc33c88e6f62c42a4dfa26f4c4d56d4cdaf529915876aa"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/csp_projection_block_ablation_norestore_helma_20260910.sh",
+    "destination": "experiments/historical_local/csp_projection_block_ablation_norestore_helma_20260910.sh",
+    "sha256": "2eb8a285b7d62e29c4c14c85be66596b56ae813c5f72c472841f81f6c8abd0f0"
+  },
+  {
+    "source": "/Users/changhunkim/.codex/attachments/55d341e0-0172-4269-bff8-e2aa03b1a2d8/pasted-text.txt",
+    "destination": "paper/submitted_manuscript.tex",
+    "sha256": "d66c52d4970ca9f758b75990855ad70ba4f500a5104abb5c73102a2722f784d1"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/neural-acpf-error-geometry/ICASSP2027_manuscript/figure1_controlled_error_geometry_larger_text_final_v9_recreated.pdf",
+    "destination": "paper/figure1_controlled_error_geometry_larger_text_final_v9_recreated.pdf",
+    "sha256": "d447a3c50769052c2d40a668cf04a09786cafc8dcfba31288574cf5bdc7a4e87"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/neural-acpf-error-geometry/ICASSP2027_manuscript/IEEEbib.bst",
+    "destination": "paper/IEEEbib.bst",
+    "sha256": "7e6ca0c8b72158d504a12bb091f817c07032a021ba41ca783cca4c2dd80d570b"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/neural-acpf-error-geometry/ICASSP2027_manuscript/csp_diagram_finished_big.pdf",
+    "destination": "paper/csp_diagram_finished_big.pdf",
+    "sha256": "b148eff9c58d81e7d4a9f495f98ca35296f5514c38edf317ec8c3a00101e88ec"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/neural-acpf-error-geometry/ICASSP2027_manuscript/spconf.sty",
+    "destination": "paper/spconf.sty",
+    "sha256": "dc5d632639040cb183f2ab62780f314845aa021be73048c8a9ec9c2072d64a86"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/neural-acpf-error-geometry/ICASSP2027_manuscript/neural_pf_tracking_calibration_error_geometry.bib",
+    "destination": "paper/neural_pf_tracking_calibration_error_geometry.bib",
+    "sha256": "6d66a2e6a8ad990b1e4aeb7bbe1e6b679837b8103e5dd7cc4470f90e45d17882"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/neural-acpf-error-geometry/ICASSP2027_manuscript/gridsfm_raw_vs_csp16_discrete3_larger_text_v7.pdf",
+    "destination": "paper/gridsfm_raw_vs_csp16_discrete3_larger_text_v7.pdf",
+    "sha256": "6823158338f49ff075f29750b07b6afd290127cb6bc5d3343d207296658e8dd5"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/latex/reports/pdf/03_projection_and_ablations/acpf_controlled-error-geometry_gbnetwork.pdf",
+    "destination": "reports/reports/pdf/03_projection_and_ablations/acpf_controlled-error-geometry_gbnetwork.pdf",
+    "sha256": "4b6346e8aeba30163d7a2dcb4f268901a7d3b606b1c5091e95f50b868bc2d204"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/latex/reports/pdf/01_datasets/dataset_ppnr-v2_31-grid-overview.pdf",
+    "destination": "reports/reports/pdf/01_datasets/dataset_ppnr-v2_31-grid-overview.pdf",
+    "sha256": "8903836590647bea133e25d5ed40dfca84beaf54aeedf7c69e589be56a1c2aec"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/latex/reports/pdf/02_acpf_benchmarks/acpf_ppnr-v2_four-model-results.pdf",
+    "destination": "reports/reports/pdf/02_acpf_benchmarks/acpf_ppnr-v2_four-model-results.pdf",
+    "sha256": "8b0584bf8d57a7e812be2a1156d89e2cc8929c84b76c70f04b06eab73bd31b8c"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/latex/reports/pdf/02_acpf_benchmarks/acpf_gbnetwork_case300_global-context-report.pdf",
+    "destination": "reports/reports/pdf/02_acpf_benchmarks/acpf_gbnetwork_case300_global-context-report.pdf",
+    "sha256": "727db8ca51a6316d68e685543dcadb98a12c07e9b3f77ab6410409e3b657fb31"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/latex/reports/pdf/06_methods_and_reference/acpf_lumina-2m_model-formulation.pdf",
+    "destination": "reports/reports/pdf/06_methods_and_reference/acpf_lumina-2m_model-formulation.pdf",
+    "sha256": "3786dc5d211d1e68d88e62ed9bdf19530c89d3f77d1fe0e215bfd028f4624994"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/latex/reports/pdf/06_methods_and_reference/acpf_gridfm-graphkit_model-formulation.pdf",
+    "destination": "reports/reports/pdf/06_methods_and_reference/acpf_gridfm-graphkit_model-formulation.pdf",
+    "sha256": "a34a3d1f5063d850bf3f3936eb387fc4c7b67881b48aac758427cf240bbf916f"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/latex/reports/pdf/06_methods_and_reference/acpf_gridsfm_model-formulation.pdf",
+    "destination": "reports/reports/pdf/06_methods_and_reference/acpf_gridsfm_model-formulation.pdf",
+    "sha256": "e8ebf8e63ee32c73f4e22e5374b633d45880f50ac0b62c2ac9d881ea8adeba97"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/latex/sources/tex/03_projection_and_ablations/acpf_controlled-error-geometry_gbnetwork.tex",
+    "destination": "reports/sources/tex/03_projection_and_ablations/acpf_controlled-error-geometry_gbnetwork.tex",
+    "sha256": "a1fed7e83a620be16e833b2ff636d58f42d1dba034ed8ce3fd483d4ed9141dd2"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/latex/sources/tex/01_datasets/dataset_ppnr-v2_31-grid-overview.tex",
+    "destination": "reports/sources/tex/01_datasets/dataset_ppnr-v2_31-grid-overview.tex",
+    "sha256": "6d5cdbdec85156e9e2c8f4e4ebd19db2cd7d78a576e9cc516e5c3f5a0810f422"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/latex/sources/tex/02_acpf_benchmarks/acpf_gbnetwork_case300_global-context-report.tex",
+    "destination": "reports/sources/tex/02_acpf_benchmarks/acpf_gbnetwork_case300_global-context-report.tex",
+    "sha256": "3172b7cb708be0843409f7eee4f7f84dd30059dfee3d9d139966c10dc3da8f52"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/latex/sources/tex/02_acpf_benchmarks/acpf_ppnr-v2_four-model-results.tex",
+    "destination": "reports/sources/tex/02_acpf_benchmarks/acpf_ppnr-v2_four-model-results.tex",
+    "sha256": "6060d7ff11186deeda00e7fcfd6914041da7ac08ce3fb0880f8dde4d292b1478"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/latex/sources/tex/06_methods_and_reference/acpf_lumina-2m_model-formulation.tex",
+    "destination": "reports/sources/tex/06_methods_and_reference/acpf_lumina-2m_model-formulation.tex",
+    "sha256": "6b3162d2409aa38e5e3b89a0417cca902572292ab551ca1fad526f328ad34c8b"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/latex/sources/tex/06_methods_and_reference/acpf_gridsfm_model-formulation.tex",
+    "destination": "reports/sources/tex/06_methods_and_reference/acpf_gridsfm_model-formulation.tex",
+    "sha256": "92393ccf7ac1c1d98342587f4596d08c5e46ce4effa62c20a69640c58ba2e7a2"
+  },
+  {
+    "source": "/Users/changhunkim/PycharmProjects/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/latex/sources/tex/06_methods_and_reference/acpf_gridfm-graphkit_model-formulation.tex",
+    "destination": "reports/sources/tex/06_methods_and_reference/acpf_gridfm-graphkit_model-formulation.tex",
+    "sha256": "4c5dab6fb488df68e91ff7fb6dbbbbb9c3bcfb8496c0d11d5664a517e1a362ca"
+  }
+]

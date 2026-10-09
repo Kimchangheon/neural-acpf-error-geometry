@@ -1,0 +1,116 @@
+{
+  "protocol": {
+    "stage": "validation-only",
+    "split": "random_split seed=42",
+    "calibration": "train-only",
+    "lambdas": [
+      0.0,
+      0.125,
+      0.25,
+      0.375,
+      0.5,
+      0.625,
+      0.75,
+      0.875,
+      1.0
+    ],
+    "selection": "minimize validation Mean PB subject to |V| RMSE <= calibrated |V| RMSE",
+    "known_variables": "restore PV/slack magnitude and slack angle from V_start"
+  },
+  "n_validation_scenarios": 12339,
+  "metrics": {
+    "raw": {
+      "vmag_rmse": 0.029324910323567047,
+      "angle_rmse_deg": 1.0714642098152458,
+      "within_r2": 0.6874085916727818,
+      "within_slope": 0.4950167930770074,
+      "mean_pb": 0.2784401753863175,
+      "max_pb": 135.8799515699761
+    },
+    "C": {
+      "vmag_rmse": 0.01409085258940884,
+      "angle_rmse_deg": 0.7342482626108271,
+      "within_r2": 0.6874085916719288,
+      "within_slope": 0.4950167930775558,
+      "mean_pb": 0.14306127827874532,
+      "max_pb": 156.0424888974652
+    },
+    "shrink_0": {
+      "vmag_rmse": 0.023276491365344435,
+      "angle_rmse_deg": 6.815749775213301,
+      "within_r2": 4.529077867105313e-12,
+      "within_slope": 4.384230289852426e-12,
+      "mean_pb": 0.12035321263059477,
+      "max_pb": 6.729535020070105
+    },
+    "shrink_0.125": {
+      "vmag_rmse": 0.021857848979465,
+      "angle_rmse_deg": 5.940410883061163,
+      "within_r2": 0.6874085912500656,
+      "within_slope": 0.06187709913844729,
+      "mean_pb": 0.1186546493440389,
+      "max_pb": 19.625746552396343
+    },
+    "shrink_0.25": {
+      "vmag_rmse": 0.02048832685704678,
+      "angle_rmse_deg": 5.066849139282067,
+      "within_r2": 0.6874085915988101,
+      "within_slope": 0.12375419827232566,
+      "mean_pb": 0.11965559151083785,
+      "max_pb": 39.175463016683274
+    },
+    "shrink_0.375": {
+      "vmag_rmse": 0.019178450835696043,
+      "angle_rmse_deg": 4.1961745936359645,
+      "within_r2": 0.6874085916380848,
+      "within_slope": 0.18563129740686712,
+      "mean_pb": 0.1215346803050777,
+      "max_pb": 58.708132863638106
+    },
+    "shrink_0.5": {
+      "vmag_rmse": 0.01794128978577562,
+      "angle_rmse_deg": 3.330652266402038,
+      "within_r2": 0.6874085916659661,
+      "within_slope": 0.2475083965400679,
+      "mean_pb": 0.12402803061319938,
+      "max_pb": 78.21964932494542
+    },
+    "shrink_0.625": {
+      "vmag_rmse": 0.016792922484221852,
+      "angle_rmse_deg": 2.4756918423912686,
+      "within_r2": 0.687408591661731,
+      "within_slope": 0.30938549567576584,
+      "mean_pb": 0.12712662445965595,
+      "max_pb": 97.71097378510393
+    },
+    "shrink_0.75": {
+      "vmag_rmse": 0.015752779932727164,
+      "angle_rmse_deg": 1.6478161173677381,
+      "within_r2": 0.6874085916693378,
+      "within_slope": 0.3712625948091368,
+      "mean_pb": 0.1309584282792137,
+      "max_pb": 117.17857287344042
+    },
+    "shrink_0.875": {
+      "vmag_rmse": 0.014843630597691402,
+      "angle_rmse_deg": 0.9230320114772137,
+      "within_r2": 0.6874085916708506,
+      "within_slope": 0.433139693943269,
+      "mean_pb": 0.13584739350121183,
+      "max_pb": 136.6224162869122
+    },
+    "shrink_1": {
+      "vmag_rmse": 0.01409085258940884,
+      "angle_rmse_deg": 0.7342482626108272,
+      "within_r2": 0.6874085916719288,
+      "within_slope": 0.4950167930775558,
+      "mean_pb": 0.14306127827874543,
+      "max_pb": 156.04248889746773
+    }
+  },
+  "calibrated_vmag_rmse": 0.01409085258940884,
+  "admissible_lambdas": [
+    1.0
+  ],
+  "selected_lambda": 1.0
+}

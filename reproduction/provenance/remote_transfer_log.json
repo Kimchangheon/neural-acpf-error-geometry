@@ -1,0 +1,499 @@
+[
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/controlled_geometry_20260905",
+    "destination": "results/helma/controlled_geometry_20260905",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/controlled_geometry_20260905",
+    "destination": "experiments/snapshots/helma/controlled_geometry_20260905",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/model_seed_replicates_20260907",
+    "destination": "results/helma/model_seed_replicates_20260907",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/model_seed_replicates_20260907",
+    "destination": "experiments/snapshots/helma/model_seed_replicates_20260907",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/gbnetwork_known_state_csp_k16_20260909",
+    "destination": "results/helma/gbnetwork_known_state_csp_k16_20260909",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/gbnetwork_known_state_csp_k16_20260909",
+    "destination": "experiments/snapshots/helma/gbnetwork_known_state_csp_k16_20260909",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/graphkit_e120_fullstate_csp_k16_20260911",
+    "destination": "results/helma/graphkit_e120_fullstate_csp_k16_20260911",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/graphkit_e120_fullstate_csp_k16_20260911",
+    "destination": "experiments/snapshots/helma/graphkit_e120_fullstate_csp_k16_20260911",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/graphkit_e120_fullstate_csp_k16_alex_20260911",
+    "destination": "results/helma/graphkit_e120_fullstate_csp_k16_alex_20260911",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/graphkit_e120_fullstate_csp_k16_alex_20260911",
+    "destination": "experiments/snapshots/helma/graphkit_e120_fullstate_csp_k16_alex_20260911",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/lumina_gbv06z_3seed_fullstate_csp_k16_20260914",
+    "destination": "results/helma/lumina_gbv06z_3seed_fullstate_csp_k16_20260914",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/lumina_gbv06z_3seed_fullstate_csp_k16_20260914",
+    "destination": "experiments/snapshots/helma/lumina_gbv06z_3seed_fullstate_csp_k16_20260914",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/lumina_gbv06z_h100_3seed_fullstate_csp_k16_20260914",
+    "destination": "results/helma/lumina_gbv06z_h100_3seed_fullstate_csp_k16_20260914",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/lumina_gbv06z_h100_3seed_fullstate_csp_k16_20260914",
+    "destination": "experiments/snapshots/helma/lumina_gbv06z_h100_3seed_fullstate_csp_k16_20260914",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/gbnetwork_inference_walltime_h100_20260912",
+    "destination": "results/helma/gbnetwork_inference_walltime_h100_20260912",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/gbnetwork_inference_walltime_h100_20260912",
+    "destination": "experiments/snapshots/helma/gbnetwork_inference_walltime_h100_20260912",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/lumina_gbv06z_h100_3seed_inference_20260914",
+    "destination": "results/helma/lumina_gbv06z_h100_3seed_inference_20260914",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/lumina_gbv06z_h100_3seed_inference_20260914",
+    "destination": "experiments/snapshots/helma/lumina_gbv06z_h100_3seed_inference_20260914",
+    "returncode": 23,
+    "stderr": "rsync: [sender] change_dir \"/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/lumina_gbv06z_h100_3seed_inference_20260914\" failed: No such file or directory (2)\nrsync(56887): error: poll: hangup on receiver idx 0\n"
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/gridsfm_31grid_csp16_20260907",
+    "destination": "results/helma/gridsfm_31grid_csp16_20260907",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/gridsfm_31grid_csp16_20260907",
+    "destination": "experiments/snapshots/helma/gridsfm_31grid_csp16_20260907",
+    "returncode": 23,
+    "stderr": "rsync: [sender] change_dir \"/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/gridsfm_31grid_csp16_20260907\" failed: No such file or directory (2)\nrsync(56898): error: poll: hangup on receiver idx 0\n"
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/basis_reconstruction_matched_20260914",
+    "destination": "results/helma/basis_reconstruction_matched_20260914",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/basis_reconstruction_matched_20260914",
+    "destination": "experiments/snapshots/helma/basis_reconstruction_matched_20260914",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/off_subspace_conditional_association_20260914",
+    "destination": "results/helma/off_subspace_conditional_association_20260914",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/off_subspace_conditional_association_20260914",
+    "destination": "experiments/snapshots/helma/off_subspace_conditional_association_20260914",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/csp_posthoc_diagnostics_gbnetwork_20260910",
+    "destination": "results/helma/csp_posthoc_diagnostics_gbnetwork_20260910",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/csp_posthoc_diagnostics_gbnetwork_20260910",
+    "destination": "experiments/snapshots/helma/csp_posthoc_diagnostics_gbnetwork_20260910",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/csp_posthoc_diagnostics_graphkit_e120_20260912",
+    "destination": "results/helma/csp_posthoc_diagnostics_graphkit_e120_20260912",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/csp_posthoc_diagnostics_graphkit_e120_20260912",
+    "destination": "experiments/snapshots/helma/csp_posthoc_diagnostics_graphkit_e120_20260912",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/csp_fullstate_vs_restore_gbnetwork_20260910",
+    "destination": "results/helma/csp_fullstate_vs_restore_gbnetwork_20260910",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/csp_fullstate_vs_restore_gbnetwork_20260910",
+    "destination": "experiments/snapshots/helma/csp_fullstate_vs_restore_gbnetwork_20260910",
+    "returncode": 23,
+    "stderr": "rsync: [sender] change_dir \"/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/csp_fullstate_vs_restore_gbnetwork_20260910\" failed: No such file or directory (2)\nrsync(56934): error: poll: hangup on receiver idx 0\n"
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/csp_projection_block_ablation_norestore_20260910",
+    "destination": "results/helma/csp_projection_block_ablation_norestore_20260910",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/csp_projection_block_ablation_norestore_20260910",
+    "destination": "experiments/snapshots/helma/csp_projection_block_ablation_norestore_20260910",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/csp_projection_block_ablation_graphkit_e120_norestore_20260912",
+    "destination": "results/helma/csp_projection_block_ablation_graphkit_e120_norestore_20260912",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/csp_projection_block_ablation_graphkit_e120_norestore_20260912",
+    "destination": "experiments/snapshots/helma/csp_projection_block_ablation_graphkit_e120_norestore_20260912",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/jacobian_reproducibility_gbnetwork_20260910",
+    "destination": "results/helma/jacobian_reproducibility_gbnetwork_20260910",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/jacobian_reproducibility_gbnetwork_20260910",
+    "destination": "experiments/snapshots/helma/jacobian_reproducibility_gbnetwork_20260910",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/jacobian_graphkit_e120_20260912",
+    "destination": "results/helma/jacobian_graphkit_e120_20260912",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/jacobian_graphkit_e120_20260912",
+    "destination": "experiments/snapshots/helma/jacobian_graphkit_e120_20260912",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/fixed_norm_directional_graphkit_e120_20260912",
+    "destination": "results/helma/fixed_norm_directional_graphkit_e120_20260912",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/fixed_norm_directional_graphkit_e120_20260912",
+    "destination": "experiments/snapshots/helma/fixed_norm_directional_graphkit_e120_20260912",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_multiproc_gbnetwork_20260910",
+    "destination": "results/helma/nr1_multiproc_gbnetwork_20260910",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/nr1_multiproc_gbnetwork_20260910",
+    "destination": "experiments/snapshots/helma/nr1_multiproc_gbnetwork_20260910",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_graphkit_e120_gbnetwork_a40_20260912",
+    "destination": "results/helma/nr1_graphkit_e120_gbnetwork_a40_20260912",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/nr1_graphkit_e120_gbnetwork_a40_20260912",
+    "destination": "experiments/snapshots/helma/nr1_graphkit_e120_gbnetwork_a40_20260912",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_graphkit_e120_gbnetwork_20260912",
+    "destination": "results/helma/nr1_graphkit_e120_gbnetwork_20260912",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/nr1_graphkit_e120_gbnetwork_20260912",
+    "destination": "experiments/snapshots/helma/nr1_graphkit_e120_gbnetwork_20260912",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_lumina_gbv06z_3seed_20260914",
+    "destination": "results/helma/nr1_lumina_gbv06z_3seed_20260914",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/nr1_lumina_gbv06z_3seed_20260914",
+    "destination": "experiments/snapshots/helma/nr1_lumina_gbv06z_3seed_20260914",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/pignn_g3_basis_controls_20260909_alex2",
+    "destination": "results/helma/pignn_g3_basis_controls_20260909_alex2",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/pignn_g3_basis_controls_20260909_alex2",
+    "destination": "experiments/snapshots/helma/pignn_g3_basis_controls_20260909_alex2",
+    "returncode": 23,
+    "stderr": "rsync: [sender] change_dir \"/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/pignn_g3_basis_controls_20260909_alex2\" failed: No such file or directory (2)\nrsync(57010): error: poll: hangup on receiver idx 0\n"
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/pignn_g3_shrinkage_20260909_alex2",
+    "destination": "results/helma/pignn_g3_shrinkage_20260909_alex2",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/pignn_g3_shrinkage_20260909_alex2",
+    "destination": "experiments/snapshots/helma/pignn_g3_shrinkage_20260909_alex2",
+    "returncode": 23,
+    "stderr": "rsync: [sender] change_dir \"/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/pignn_g3_shrinkage_20260909_alex2\" failed: No such file or directory (2)\nrsync(57023): error: poll: hangup on receiver idx 0\n"
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/mix_n1_20260905",
+    "destination": "results/helma/mix_n1_20260905",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/mix_n1_20260905",
+    "destination": "experiments/snapshots/helma/mix_n1_20260905",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "alex",
+    "path": "/home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/csp_blocks_lumina_gbv06z_20260913",
+    "destination": "results/alex/csp_blocks_lumina_gbv06z_20260913",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "alex",
+    "path": "/home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/csp_blocks_lumina_gbv06z_20260913",
+    "destination": "experiments/snapshots/alex/csp_blocks_lumina_gbv06z_20260913",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "alex",
+    "path": "/home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/csp_posthoc_lumina_gbv06z_20260913",
+    "destination": "results/alex/csp_posthoc_lumina_gbv06z_20260913",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "alex",
+    "path": "/home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/csp_posthoc_lumina_gbv06z_20260913",
+    "destination": "experiments/snapshots/alex/csp_posthoc_lumina_gbv06z_20260913",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "alex",
+    "path": "/home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/fixed_norm_lumina_gbv06z_20260913",
+    "destination": "results/alex/fixed_norm_lumina_gbv06z_20260913",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "alex",
+    "path": "/home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/fixed_norm_lumina_gbv06z_20260913",
+    "destination": "experiments/snapshots/alex/fixed_norm_lumina_gbv06z_20260913",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "alex",
+    "path": "/home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/jacobian_lumina_gbv06z_20260913",
+    "destination": "results/alex/jacobian_lumina_gbv06z_20260913",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "alex",
+    "path": "/home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/jacobian_lumina_gbv06z_20260913",
+    "destination": "experiments/snapshots/alex/jacobian_lumina_gbv06z_20260913",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "alex",
+    "path": "/home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_lumina_gbv06z_20260913",
+    "destination": "results/alex/nr1_lumina_gbv06z_20260913",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "alex",
+    "path": "/home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/nr1_lumina_gbv06z_20260913",
+    "destination": "experiments/snapshots/alex/nr1_lumina_gbv06z_20260913",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "alex",
+    "path": "/home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/gbcorr_csp_posthoc_20260910",
+    "destination": "results/alex/gbcorr_csp_posthoc_20260910",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "alex",
+    "path": "/home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/gbcorr_csp_posthoc_20260910",
+    "destination": "experiments/snapshots/alex/gbcorr_csp_posthoc_20260910",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch",
+    "destination": "experiments/historical_helma",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/GridSFM",
+    "destination": "third_party/GridSFM",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/LUMINA",
+    "destination": "third_party/LUMINA",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/gridfm-graphkit",
+    "destination": "third_party/gridfm-graphkit",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "host": "helma",
+    "path": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/lumina-sdk",
+    "destination": "third_party/lumina-sdk",
+    "returncode": 0,
+    "stderr": ""
+  }
+]

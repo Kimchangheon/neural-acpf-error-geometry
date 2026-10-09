@@ -1,0 +1,290 @@
+\documentclass[10pt]{article}
+\usepackage[a4paper,margin=20mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb,mathtools,bm}
+\usepackage{booktabs,tabularx,array}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\setlist{nosep,leftmargin=1.5em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\definecolor{navy}{HTML}{183B56}
+\definecolor{teal}{HTML}{127475}
+\definecolor{soft}{HTML}{F2F6F7}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\wrap}{\operatorname{wrap}}
+\newcommand{\LN}{\operatorname{LN}}
+\newcommand{\MLP}{\operatorname{MLP}}
+\newcommand{\maskP}{\mathcal M_P}
+\newcommand{\maskQ}{\mathcal M_Q}
+\newcommand{\code}[1]{\texttt{#1}}
+\title{\vspace{-1.4em}\color{navy}\textbf{Released GridFM GraphKit as an AC Power-Flow Surrogate}\\
+\large Exact formulation of the PPC branch-row adaptation}
+\author{Implementation note for \code{train\_valid\_test\_gridfm.py}}
+\date{August 2026}
+
+\begin{document}
+\maketitle
+\vspace{-1.5em}
+
+\begin{center}
+\fcolorbox{teal}{soft}{\parbox{0.93\linewidth}{
+\textbf{Scope.} This document formulates the released
+\code{GNS\_heterogeneous} from the released \code{gridfm\_graphkit} package
+used with \code{--task pf --gridfm\_impl graphkit}. It is not the earlier local
+\code{GridFMHeteroSurrogate} mirror. The optional post-model known-operator
+projection is excluded; all equations describe the raw GraphKit prediction.
+}}
+\end{center}
+
+\section{AC Power-Flow Problem}
+
+Let bus voltage be
+\begin{equation}
+  \underline V_i = v_i e^{\mathrm j\theta_i},\qquad
+  \underline{\bm V}=[\underline V_1,\ldots,\underline V_N]^\top.
+\end{equation}
+For the PPC-derived admittance matrix \(\bm Y\), calculated nodal power is
+\begin{equation}
+  \underline{\bm S}^{\rm calc}(\bm v,\bm\theta)
+  =\underline{\bm V}\odot\overline{\bm Y\underline{\bm V}}.
+\end{equation}
+With specified injection \(\underline{\bm S}^{\rm set}=\bm P^{\rm set}+\mathrm j\bm Q^{\rm set}\),
+\begin{equation}
+  \Delta\bm P=\bm P^{\rm set}-\Re(\underline{\bm S}^{\rm calc}),\qquad
+  \Delta\bm Q=\bm Q^{\rm set}-\Im(\underline{\bm S}^{\rm calc}).
+\end{equation}
+The PF equation masks are
+\begin{equation}
+ \maskP=\{i:i\notin\mathcal V_{\rm REF}\},\qquad
+ \maskQ=\{i:i\in\mathcal V_{\rm PQ}\}.
+\end{equation}
+Thus active balance is imposed at PV and PQ buses, while reactive balance is
+imposed only at PQ buses.
+
+\section{Adapted Heterogeneous Graph}
+
+The adapted graph is
+\begin{equation}
+ \mathcal G=(\mathcal V_b\cup\widetilde{\mathcal V}_g,
+ \mathcal E_{bb}\cup\mathcal E_{gb}\cup\mathcal E_{bg}).
+\end{equation}
+Here \(\mathcal V_b\) contains one node per PPC bus. In native GridFM,
+\(\mathcal V_g\) contains physical generator rows. The PPC PF parquet has no
+generator-resolved table, so this adapter constructs one \emph{proxy} generator
+\(\tilde g_i\) for each PV or REF bus \(i\):
+\begin{equation}
+ b(\tilde g_i)=i,\qquad
+ |\widetilde{\mathcal G}(i)|=
+ \begin{cases}1,&i\in\mathcal V_{\rm PV}\cup\mathcal V_{\rm REF},\\0,&i\in\mathcal V_{\rm PQ}.\end{cases}
+\end{equation}
+The two association edges \(\tilde g_i\to i\) and \(i\to\tilde g_i\) do not
+represent electrical branches; they allow two-way latent exchange.
+
+\subsection{Bus and proxy-generator inputs}
+
+Define \(T(x)=\operatorname{sign}(x)\log(1+|x|)\). The bus row is
+\begin{align}
+ \bm x_i^b=[&T(-P_i^{\rm set}),T(-Q_i^{\rm set}),0,
+ v_i^{0},\theta_i^{0},\mathbb 1_{\rm PQ},\mathbb 1_{\rm PV},\mathbb 1_{\rm REF},\nonumber\\
+ &0.5,1.5,-10,10,T(G_i^{\rm sh}),T(B_i^{\rm sh}),\log_{10}(V_{n,i}^{\rm kV}+10^{-9})]\in\R^{15}.
+\end{align}
+The standard PF adapter uses
+\begin{equation}
+ \bm x_{\tilde g_i}^g=
+ [T(\max(P_i^{\rm set},0)),-10,10,0,0,0]\in\R^6.
+\end{equation}
+The limits and costs are placeholders, not reconstructed physical-generator
+data. The voltage start \((v^0,\theta^0)\) is retained in the bus row.
+
+\subsection{Transformer-aware directed branch features}
+
+For branch \(f\to t\), let
+\begin{equation}
+ a=\tau e^{\mathrm j\phi},
+\end{equation}
+and use the already per-unit branch quantities stored by the PPC loader:
+\begin{align}
+ Y_{ff}&=\frac{y_f+y_f^{\rm sh}/2}{|a|^2}, &
+ Y_{ft}&=-\frac{y_f}{\overline a},\\
+ Y_{tt}&=y_t+y_t^{\rm sh}/2, &
+ Y_{tf}&=-\frac{y_t}{a}.
+\end{align}
+Each physical branch becomes two directed message edges. Their features are
+\begin{align}
+ \bm e_{ft}&=[0,0,\Re Y_{ff},\Im Y_{ff},\Re Y_{ft},\Im Y_{ft},\tau,0,0,S^{\max}],\\
+ \bm e_{tf}&=[0,0,\Re Y_{tt},\Im Y_{tt},\Re Y_{tf},\Im Y_{tf},\tau,0,0,S^{\max}].
+\end{align}
+The first two flow channels and the angle-limit channels are zero in the current
+PF adapter; the admittance split and tap carry the meaningful electrical data.
+The adapter's reconstruction validator confirms
+\begin{equation}
+ \bm Y_{\rm adapter}=\bm Y_{\rm parquet}
+\end{equation}
+to floating-point tolerance, including bus shunts.
+
+\section{Relation-Specific Transformer Layers}
+
+Initial embeddings are produced independently by node and edge type:
+\begin{equation}
+ \bm h_i^{b,(0)}=E_b(\bm x_i^b),\quad
+ \bm h_g^{g,(0)}=E_g(\bm x_g^g),\quad
+ \bar{\bm e}_{ji}=E_e(\bm e_{ji}),
+\end{equation}
+where each \(E\) is Linear--LeakyReLU--Linear--LayerNorm. The released
+configuration uses hidden width \(d=48\), \(H=8\) heads, and \(L=12\) layers.
+
+At layer \(\ell\), each relation has its own TransformerConv operator:
+\begin{equation}
+ \mathcal T_{bb}^{(\ell)},\qquad
+ \mathcal T_{gb}^{(\ell)},\qquad
+ \mathcal T_{bg}^{(\ell)}.
+\end{equation}
+For a bus edge \(j\to i\) and head \(h\), a faithful operator-level form is
+\begin{align}
+ \bm q_i^{h}&=W_{Q,bb}^{h}\bm h_i^b,\\
+ \bm k_{ji}^{h}&=W_{K,bb}^{h}\bm h_j^b+W_{K,e}^{h}\bar{\bm e}_{ji},\\
+ \bm z_{ji}^{h}&=W_{V,bb}^{h}\bm h_j^b+W_{V,e}^{h}\bar{\bm e}_{ji},\\
+ \alpha_{ji}^{h}&=\operatorname{softmax}_{j\in\mathcal N_{bb}(i)}
+ \left(\frac{(\bm q_i^h)^\top\bm k_{ji}^h}{\sqrt{d_h}}\right),\\
+ \bm m_{bb,i}^{(\ell)}&=W_{O,bb}\mathop{\Vert}_{h=1}^{H}
+ \sum_{j\in\mathcal N_{bb}(i)}\alpha_{ji}^{h}\bm z_{ji}^{h}.
+\end{align}
+Association relations are analogous but have no branch attribute:
+\begin{align}
+ \bm m_{gb,i}^{(\ell)}&=\mathcal T_{gb}^{(\ell)}
+ (\bm h_i^b,\{\bm h_g^g:b(g)=i\}),\\
+ \bm m_{bg,g}^{(\ell)}&=\mathcal T_{bg}^{(\ell)}
+ (\bm h_g^g,\bm h_{b(g)}^b).
+\end{align}
+HeteroConv sums relation outputs at each target type, then applies
+LayerNorm, LeakyReLU, and a shape-compatible residual connection:
+\begin{align}
+ \bm h_i^{b,(\ell+1)}&\leftarrow \bm h_i^{b,(\ell)}+
+ \sigma\!\left(\LN(\bm m_{bb,i}^{(\ell)}+\bm m_{gb,i}^{(\ell)})\right),\\
+ \bm h_g^{g,(\ell+1)}&\leftarrow \bm h_g^{g,(\ell)}+
+ \sigma\!\left(\LN(\bm m_{bg,g}^{(\ell)})\right).
+\end{align}
+The first layer changes width from \(48\) to \(48H\), so its outer residual is
+omitted; subsequent layers retain it. TransformerConv also uses its internal
+\(\beta\)-gated root/neighbor combination.
+
+\section{Layerwise Physics Feedback}
+
+Unlike the local mirror, the released model invokes the same bus and generator
+decoders after \emph{every} layer:
+\begin{equation}
+ [\tilde v_i^{(\ell)},\tilde\theta_i^{(\ell)}]
+ =D_b(\bm h_i^{b,(\ell)}),\qquad
+ \tilde P_g^{(\ell)}=D_g(\bm h_g^{g,(\ell)}).
+\end{equation}
+PF masks pin known state components:
+\begin{align}
+ v_i^{(\ell)}&=
+ \begin{cases}\tilde v_i^{(\ell)},&i\in\mathcal V_{\rm PQ},\\v_i^0,&i\in\mathcal V_{\rm PV}\cup\mathcal V_{\rm REF},\end{cases}\\
+ \theta_i^{(\ell)}&=
+ \begin{cases}\theta_i^0,&i\in\mathcal V_{\rm REF},\\\tilde\theta_i^{(\ell)},&\text{otherwise}.
+ \end{cases}
+\end{align}
+
+For a directed edge \(i\to j\), the branch-current and branch-power operators are
+\begin{align}
+ \underline I_{ij}^{(\ell)}&=Y_{ii}^{(ij)}\underline V_i^{(\ell)}+
+ Y_{ij}^{(ij)}\underline V_j^{(\ell)},\\
+ \underline S_{ij}^{(\ell)}&=\underline V_i^{(\ell)}
+ \overline{\underline I_{ij}^{(\ell)}}.
+\end{align}
+Outgoing directed powers are aggregated at each bus:
+\begin{equation}
+ P_i^{\rm net,(\ell)}=\sum_{j:(i,j)\in\mathcal E_{bb}}P_{ij}^{(\ell)},\qquad
+ Q_i^{\rm net,(\ell)}=\sum_{j:(i,j)\in\mathcal E_{bb}}Q_{ij}^{(\ell)}.
+\end{equation}
+The PF physics decoder analytically recovers quantities that are not specified:
+\begin{align}
+ Q_{g,i}^{(\ell)}&=
+ \begin{cases}
+ Q_i^{\rm net,(\ell)}+Q_{d,i}-q_i^{\rm sh,(\ell)},
+ &i\in\mathcal V_{\rm PV}\cup\mathcal V_{\rm REF},\\0,&i\in\mathcal V_{\rm PQ},
+ \end{cases}\\
+ P_{g,i}^{(\ell)}&=
+ \begin{cases}
+ \sum_{g:b(g)=i}\tilde P_g^{(\ell)},&i\in\mathcal V_{\rm PV},\\
+ P_i^{\rm net,(\ell)}+P_{d,i}-p_i^{\rm sh,(\ell)},&i\in\mathcal V_{\rm REF},\\
+ 0,&i\in\mathcal V_{\rm PQ}.
+ \end{cases}
+\end{align}
+With \(p_i^{\rm sh}=-G_i^{\rm sh}v_i^2\) and
+\(q_i^{\rm sh}=B_i^{\rm sh}v_i^2\), the layer residual is
+\begin{align}
+ r_{P,i}^{(\ell)}&=P_{g,i}^{(\ell)}-P_{d,i}+p_i^{\rm sh,(\ell)}-P_i^{\rm net,(\ell)},\\
+ r_{Q,i}^{(\ell)}&=Q_{g,i}^{(\ell)}-Q_{d,i}+q_i^{\rm sh,(\ell)}-Q_i^{\rm net,(\ell)}.
+\end{align}
+It is injected into the next bus representation:
+\begin{equation}
+ \bm h_i^{b,(\ell)}\leftarrow \bm h_i^{b,(\ell)}+
+ \MLP_{\rm phys}([r_{P,i}^{(\ell)},r_{Q,i}^{(\ell)}]).
+\end{equation}
+Only the last layer's decoded state is returned. This is depthwise learned
+physics feedback, not a Newton step and not a \(K\)-step voltage unrolling.
+
+\section{Output and Training Objective}
+
+The raw AC-PF prediction is
+\begin{equation}
+ \widehat{\bm V}_{\rm state}=
+ \{(\hat v_i,\hat\theta_i)=(v_i^{(L)},\wrap(\theta_i^{(L)}))\}_{i=1}^{N}.
+\end{equation}
+Against Newton labels \((v_i^\star,\theta_i^\star)\), the supervised term is
+\begin{equation}
+ \mathcal L_{\rm state}=\frac1N\sum_i
+ \left[(\hat v_i-v_i^\star)^2+wrap(\hat\theta_i-\theta_i^\star)^2\right].
+\end{equation}
+The external PPC physics term recomputes power from the exact dataset \(\bm Y\),
+not from transformed neural features:
+\begin{equation}
+ \mathcal L_{\rm phys}=\frac1{|\maskP|+|\maskQ|}
+ \left[\sum_{i\in\maskP}\rho(\Delta P_i)+
+ \sum_{i\in\maskQ}\rho(\Delta Q_i)\right],
+\end{equation}
+where the default robust penalty is
+\begin{equation}
+ \rho(r)=\log\cosh(\operatorname{clip}(r,-30,30)).
+\end{equation}
+The default total objective is
+\begin{equation}
+ \boxed{\mathcal L=\mathcal L_{\rm state}+10^{-2}\mathcal L_{\rm phys}.}
+\end{equation}
+Training physics is evaluated through the script's complex64 path; reported
+validation/test residual metrics reconstruct \(\underline{\bm S}^{\rm calc}\)
+with complex128 when the dataset is loaded with
+\code{--dataset\_complex\_dtype complex128}.
+
+\section{Interpretive Summary}
+
+\begin{tabularx}{\linewidth}{>{\bfseries}p{0.25\linewidth}X}
+\toprule
+Property & Released GraphKit PF adaptation \\
+\midrule
+Graph & Bus nodes plus one proxy generator per PV/REF bus; three directed relation types.\\
+Electrical edge encoding & Directed transformer-aware \(\pi\)-model split \((Y_{ff},Y_{ft})\) and \((Y_{tt},Y_{tf})\).\\
+Message passing & 12 relation-specific multi-head TransformerConv layers, width 48 and 8 heads.\\
+Voltage decoding & Shared decoder at every layer; known PF quantities are pinned.\\
+Physics inside forward & Branch flows, nodal injections, analytic PF decoder, and residual feedback at every layer.\\
+Physics outside forward & Exact-Ybus robust residual loss and complex128 validation/test metrics.\\
+Pretraining status & No released GridFM checkpoint; this implementation is trained from scratch.\\
+\bottomrule
+\end{tabularx}
+
+\section*{Code provenance}
+{\small\sloppy
+The equations follow \path{gridfm_graphkit/models/gnn_heterogeneous_gns.py},
+\path{gridfm_graphkit/models/utils.py}, \path{gridfm_graphkit_adapter.py},
+and the AC-PF path in \path{train_valid_test_gridfm.py}, as present in the
+local workspace in August 2026.
+\par}
+
+\end{document}

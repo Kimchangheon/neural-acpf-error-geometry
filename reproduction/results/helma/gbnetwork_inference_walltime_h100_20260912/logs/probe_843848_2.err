@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/gbnetwork_inference_walltime_h100_20260912/benchmark_inference_walltime.py", line 222, in <module>
+    main()
+  File "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/gbnetwork_inference_walltime_h100_20260912/benchmark_inference_walltime.py", line 212, in main
+    meta["probe"] = probe(args, model, forward, test)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/gbnetwork_inference_walltime_h100_20260912/benchmark_inference_walltime.py", line 97, in probe
+    assert ok
+           ^^
+AssertionError
+srun: error: h11-11: task 0: Exited with exit code 1
+srun: Terminating StepId=843848.0

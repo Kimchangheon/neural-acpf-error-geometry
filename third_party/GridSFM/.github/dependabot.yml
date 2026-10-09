@@ -1,0 +1,24 @@
+# To get started with Dependabot version updates, you'll need to specify which
+# package ecosystems to update and where the package manifests are located.
+# Please see the documentation for all configuration options:
+# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  # Python: main gridsfm package (model/pyproject.toml)
+  - package-ecosystem: "pip"
+    directory: "/model"
+    schedule:
+      interval: "weekly"
+
+  # Julia: topology_solver_pipeline (Project.toml / Manifest.toml)
+  - package-ecosystem: "julia"
+    directory: "/power_grid/US/topology_solver_pipeline"
+    schedule:
+      interval: "weekly"
+
+  # Docker: topology_solver_pipeline image
+  - package-ecosystem: "docker"
+    directory: "/power_grid/US/topology_solver_pipeline/docker"
+    schedule:
+      interval: "weekly"

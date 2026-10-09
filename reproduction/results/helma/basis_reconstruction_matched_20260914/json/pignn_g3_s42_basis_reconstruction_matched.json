@@ -1,0 +1,404 @@
+{
+  "protocol": {
+    "model": "PIGNN-GC/G3 seed42",
+    "checkpoint": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/residual_split_20260829/pignn_global_GBnetwork_g3_s42_40_best_model.ckpt",
+    "split": "seed42 paper split",
+    "calibration": "train predictions only",
+    "solution_basis": "train NR only; k=16",
+    "matching_rule": "blockwise: smallest Laplacian low-frequency rank reaching the corresponding SVD-16 training EVR; spatial beta in H_beta=(1-beta)I+beta H chosen analytically from training reconstruction energy",
+    "selection_uses_validation_or_test": false,
+    "prediction_pb": "restore known setpoints then complex128 structural-zero Mean PB",
+    "reference_pb": "both pure operator and operational restore-known values reported"
+  },
+  "targets": {
+    "svd16_training_evr_magnitude": 0.9880053751661676,
+    "svd16_training_evr_angle": 0.9968392019907943
+  },
+  "selected": {
+    "laplacian_rank_magnitude": 1750,
+    "laplacian_rank_angle": 2122,
+    "spatial_beta_magnitude": 0.3567906323115381,
+    "spatial_beta_angle": 0.207884929484613
+  },
+  "training_retained": {
+    "laplacian_matched": {
+      "magnitude": 0.9881868721371794,
+      "angle": 0.9968788037727974
+    },
+    "spatial_matched": {
+      "magnitude": 0.9880053751661676,
+      "angle": 0.9968392019907943
+    },
+    "random_k16": [
+      {
+        "magnitude": 0.005905637085619642,
+        "angle": 0.007226857899027439
+      },
+      {
+        "magnitude": 0.008008292757195279,
+        "angle": 0.006529311491600187
+      },
+      {
+        "magnitude": 0.006022725270367069,
+        "angle": 0.0045641167767771496
+      },
+      {
+        "magnitude": 0.002558456835874856,
+        "angle": 0.005305562977276246
+      },
+      {
+        "magnitude": 0.011624118156018937,
+        "angle": 0.004049446179527738
+      },
+      {
+        "magnitude": 0.009923190976203977,
+        "angle": 0.005733479174411138
+      },
+      {
+        "magnitude": 0.005431357174160101,
+        "angle": 0.007869217952649055
+      },
+      {
+        "magnitude": 0.0027191583757277815,
+        "angle": 0.009526108992867988
+      }
+    ]
+  },
+  "methods": {
+    "solution_svd_k16": {
+      "test_reference_retained": {
+        "magnitude": 0.9878940592596026,
+        "angle": 0.9968251315392486
+      },
+      "reference_pure": {
+        "vmag_rmse": 0.00257593046740752,
+        "angle_rmse_deg": 0.38577221894927227,
+        "mean_pb": 0.04153755348709462,
+        "max_pb": 5.97084673651201
+      },
+      "reference_restore_known": {
+        "vmag_rmse": 0.00257593046740752,
+        "angle_rmse_deg": 0.38577221894927227,
+        "mean_pb": 0.04153755348709456,
+        "max_pb": 5.97084673651201
+      },
+      "calibrated_prediction_intervention": {
+        "vmag_rmse": 0.012873089387810501,
+        "angle_rmse_deg": 0.8188653610493158,
+        "mean_pb": 0.056899618287608165,
+        "max_pb": 4.004297158975709
+      }
+    },
+    "laplacian_k16": {
+      "test_reference_retained": {
+        "magnitude": 0.2243690214116434,
+        "angle": 0.25961143015524424
+      },
+      "reference_pure": {
+        "vmag_rmse": 0.02061875495321785,
+        "angle_rmse_deg": 5.891120872168366,
+        "mean_pb": 29.805309815163177,
+        "max_pb": 19499.604140783773
+      },
+      "reference_restore_known": {
+        "vmag_rmse": 0.0204703978031617,
+        "angle_rmse_deg": 5.891108757710898,
+        "mean_pb": 29.81467298594303,
+        "max_pb": 19487.967515318807
+      },
+      "calibrated_prediction_intervention": {
+        "vmag_rmse": 0.021317992064054696,
+        "angle_rmse_deg": 5.900776775880131,
+        "mean_pb": 30.550389281443707,
+        "max_pb": 18309.45934005878
+      }
+    },
+    "laplacian_reconstruction_matched": {
+      "test_reference_retained": {
+        "magnitude": 0.9881916094970672,
+        "angle": 0.9968769091261398
+      },
+      "reference_pure": {
+        "vmag_rmse": 0.002544076799214855,
+        "angle_rmse_deg": 0.38261358984721905,
+        "mean_pb": 26.14707011461097,
+        "max_pb": 19254.69756482296
+      },
+      "reference_restore_known": {
+        "vmag_rmse": 0.002500889842860889,
+        "angle_rmse_deg": 0.38261358541968826,
+        "mean_pb": 26.139383494232227,
+        "max_pb": 19254.684928605362
+      },
+      "calibrated_prediction_intervention": {
+        "vmag_rmse": 0.014326117460793559,
+        "angle_rmse_deg": 0.8409553133714839,
+        "mean_pb": 26.215683740181483,
+        "max_pb": 18742.628077713733
+      }
+    },
+    "spatial_onehop": {
+      "test_reference_retained": {
+        "magnitude": 0.9058047628488318,
+        "angle": 0.9268550664728675
+      },
+      "reference_pure": {
+        "vmag_rmse": 0.0071853733014889815,
+        "angle_rmse_deg": 1.851655568646393,
+        "mean_pb": 28.86648331210272,
+        "max_pb": 19251.51354165933
+      },
+      "reference_restore_known": {
+        "vmag_rmse": 0.007146757018814385,
+        "angle_rmse_deg": 1.851649496871769,
+        "mean_pb": 28.862563664362337,
+        "max_pb": 19251.564574124488
+      },
+      "calibrated_prediction_intervention": {
+        "vmag_rmse": 0.015678382190834554,
+        "angle_rmse_deg": 1.9229442640639984,
+        "mean_pb": 29.308867918550337,
+        "max_pb": 18744.394908653103
+      }
+    },
+    "spatial_reconstruction_matched": {
+      "test_reference_retained": {
+        "magnitude": 0.9880089881987821,
+        "angle": 0.9968389580266365
+      },
+      "reference_pure": {
+        "vmag_rmse": 0.0025636738836326963,
+        "angle_rmse_deg": 0.384931287317846,
+        "mean_pb": 6.197166918616176,
+        "max_pb": 4021.936588639576
+      },
+      "reference_restore_known": {
+        "vmag_rmse": 0.002549895955719705,
+        "angle_rmse_deg": 0.3849300250874069,
+        "mean_pb": 6.195247598233075,
+        "max_pb": 4021.940386712177
+      },
+      "calibrated_prediction_intervention": {
+        "vmag_rmse": 0.014629069396362717,
+        "angle_rmse_deg": 0.7935115130554969,
+        "mean_pb": 6.218672545954621,
+        "max_pb": 3918.7243197860266
+      }
+    },
+    "random_00_k16": {
+      "test_reference_retained": {
+        "magnitude": 0.005900830451594619,
+        "angle": 0.007224246717984162
+      },
+      "reference_pure": {
+        "vmag_rmse": 0.023342626417627733,
+        "angle_rmse_deg": 6.8217164192487045,
+        "mean_pb": 14.793716520537382,
+        "max_pb": 4349.425336641496
+      },
+      "reference_restore_known": {
+        "vmag_rmse": 0.023331271784175853,
+        "angle_rmse_deg": 6.821702537219841,
+        "mean_pb": 14.785865851368488,
+        "max_pb": 4349.410630788517
+      },
+      "calibrated_prediction_intervention": {
+        "vmag_rmse": 0.023372060213375442,
+        "angle_rmse_deg": 6.822081924701207,
+        "mean_pb": 14.909083936049214,
+        "max_pb": 4799.0357790597545
+      }
+    },
+    "random_01_k16": {
+      "test_reference_retained": {
+        "magnitude": 0.008000300961057305,
+        "angle": 0.006526269156634235
+      },
+      "reference_pure": {
+        "vmag_rmse": 0.02331796436197388,
+        "angle_rmse_deg": 6.824114024339546,
+        "mean_pb": 17.560018493538387,
+        "max_pb": 9040.032925949536
+      },
+      "reference_restore_known": {
+        "vmag_rmse": 0.023303147530707304,
+        "angle_rmse_deg": 6.8241139272448805,
+        "mean_pb": 17.558926814745586,
+        "max_pb": 9040.032925949536
+      },
+      "calibrated_prediction_intervention": {
+        "vmag_rmse": 0.023346940338774363,
+        "angle_rmse_deg": 6.824381086660065,
+        "mean_pb": 17.435456237259235,
+        "max_pb": 8318.739951456826
+      }
+    },
+    "random_02_k16": {
+      "test_reference_retained": {
+        "magnitude": 0.006034074794599054,
+        "angle": 0.004563911376676999
+      },
+      "reference_pure": {
+        "vmag_rmse": 0.02334106199767606,
+        "angle_rmse_deg": 6.830850360963657,
+        "mean_pb": 14.692787826205729,
+        "max_pb": 5383.922086239858
+      },
+      "reference_restore_known": {
+        "vmag_rmse": 0.023329440910023685,
+        "angle_rmse_deg": 6.830842194452167,
+        "mean_pb": 14.698827574368464,
+        "max_pb": 5383.922086239858
+      },
+      "calibrated_prediction_intervention": {
+        "vmag_rmse": 0.023360307428750535,
+        "angle_rmse_deg": 6.831020126644246,
+        "mean_pb": 14.272344624415332,
+        "max_pb": 5724.546906769022
+      }
+    },
+    "random_03_k16": {
+      "test_reference_retained": {
+        "magnitude": 0.002559840145897274,
+        "angle": 0.00530653815738602
+      },
+      "reference_pure": {
+        "vmag_rmse": 0.02338181872123336,
+        "angle_rmse_deg": 6.828301870439621,
+        "mean_pb": 15.927080034543511,
+        "max_pb": 7038.860970353795
+      },
+      "reference_restore_known": {
+        "vmag_rmse": 0.023376731364670486,
+        "angle_rmse_deg": 6.8282988273009195,
+        "mean_pb": 15.929185477536365,
+        "max_pb": 7038.860970353795
+      },
+      "calibrated_prediction_intervention": {
+        "vmag_rmse": 0.02339927270133546,
+        "angle_rmse_deg": 6.828538033834828,
+        "mean_pb": 16.599870538528855,
+        "max_pb": 7805.775509140777
+      }
+    },
+    "random_04_k16": {
+      "test_reference_retained": {
+        "magnitude": 0.011628544528925921,
+        "angle": 0.0040539910552360725
+      },
+      "reference_pure": {
+        "vmag_rmse": 0.02327528251676298,
+        "angle_rmse_deg": 6.832599716594165,
+        "mean_pb": 17.50417926397653,
+        "max_pb": 15272.380237992063
+      },
+      "reference_restore_known": {
+        "vmag_rmse": 0.02325258473356392,
+        "angle_rmse_deg": 6.832589415682191,
+        "mean_pb": 17.49184721337933,
+        "max_pb": 15272.380237992063
+      },
+      "calibrated_prediction_intervention": {
+        "vmag_rmse": 0.02332284071323213,
+        "angle_rmse_deg": 6.832752707271993,
+        "mean_pb": 16.437334879059247,
+        "max_pb": 16060.199256897176
+      }
+    },
+    "random_05_k16": {
+      "test_reference_retained": {
+        "magnitude": 0.00990763907556913,
+        "angle": 0.005741308011694035
+      },
+      "reference_pure": {
+        "vmag_rmse": 0.023295536612668585,
+        "angle_rmse_deg": 6.826809418546005,
+        "mean_pb": 20.887902618655062,
+        "max_pb": 10361.826463457513
+      },
+      "reference_restore_known": {
+        "vmag_rmse": 0.023277457256926162,
+        "angle_rmse_deg": 6.826798017370114,
+        "mean_pb": 20.881787500165334,
+        "max_pb": 10361.826463457513
+      },
+      "calibrated_prediction_intervention": {
+        "vmag_rmse": 0.023333769533617977,
+        "angle_rmse_deg": 6.826989583146236,
+        "mean_pb": 20.759841677383957,
+        "max_pb": 10886.386701040943
+      }
+    },
+    "random_06_k16": {
+      "test_reference_retained": {
+        "magnitude": 0.005419078649672282,
+        "angle": 0.007872308323678578
+      },
+      "reference_pure": {
+        "vmag_rmse": 0.023348281784117426,
+        "angle_rmse_deg": 6.819489524513453,
+        "mean_pb": 20.711668881209004,
+        "max_pb": 10781.042887259924
+      },
+      "reference_restore_known": {
+        "vmag_rmse": 0.023339053652690407,
+        "angle_rmse_deg": 6.819486890768825,
+        "mean_pb": 20.7115220682726,
+        "max_pb": 10781.042887259924
+      },
+      "calibrated_prediction_intervention": {
+        "vmag_rmse": 0.023372546918298674,
+        "angle_rmse_deg": 6.819863118766485,
+        "mean_pb": 21.542061624655087,
+        "max_pb": 12073.153488230424
+      }
+    },
+    "random_07_k16": {
+      "test_reference_retained": {
+        "magnitude": 0.0027278288286390895,
+        "angle": 0.009523332068314905
+      },
+      "reference_pure": {
+        "vmag_rmse": 0.023379849657583045,
+        "angle_rmse_deg": 6.813812922963606,
+        "mean_pb": 19.314648514285548,
+        "max_pb": 6931.779754213843
+      },
+      "reference_restore_known": {
+        "vmag_rmse": 0.02337482915904403,
+        "angle_rmse_deg": 6.8138055751525854,
+        "mean_pb": 19.316607261464952,
+        "max_pb": 6931.779754213843
+      },
+      "calibrated_prediction_intervention": {
+        "vmag_rmse": 0.02339517313781484,
+        "angle_rmse_deg": 6.814171726854573,
+        "mean_pb": 20.08193337722132,
+        "max_pb": 7548.457363691251
+      }
+    }
+  },
+  "laplacian_eigenvalues": {
+    "first16": [
+      -1.9875694472142276e-18,
+      2.31435220754026e-05,
+      5.254409252734524e-05,
+      6.76391285826472e-05,
+      9.199667925599064e-05,
+      0.00011790477821714208,
+      0.00023168483794251476,
+      0.0002834492819973153,
+      0.0003050535183663327,
+      0.000323237130584878,
+      0.00044638549533577114,
+      0.0004642447914574568,
+      0.0005328896747618653,
+      0.0005997967071418571,
+      0.0006075867068297681,
+      0.0006301251409712638
+    ],
+    "at_kv": 1.5021899337928208,
+    "at_kt": 1.9802888878125253
+  },
+  "n_test": 12344
+}

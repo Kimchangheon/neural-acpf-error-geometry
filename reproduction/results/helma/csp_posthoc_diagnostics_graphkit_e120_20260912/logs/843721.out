@@ -1,0 +1,46 @@
+### Starting TaskPrologue of job 843721 on h11-11 at Sat Sep 12 21:20:38 CEST 2026
+Running on cores 96-127 with governor performance
+Sat Sep 12 21:20:38 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:C6:00.0 Off |                    0 |
+| N/A   35C    P0             72W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+[protocol] GraphKit E120 seed 42; seed-42 split; train-only calibration/basis; k=16; complex128 PB
+[identity] pure affine projection is checked separately from restore_known operational CSP
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 12 21:20:49 CEST 2026
+= Job-ID             : 843721 on helma
+= Job-Name           : gk120_csp_posthoc
+= Job-Command        : /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/csp_posthoc_diagnostics_graphkit_e120_helma_20260912.sh
+= Initial workdir    : /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC
+= Queue/Partition    : h100
+= Slurm account      : b313dc with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 06:00:00
+= Elapsed runtime    : 00:00:12
+= Total RAM usage    : 8.3 GiB of assigned 175 GiB (4.7%)
+= Node list          : h11-11
+= Subm/Elig/Start/End: 2026-09-12T20:18:58 / 2026-09-12T20:18:58 / 2026-09-12T21:20:37 / 2026-09-12T21:20:49
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              80.1G   104.9G   209.7G        N/A     127K     500K   1,000K        N/A    
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]

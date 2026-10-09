@@ -1,0 +1,68 @@
+{
+  "stage": "benchmark",
+  "model": "graphkit",
+  "checkpoint": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/ckpt/gk_e120_20260910/k07_s43_e120_best.pt",
+  "gpu": "NVIDIA H100",
+  "gpu_total_memory_bytes": 99951706112,
+  "test_scenarios": 12344,
+  "parameters_total": 20069187,
+  "parameters_trainable": 20069187,
+  "parameter_bytes": 80276748,
+  "timing_scope": "GPU-synchronized model forward plus requested output transform; data loading, model loading, calibration fitting, and SVD fitting excluded",
+  "batch_size": 943,
+  "repeats": 3,
+  "timing": {
+    "Raw": {
+      "seconds_per_testset_repeats": [
+        73.84189777303254,
+        72.19193275796715,
+        72.43373986298684
+      ],
+      "seconds_per_testset_mean": 72.82252346466218,
+      "seconds_per_testset_sample_sd": 0.8910446983365478,
+      "milliseconds_per_scenario": 5.899426722671921,
+      "scenarios": 12344,
+      "peak_allocated_bytes": 89148407808,
+      "peak_reserved_bytes": 99157540864
+    },
+    "C": {
+      "seconds_per_testset_repeats": [
+        72.58223997004097,
+        69.72719226498157,
+        69.73355233401526
+      ],
+      "seconds_per_testset_mean": 70.68099485634593,
+      "seconds_per_testset_sample_sd": 1.646529638172808,
+      "milliseconds_per_scenario": 5.725939311110332,
+      "scenarios": 12344,
+      "peak_allocated_bytes": 89165185536,
+      "peak_reserved_bytes": 98685681664
+    },
+    "P16": {
+      "seconds_per_testset_repeats": [
+        72.4875608869479,
+        69.73149403918069,
+        69.6746116890572
+      ],
+      "seconds_per_testset_mean": 70.63122220506193,
+      "seconds_per_testset_sample_sd": 1.6078880175057295,
+      "milliseconds_per_scenario": 5.721907177986223,
+      "scenarios": 12344,
+      "peak_allocated_bytes": 89165185536,
+      "peak_reserved_bytes": 98182365184
+    },
+    "CSP16": {
+      "seconds_per_testset_repeats": [
+        74.28020078799454,
+        69.69563366600778,
+        69.6368951619952
+      ],
+      "seconds_per_testset_mean": 71.2042432053325,
+      "seconds_per_testset_sample_sd": 2.6640193018661615,
+      "milliseconds_per_scenario": 5.768328192266081,
+      "scenarios": 12344,
+      "peak_allocated_bytes": 89165185536,
+      "peak_reserved_bytes": 98685681664
+    }
+  }
+}

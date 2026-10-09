@@ -1,0 +1,128 @@
+{
+  "protocol": {
+    "split": "controlled_error_geometry.split_dataset: random_split seed=42; sorted membership order",
+    "basis": "diagnose_residual_distributions.manifold_basis -> manifold_projection.fit_basis; train NR only; circular angle mean/wrap; k=16",
+    "calibration": "diagnose_residual_distributions.fit_per_bus_offset + controlled_error_geometry.calibrated_forward; train only; circular angle offset",
+    "csp": "manifold_projection.project_state then output_intervention_metrics._restore_known_setpoints, matching restore_known paper rows",
+    "pb": "controlled_error_geometry.pb_per_scenario; final complex128 voltage; GENCO structural-zero PB",
+    "oracle_floor": "pure project_state(reference), as requested; operational restore_known oracle PB additionally reported",
+    "no_clipping": true,
+    "known_state_restoration_after_csp": "PV/slack magnitude and slack angle restored from V_start",
+    "rank_requested": 16,
+    "rank_actual_magnitude": 16,
+    "rank_actual_angle": 16,
+    "test_scenarios": 12344
+  },
+  "reference": {
+    "training_explained_variance": {
+      "magnitude": 0.9880053751661676,
+      "angle": 0.9968392019907943
+    },
+    "test_reference_retained_variance": {
+      "magnitude": 0.9878940592596026,
+      "angle": 0.9968251315392486
+    },
+    "oracle_pure_reference_projection": {
+      "vmag_rmse": 0.00257593046740752,
+      "angle_rmse_deg": 0.3857722189492722,
+      "mean_pb": 0.041537553487076655,
+      "max_pb": 5.970846736512017
+    },
+    "oracle_restore_known_reference_projection": {
+      "mean_pb": 0.04153755348707658,
+      "max_pb": 5.970846736512017,
+      "restoration_change_vmag_rmse": 1.0688060938893328e-16,
+      "restoration_change_angle_rmse_deg": 0.0
+    }
+  },
+  "models": {
+    "PIGNN-GC": {
+      "off_error_fraction_calibrated": {
+        "magnitude": 0.21238102208471796,
+        "angle": 0.07140976502143928
+      },
+      "removed_error_energy_calibrated": {
+        "magnitude": 1177.1098364976558,
+        "angle": 338.5148726736306
+      },
+      "identity_check": {
+        "magnitude": {
+          "calibrated_error_energy": 5542.443599447936,
+          "csp_pure_error_energy": 4547.496258653601,
+          "csp_operational_error_energy": 4547.496258653601,
+          "reference_off_subspace_energy": 182.162495703322,
+          "calibrated_error_off_subspace_energy": 1177.1098364976558,
+          "rhs_reference_off_minus_error_off": -994.9473407943337,
+          "lhs_pure_projection": -994.9473407943351,
+          "lhs_operational_restore_known": -994.9473407943351,
+          "pure_discrepancy": -1.3642420526593924e-12,
+          "operational_discrepancy": -1.3642420526593924e-12,
+          "pure_relative_discrepancy": 1.371170107927746e-15,
+          "operational_relative_discrepancy": 1.371170107927746e-15,
+          "max_abs_scenario_discrepancy_pure": 1.8318679906315083e-15,
+          "max_abs_scenario_discrepancy_operational": 1.8318679906315083e-15
+        },
+        "angle": {
+          "calibrated_error_energy": 4740.456330755305,
+          "csp_pure_error_energy": 5646.477072981636,
+          "csp_operational_error_energy": 5646.477072981636,
+          "reference_off_subspace_energy": 1244.5356148999438,
+          "calibrated_error_off_subspace_energy": 338.5148726736306,
+          "rhs_reference_off_minus_error_off": 906.0207422263131,
+          "lhs_pure_projection": 906.0207422263311,
+          "lhs_operational_restore_known": 906.0207422263311,
+          "pure_discrepancy": 1.7962520360015333e-11,
+          "operational_discrepancy": 1.7962520360015333e-11,
+          "pure_relative_discrepancy": 1.9825727516874172e-14,
+          "operational_relative_discrepancy": 1.9825727516874172e-14,
+          "max_abs_scenario_discrepancy_pure": 4.110600748674642e-14,
+          "max_abs_scenario_discrepancy_operational": 4.110600748674642e-14
+        }
+      }
+    },
+    "GridSFM": {
+      "off_error_fraction_calibrated": {
+        "magnitude": 0.5188315952783983,
+        "angle": 0.018924535995911318
+      },
+      "removed_error_energy_calibrated": {
+        "magnitude": 1979.5616453419516,
+        "angle": 518.9860897713392
+      },
+      "identity_check": {
+        "magnitude": {
+          "calibrated_error_energy": 3815.4223130527444,
+          "csp_pure_error_energy": 2018.023163414115,
+          "csp_operational_error_energy": 2018.023163414115,
+          "reference_off_subspace_energy": 182.162495703322,
+          "calibrated_error_off_subspace_energy": 1979.5616453419516,
+          "rhs_reference_off_minus_error_off": -1797.3991496386295,
+          "lhs_pure_projection": -1797.3991496386293,
+          "lhs_operational_restore_known": -1797.3991496386293,
+          "pure_discrepancy": 2.2737367544323206e-13,
+          "operational_discrepancy": 2.2737367544323206e-13,
+          "pure_relative_discrepancy": 1.2650149272015955e-16,
+          "operational_relative_discrepancy": 1.2650149272015955e-16,
+          "max_abs_scenario_discrepancy_pure": 1.887379141862766e-15,
+          "max_abs_scenario_discrepancy_operational": 1.887379141862766e-15
+        },
+        "angle": {
+          "calibrated_error_energy": 27423.979635932268,
+          "csp_pure_error_energy": 28149.529161060877,
+          "csp_operational_error_energy": 28149.529161060877,
+          "reference_off_subspace_energy": 1244.5356148999438,
+          "calibrated_error_off_subspace_energy": 518.9860897713392,
+          "rhs_reference_off_minus_error_off": 725.5495251286046,
+          "lhs_pure_projection": 725.5495251286084,
+          "lhs_operational_restore_known": 725.5495251286084,
+          "pure_discrepancy": 3.751665644813329e-12,
+          "operational_discrepancy": 3.751665644813329e-12,
+          "pure_relative_discrepancy": 5.170791951312106e-15,
+          "operational_relative_discrepancy": 5.170791951312106e-15,
+          "max_abs_scenario_discrepancy_pure": 6.247780071078068e-14,
+          "max_abs_scenario_discrepancy_operational": 6.247780071078068e-14
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "expected_grids": 31,
+  "scored_grids": 31,
+  "unscored_grids": [],
+  "csp_lowers_mean_pb_grids": 31,
+  "median_raw_mean_pb": 0.20986021561190124,
+  "median_csp16_mean_pb": 0.054780683365064614,
+  "median_relative_reduction": 0.6795557447316619,
+  "geometric_mean_csp16_over_raw": 0.2881792071665165
+}

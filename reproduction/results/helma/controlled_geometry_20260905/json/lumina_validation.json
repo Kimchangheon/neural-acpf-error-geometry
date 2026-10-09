@@ -1,0 +1,69 @@
+{
+  "protocol": {
+    "split": "random_split seed=42, 1/3 train/valid/test",
+    "phase": "validation",
+    "ranks": [
+      4,
+      8,
+      16,
+      32,
+      64
+    ],
+    "alphas": [
+      0.0,
+      0.25,
+      0.5,
+      0.75,
+      1.0
+    ],
+    "pb": "GENCO-style complex128, all bus-scenario pairs"
+  },
+  "models": {
+    "lumina": {
+      "model": "lumina",
+      "n_scenarios": 12339,
+      "rank": {
+        "4": {
+          "csp": {
+            "mean_pb": 0.10618073699322339,
+            "relative_pb_to_calibrated": 0.05823859326456126,
+            "vmag_rmse": 0.023130124360480276
+          }
+        },
+        "8": {
+          "csp": {
+            "mean_pb": 0.10454586004889482,
+            "relative_pb_to_calibrated": 0.057341886987184065,
+            "vmag_rmse": 0.023129398196996064
+          }
+        },
+        "16": {
+          "csp": {
+            "mean_pb": 0.10250131812418742,
+            "relative_pb_to_calibrated": 0.056220485413441205,
+            "vmag_rmse": 0.02312887127460886
+          }
+        },
+        "32": {
+          "csp": {
+            "mean_pb": 0.09796813078173745,
+            "relative_pb_to_calibrated": 0.0537340979451959,
+            "vmag_rmse": 0.02312847135865623
+          }
+        },
+        "64": {
+          "csp": {
+            "mean_pb": 0.09900185213904356,
+            "relative_pb_to_calibrated": 0.05430107910752182,
+            "vmag_rmse": 0.023127790317518916
+          }
+        }
+      },
+      "calibrated": {
+        "mean_pb": 1.8232022966433048,
+        "vmag_rmse": 0.0231743723149578
+      },
+      "calibration_offset_rms_vmag": 0.03782887441005995
+    }
+  }
+}

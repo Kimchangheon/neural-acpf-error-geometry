@@ -1,0 +1,60 @@
+### Starting TaskPrologue of job 4195306 on a0702 at Mon Sep  7 13:16:00 CEST 2026
+Running on cores 48-63 with governor performance
+Mon Sep  7 13:16:00 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A100-SXM4-40GB          On  |   00000000:4F:00.0 Off |                    0 |
+| N/A   33C    P0             53W /  400W |       0MiB /  40960MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+Indexing parquet lazily from /home/hpc/b313dc/b313dc11/data_staging/controlled_geometry_20260905/GBnetwork.parquet ...
+[Dataset] /home/hpc/b313dc/b313dc11/data_staging/controlled_geometry_20260905/GBnetwork.parquet
+[Dataset]   parquet S_base = 1.000e+08 VA (= 100 MVA)
+[Dataset]   per-unit S_base matches target (100 MVA); no rebase
+Indexed 37022 valid rows from /home/hpc/b313dc/b313dc11/data_staging/controlled_geometry_20260905/GBnetwork.parquet across 1852 row groups (removed 0 diverged rows)
+Final combined dataset shape: (37022, streamed rows) | removed 0 diverged rows total
+[begin] gridsfm
+[GridSFM] checkpoint missing=0 unexpected=0
+[Dataset]   share_ybus=True: cached shared Ybus from first row (N=2224, |Y|_pu max=2.048e+05); subsequent rows will skip dense Y reconstruction
+[Dataset]   share_grid=True: cached 21 grid-only tensors from first row (Ybus + Branch_y_* + topology + vn_kv + ...); subsequent rows skip parquet decode + per-unit math for these fields
+[debias] per-bus offset fitted on 12339 training scenarios; rms dvm 2.95895e-02 pu
+[manifold] 12339 train scenarios, 2224 buses; k=16 captures 98.801% of |V| and 99.684% of theta variance
+=== JOB_STATISTICS ===
+=== current date     : Mon Sep  7 13:39:57 CEST 2026
+= Job-ID             : 4195306 on alex as 4195294_1
+= Job-Name           : cgeom_s16
+= Job-Command        : /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/controlled_geometry_summary_k16_alex_20260907.sh
+= Initial workdir    : /home/hpc/b313dc/b313dc11
+= Queue/Partition    : a100
+= Slurm account      : b313dc with QOS=normal
+= Features           : a100_40
+= Requested resources:  for 02:00:00
+= Elapsed runtime    : 00:24:13
+= Total RAM usage    : 7.7 GiB of assigned  GiB (%)
+= Node list          : a0702
+= Subm/Elig/Start/End: 2026-09-07T13:12:51 / 2026-09-07T13:12:52 / 2026-09-07T13:15:43 / 2026-09-07T13:39:56
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              85.3G   104.9G   209.7G        N/A     125K     500K   1,000K        N/A    
+    /home/vault           726.9G  1048.6G  2097.2G        N/A      60K     200K     400K        N/A    
+    /home/atuin          4506.8M     0.0K     0.0K        N/A       3                           N/A    
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA A100-SXM4-40GB, 00000000:4F:00.0, 548441, 11 %, 5 %, 2554 MiB, 1411091 ms

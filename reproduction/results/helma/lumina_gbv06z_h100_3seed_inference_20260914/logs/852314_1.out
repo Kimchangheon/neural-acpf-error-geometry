@@ -1,0 +1,44 @@
+### Starting TaskPrologue of job 852316 on h14-16 at Mon Sep 14 11:31:29 CEST 2026
+Running on cores 96-127 with governor performance
+Mon Sep 14 11:31:29 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.91.07              Driver Version: 595.91.07      CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:C6:00.0 Off |                    0 |
+| N/A   37C    P0             70W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+=== JOB_STATISTICS ===
+=== current date     : Mon Sep 14 11:31:29 CEST 2026
+= Job-ID             : 852316 on helma as 852314_1
+= Job-Name           : lum_gbv06z_h100_t
+= Job-Command        : /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/benchmark_lumina_gbv06z_h100_3seed_20260914.sh
+= Initial workdir    : /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC
+= Queue/Partition    : h100
+= Slurm account      : b313dc with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 04:00:00
+= Elapsed runtime    : 00:00:01
+= Total RAM usage    : 0.0 GiB of assigned 175 GiB (0.0%)
+= Node list          : h14-16
+= Subm/Elig/Start/End: 2026-09-14T11:31:04 / 2026-09-14T11:31:04 / 2026-09-14T11:31:28 / 2026-09-14T11:31:29
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+!!! /home/hpc             162.1G   104.9G   209.7G  -28994days     128K     500K   1,000K        N/A !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]

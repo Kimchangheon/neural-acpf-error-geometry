@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/csp_posthoc_diagnostics_graphkit_e120_20260912/csp_posthoc_diagnostics.py", line 226, in <module>
+    main()
+  File "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/csp_posthoc_diagnostics_graphkit_e120_20260912/csp_posthoc_diagnostics.py", line 117, in main
+    model, forward = make_model(kind, checkpoint, args.parquet, args.batch, device,
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/csp_posthoc_diagnostics_graphkit_e120_20260912/controlled_error_geometry.py", line 51, in make_model
+    model, ext_forward, ext_to_dev = make_graphkit_or_lumina(
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: make_graphkit_or_lumina() got an unexpected keyword argument 'lumina_args'
+srun: error: a0326: task 0: Exited with exit code 1
+srun: Terminating StepId=4224741.0

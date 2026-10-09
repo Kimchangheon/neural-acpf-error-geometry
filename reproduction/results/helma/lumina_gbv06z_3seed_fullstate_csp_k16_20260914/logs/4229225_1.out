@@ -1,0 +1,95 @@
+### Starting TaskPrologue of job 4229247 on a0632 at Mon Sep 14 00:06:17 CEST 2026
+Running on cores 112-127 with governor schedutil
+Mon Sep 14 00:06:17 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A100-SXM4-80GB          On  |   00000000:D1:00.0 Off |                    0 |
+| N/A   37C    P0             63W /  400W |       0MiB /  81920MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+[checkpoint] seed=42 /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/ckpt/gb_vsweep2_20260911/gbv06z_control_zerohead_best.pt
+[protocol] fixed split seed=42; train-only calibration/SVD basis; full-state P16/CSP16
+Indexing parquet lazily from /home/hpc/b313dc/b313dc11/data_staging/controlled_geometry_20260905/GBnetwork.parquet ...
+[Dataset] /home/hpc/b313dc/b313dc11/data_staging/controlled_geometry_20260905/GBnetwork.parquet
+[Dataset]   parquet S_base = 1.000e+08 VA (= 100 MVA)
+[Dataset]   per-unit S_base matches target (100 MVA); no rebase
+Indexed 37022 valid rows from /home/hpc/b313dc/b313dc11/data_staging/controlled_geometry_20260905/GBnetwork.parquet across 1852 row groups (removed 0 diverged rows)
+Final combined dataset shape: (37022, streamed rows) | removed 0 diverged rows total
+[model] LUMINA HGT layers=6 hidden=128 heads=2 dropout=0.0
+[model] bus input widened to 13 (+6)
+[init] normal_(0, 0.02) applied to 66 weight matrices
+[init] terminal bus head zeroed (Linear, (2, 128)): flat-voltage start
+[lumina] checkpoint missing=0 unexpected=0
+[Dataset]   share_ybus=True: cached shared Ybus from first row (N=2224, |Y|_pu max=2.048e+05); subsequent rows will skip dense Y reconstruction
+[Dataset]   share_grid=True: cached 21 grid-only tensors from first row (Ybus + Branch_y_* + topology + vn_kv + ...); subsequent rows skip parquet decode + per-unit math for these fields
+[debias] per-bus offset fitted on 12339 training scenarios; rms dvm 2.02462e-02 pu
+[manifold] 12339 train scenarios, 2224 buses; k=16 captures 98.801% of |V| and 99.684% of theta variance
+[lumina] evaluated 25/772 batches
+[lumina] evaluated 50/772 batches
+[lumina] evaluated 75/772 batches
+[lumina] evaluated 100/772 batches
+[lumina] evaluated 125/772 batches
+[lumina] evaluated 150/772 batches
+[lumina] evaluated 175/772 batches
+[lumina] evaluated 200/772 batches
+[lumina] evaluated 225/772 batches
+[lumina] evaluated 250/772 batches
+[lumina] evaluated 275/772 batches
+[lumina] evaluated 300/772 batches
+[lumina] evaluated 325/772 batches
+[lumina] evaluated 350/772 batches
+[lumina] evaluated 375/772 batches
+[lumina] evaluated 400/772 batches
+[lumina] evaluated 425/772 batches
+[lumina] evaluated 450/772 batches
+[lumina] evaluated 475/772 batches
+[lumina] evaluated 500/772 batches
+[lumina] evaluated 525/772 batches
+[lumina] evaluated 550/772 batches
+[lumina] evaluated 575/772 batches
+[lumina] evaluated 600/772 batches
+[lumina] evaluated 625/772 batches
+[lumina] evaluated 650/772 batches
+[lumina] evaluated 675/772 batches
+[lumina] evaluated 700/772 batches
+[lumina] evaluated 725/772 batches
+[lumina] evaluated 750/772 batches
+=== JOB_STATISTICS ===
+=== current date     : Mon Sep 14 00:23:24 CEST 2026
+= Job-ID             : 4229247 on alex as 4229225_1
+= Job-Name           : lum_gbv06z_full16
+= Job-Command        : /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/score_lumina_gbv06z_3seed_fullstate_k16_alex2_20260914.sh
+= Initial workdir    : /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC
+= Queue/Partition    : a100
+= Slurm account      : b313dc with QOS=normal
+= Features           : a100_80
+= Requested resources:  for 03:00:00
+= Elapsed runtime    : 00:18:01
+= Total RAM usage    : 8.4 GiB of assigned  GiB (%)
+= Node list          : a0632
+= Subm/Elig/Start/End: 2026-09-14T00:04:05 / 2026-09-14T00:04:08 / 2026-09-14T00:05:23 / 2026-09-14T00:23:24
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+!!! /home/hpc             161.8G   104.9G   209.7G  -28994days     128K     500K   1,000K        N/A !!!
+    /home/atuin          4506.8M     0.0K     0.0K        N/A       3                           N/A    
+    /home/vault           781.8G  1048.6G  2097.2G        N/A      60K     200K     400K        N/A    
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA A100-SXM4-80GB, 00000000:D1:00.0, 1555838, 4 %, 1 %, 1148 MiB, 1008060 ms

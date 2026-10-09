@@ -1,0 +1,824 @@
+\documentclass[10pt]{article}
+\usepackage[final,main]{neurips_2026}
+\usepackage{lmodern}
+\usepackage{amsmath,booktabs,geometry,longtable,array,float}
+\geometry{margin=0.68in}
+\title{Global Context and Feasibility Ablations for PIGNN\\\large GBnetwork and case300}
+\author{PIGNN--Attn--LS--PPC experimental report}
+\date{28 August 2026}
+\begin{document}
+\maketitle
+
+\section{Executive summary}
+
+This report consolidates the controlled global-context experiments for
+\texttt{case300} and \texttt{GBnetwork}.  The experiments retain the PIGNN
+backbone and $K=40$ recurrent corrections and change only the graph-context
+sidecar.  G0 is the signed-log PIGNN reference; G1--G3 are global-context
+ablations; G4--G5 add dynamic sigmoid gating; and RANGE uses persistent master
+tokens.  GraphKit and GridSFM values are included as external reference rows
+from the ppNR-v2 four-model report.
+
+The main conclusions are:
+\begin{itemize}
+\item On \texttt{GBnetwork}, G2 (attention before local processing) gives the
+      best voltage result among G1--G5, while G3 (attention after local
+      processing) gives the best P/Q residuals among those variants.
+\item G4 and G5 do not improve consistently over their ungated counterparts;
+      their sigmoid gates remain mostly open and therefore do not provide a
+      useful selective safeguard.
+\item RANGE is now complete and test-scored.  $M=1$ is the best RANGE setting
+      but lands inside the G1--G5 band rather than beyond it, and $M=4$ and
+      $M=8$ are clearly worse: their masters collapse to identical
+      representations (attention and embedding cosine $+1.000$).  Persistent
+      master tokens are therefore not a productive direction for GBnetwork.
+\item A per-bus residual breakdown shows PIGNN is \emph{not} broadly worse than
+      GridSFM on GBnetwork: G3's median residual is lower on both channels.  The
+      entire gap is an extreme tail concentrated on four 22-kV buses
+      ($0.18\%$ of the grid), which carry up to $20\%$ of the total $|\Delta Q|$
+      mass, and it scales with $|Y_{ii}|$.  GridSFM exceeds 10 pu in no bin of
+      any breakdown, which reads as an output bound rather than better typical
+      accuracy.
+\item Measured against a predictor that ignores the scenario entirely --- each
+      bus held at its own training-split mean --- every model here loses on
+      $|V|$ RMSE and on both median residuals, and wins only on bus angle.  Two
+      thirds of that angle win is gauge drift rather than flow accuracy
+      (Section~\ref{sec:metrology}).
+\item The negative voltage $R^2_{\sigma}$ throughout this report is a
+      \emph{calibration}
+      failure, not collapse: after each bus's static profile is removed the
+      models still explain 59--75\% of the variance.  Subtracting a per-bus
+      offset fitted on the training split --- no retraining --- cuts $|V|$ RMSE
+      by $2.0$--$2.7\times$, turns every $R^2_{\sigma}$ positive, and improves median
+      $|\Delta Q|$ by $3$--$4\times$.  It does not improve the worst-bus tail.
+\item Replacing the log-cosh physics term with MSE (G3-mse) is worse on every
+      metric and an order of magnitude worse on the worst bus
+      ($\max|\Delta P|$ $18.6\to197.8$ pu), which is the opposite of what a
+      quadratic penalty was expected to do to the tail.
+\item The GridSFM values 1.10 and 4.81, like the corresponding PIGNN log
+      fields, are \emph{means of per-scenario maxima}, not global maxima over
+      the complete test set.  They are comparable as reducers when split,
+      masks and precision also match.
+\end{itemize}
+
+Unless a table says otherwise, $R^2$ in this report means $R^2_{\sigma}$ of
+Section~\ref{sec:r2notation}: $1-(\mathrm{RMSE}/\sigma)^2$ against a per-bus
+constant predictor.  It is not a tracking measure; the tracking coefficient
+$R^2_{\mathrm{bus}}$ appears there.
+
+\section{Experimental protocol}
+
+All G1--G5 and RANGE runs use the same PPC adapter, DC initialization,
+train/validation/test split, seed 42 and complex128 parquet decoding.  The
+canonical settings are $d=4$, $d_{hi}=24$, eight heads, eight local attention
+layers, $K=40$, voltage limits, direct updates, geometric-safe Armijo,
+\texttt{mse\_weight}=5, graph-normalized log-cosh physics, signed-log residual
+features, learning rate $10^{-5}$ and cosine annealing.  G1--G5 use the
+37,022-row \texttt{GBnetwork} parquet.  The contemporaneous \texttt{case300}
+G1--G5 runs use the 27,994-row comparison parquet; the separate 37,930-row
+authoritative v2 G0 is not a paired baseline for those runs.
+
+The external GraphKit/GridSFM rows below come from a different campaign: one
+model per grid, seed 42, approximately 40 epochs, and the report's original
+PPC-v2 data.  They are useful architectural references, but are not a strict
+same-checkpoint comparison with the later G1--G5 campaign.
+
+\section{GBnetwork results}
+
+\begin{table}[H]
+\centering\footnotesize
+\begin{tabular}{lrrrr}
+\toprule
+Setting & $|V|$ RMSE & $\theta$ RMSE (deg) & mean case-max $|\Delta P|$ & mean case-max $|\Delta Q|$\\
+\midrule
+G0 signed-log reference & $\approx0.0302$ & $\approx0.889$ & not paired & not paired\\
+G1 mean/max pre & 0.030015 & 1.1963 & 5.3509 & 108.51\\
+\textbf{G2 attention pre} & \textbf{0.027269} & \textbf{0.9513} & \textbf{7.4611} & \textbf{68.119}\\
+\textbf{G3 attention post} & \textbf{0.029390} & \textbf{1.0849} & \textbf{3.6316} & \textbf{46.803}\\
+G4 gated pre & 0.030777 & 1.1578 & 7.1467 & 32.962\\
+G5 gated post & 0.031904 & 1.3042 & 4.4431 & 62.240\\
+G3 with MSE physics & 0.035169 & 1.4251 & 7.9892 & 205.45\\
+GraphKit reference & 0.0354 & 4.94 & 181 & 55.8\\
+\textbf{GridSFM reference} & \textbf{0.0319} & \textbf{2.14} & \textbf{1.10} & \textbf{4.81}\\
+\bottomrule
+\end{tabular}
+\caption{GBnetwork voltage metrics and mean per-scenario maxima.  Every
+residual entry in the last two columns uses
+$N_s^{-1}\sum_s\max_i|\Delta P_{s,i}|$ (and analogously for $Q$); none is a
+global test-set maximum.  External rows remain cross-campaign references.
+``G3 with MSE physics'' is G3 with \texttt{physics\_loss\_form=mse} and nothing
+else changed; it is a paired ablation of G3, not a sixth global-context
+variant.}
+\end{table}
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{lrr}
+\toprule
+Setting & $R^2_{\sigma}$ on $|V|$ & $R^2_{\sigma}$ on $\theta$\\
+\midrule
+G1 mean/max pre & -0.611 & 0.971\\
+\textbf{G2 attention pre} & \textbf{-0.329} & \textbf{0.982}\\
+G3 attention post & -0.544 & 0.976\\
+G4 gated pre & -0.694 & 0.973\\
+G5 gated post & -0.820 & 0.965\\
+G3 with MSE physics & -1.211 & 0.959\\
+GraphKit reference & -1.241 & 0.502\\
+GridSFM reference & -0.820 & 0.906\\
+\bottomrule
+\end{tabular}
+\caption{GBnetwork coefficient of determination.  G1--G5 use the report's
+reference spreads, $\sigma_{|V|}=0.02365$ pu and
+$\sigma_\theta=7.0^\circ$, through
+$R^2_{\sigma}=1-(\mathrm{RMSE}/\sigma)^2$.  GraphKit and GridSFM are the values printed
+in the four-model report.}
+\end{table}
+
+\begin{table}[H]
+\centering\footnotesize
+\setlength{\tabcolsep}{2.2pt}
+\begin{tabular}{lrrrrrrrrrr}
+\toprule
+Setting & mn P & mn Q & rms P & rms Q & p95 P & p95 Q & md P & md Q & $\le$1e-2 P & $\le$1e-3 P\\
+\midrule
+G1 & 0.1173 & 0.2953 & 0.3024 & 2.6399 & 0.4355 & 0.7875 & 0.0455 & 0.1333 & 19.94\% & 3.66\%\\
+G2 & 0.1418 & 0.3056 & 0.3910 & 1.8777 & 0.5961 & 0.9023 & 0.0440 & 0.1336 & 20.87\% & 3.90\%\\
+\textbf{G3} & \textbf{0.1094} & \textbf{0.2715} & \textbf{0.2477} & \textbf{1.3677} & \textbf{0.4332} & \textbf{0.7913} & \textbf{0.0411} & \textbf{0.1256} & \textbf{22.11\%} & \textbf{4.29\%}\\
+G4 & 0.1225 & 0.2897 & 0.4447 & 1.0635 & 0.4388 & 0.9575 & 0.0478 & 0.1272 & 20.09\% & 3.67\%\\
+G5 & 0.1114 & 0.2865 & 0.3246 & 1.5413 & 0.4069 & 0.8830 & 0.0468 & 0.1315 & 19.78\% & 3.66\%\\
+G3-mse & 0.1252 & 0.3528 & 0.5837 & 4.8016 & 0.4754 & 0.8244 & 0.0452 & 0.1278 & 20.34\% & 3.85\%\\
+\midrule
+RANGE $M{=}1$ & 0.1095 & 0.2859 & 0.2695 & 2.7854 & 0.4104 & 0.7655 & 0.0465 & 0.1291 & 18.77\% & 3.43\%\\
+RANGE $M{=}4$ & 0.2771 & 0.5772 & 1.0370 & 5.0045 & 1.1322 & 1.7964 & 0.0896 & 0.2015 & 12.99\% & 2.74\%\\
+RANGE $M{=}8$ & 0.1696 & 0.6017 & 0.5973 & 4.8743 & 0.6326 & 2.0083 & 0.0649 & 0.1918 & 16.46\% & 4.23\%\\
+\midrule
+GraphKit & 2.05 & 0.771 & --- & --- & 6.85 & 2.74 & 0.458 & 0.191 & --- & 0.00\%\\
+\textbf{GridSFM} & \textbf{0.0828} & \textbf{0.266} & --- & --- & \textbf{0.304} & \textbf{0.913} & \textbf{0.0432} & \textbf{0.156} & --- & \textbf{0.03\%}\\
+\bottomrule
+\end{tabular}
+\caption{GBnetwork residual distributions, exact-complex test summary fields,
+in pu on a 100-MVA base.  \textbf{Correction to the previous version of this
+table:} the columns previously headed ``mean P'' and ``mean Q'' carried the
+driver's \texttt{RMSE $\Delta$P}/\texttt{$\Delta$Q} fields, not the pooled
+means, and the columns headed ``tol'' were the $\le10^{-3}$ pu fractions and
+not the $10^{-6}$ pu tolerance.  Both are now separated and relabelled; no
+underlying run changed.  The $10^{-6}$ pu fraction is $\le0.02\%$ for every
+PIGNN row here and is omitted.  The external GraphKit/GridSFM rows are the
+four-model report's printed mean/median/p95 fields; that report did not print
+RMSE or the $10^{-2}$ pu fraction, so those cells are blank, and its ``tol''
+column is used in the $\le10^{-3}$ position.}
+\end{table}
+
+The PIGNN G2 voltage RMSE is about 9.7\% below the historical G0 value.  G3
+reduces the PIGNN mean case-max residuals relative to G2, especially reactive
+power, but does not simultaneously minimize voltage error.
+
+\section{case300 results}
+
+\begin{table}[H]
+\centering\footnotesize
+\begin{tabular}{lrrrr}
+\toprule
+Setting & $|V|$ RMSE & $\theta$ RMSE (deg) & mean case-max $|\Delta P|$ & mean case-max $|\Delta Q|$\\
+\midrule
+G1 mean/max pre & 0.032798 & 4.9682 & 10.914 & 10.885\\
+\textbf{G2 attention pre} & \textbf{0.027823} & \textbf{4.5222} & \textbf{5.463} & \textbf{7.260}\\
+G3 attention post & 0.026900 & 4.5463 & 6.369 & 9.050\\
+G4 gated pre & 0.032155 & 5.4597 & 10.160 & 11.566\\
+G5 gated post & 0.034005 & 5.3795 & 8.932 & 11.859\\
+\textbf{GraphKit reference} & \textbf{0.0237} & \textbf{4.76} & \textbf{10.4} & \textbf{6.82}\\
+\textbf{GridSFM reference} & \textbf{0.0247} & \textbf{27.7} & \textbf{1.22} & \textbf{1.23}\\
+\bottomrule
+\end{tabular}
+\caption{case300 comparison.  The G1--G5 rows use the 27,994-row campaign;
+the external rows use the four-model report's case300 campaign.}
+\end{table}
+
+Global context does not provide a uniform case300 improvement.  G3 obtains
+the lowest magnitude RMSE, while G2 obtains the lowest reported mean case-max
+P/Q residuals.  The angle errors remain large for all five variants.  On GBnetwork the
+per-bus/per-edge split in Section~\ref{sec:metrology} shows roughly a third to
+two thirds of such an error to be gauge drift rather than flow error; the same
+split has not been measured on case300, so the case300 angle column should be
+read as an upper bound on the flow-relevant error rather than as its size.
+
+\section{RANGE final test results}
+
+The three RANGE training jobs were stopped by the four-hour Slurm wall clock
+(state \texttt{TIMEOUT}) after 38, 33 and 33 of the planned 40 epochs for
+$M=1,4,8$; their best checkpoints were written at epochs 35, 27 and 33
+respectively.  Because the in-job test block never ran, the saved checkpoints
+were re-evaluated in a separate test-only array (job 797689, three tasks, all
+\texttt{COMPLETED}) on the same 12{,}344-scenario test split, seed 42, with the
+identical flags.  The values below are therefore final test values, not
+validation values, but they belong to slightly under-trained models.
+
+\begin{table}[H]
+\centering\footnotesize
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{lrrrrrrr}
+\toprule
+Masters & best ep. & $|V|$ RMSE & $\theta$ RMSE & $R^2_{\sigma,|V|}$ & $R^2_{\sigma,\theta}$ & mean c-max $|\Delta P|$ & mean c-max $|\Delta Q|$\\
+\midrule
+\textbf{$M=1$} & \textbf{35/38} & \textbf{0.03253} & \textbf{1.016$^\circ$} & \textbf{-0.891} & \textbf{+0.979} & \textbf{4.007} & \textbf{100.56}\\
+$M=4$ & 27/33 & 0.04455 & 2.966$^\circ$ & -2.548 & +0.821 & 31.426 & 211.25\\
+$M=8$ & 33/33 & 0.04683 & 1.604$^\circ$ & -2.921 & +0.947 & 17.843 & 205.35\\
+\bottomrule
+\end{tabular}
+\caption{RANGE final test metrics.  ``best ep.'' is the epoch of the loaded
+checkpoint over the epochs actually reached before the wall clock.  The
+$R^2_{\sigma}$ values are recomputed here with the same reference spreads used for G1--G5,
+$\sigma_{|V|}=0.02365$ pu and $\sigma_\theta=7.0^\circ$, so that this table can
+be read against Table~2.  \textbf{These are not the driver's printed $R^2$
+fields}, which for these three runs read $+0.610/+0.269/+0.193$ on $|V|$.  The
+two differ only in the baseline predictor in the denominator, and the gap is
+large.  \texttt{train\_valid\_test.py} pools every bus--scenario value and
+subtracts a single global mean, so its baseline is ``predict one number
+everywhere''; measured on this parquet that spread is
+$\sigma_{|V|}^{\text{global}}=5.23\times10^{-2}$ pu, because it also contains
+the \emph{static} bus-to-bus differences in nominal voltage level.  The spread
+used throughout this report subtracts each bus's own mean first, so its
+baseline is ``predict each bus's usual voltage'', giving
+$\sigma_{|V|}^{\text{per-bus}}=2.38\times10^{-2}$ pu.  Only the latter measures
+what the surrogate must actually learn --- how voltages move as the loading
+changes --- since per-bus nominal levels are already available from
+\texttt{vn\_kv} and the admittance matrix.  The GraphKit and GridSFM drivers
+emit no $R^2$ at all, so every external $R^2$ in this report is likewise a
+per-bus-baseline hand computation of $R^2_{\sigma}$; mixing the two conventions
+in one column would make a model with a \emph{worse} $|V|$ RMSE appear to be
+the only one with a positive value.}
+\end{table}
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{lrrrrr}
+\toprule
+Masters & agg./bcast.\ entropy & eff.\ masters & attn.\ cosine & emb.\ cosine & self-loop mass\\
+\midrule
+$M=1$ & 1.000 / 1.000 & 1.000 & +0.000 & +0.000 & 50.0\%\\
+$M=4$ & 1.000 / 1.000 & 4.000 & +1.000 & +1.000 & 20.0\%\\
+$M=8$ & 1.000 / 1.000 & 8.000 & +1.000 & +1.000 & 11.2\%\\
+\bottomrule
+\end{tabular}
+\caption{RANGE master diagnostics on the test split.  The effective master
+count equals the nominal count only because attention is uniform; for $M=4$
+and $M=8$ the master-attention and master-embedding cosine similarities are
+both $+1.000$, so the masters are duplicates rather than specialists.  Token
+utilization is exactly uniform ($1/M$ each) in both cases.}
+\end{table}
+
+The final test values confirm the interim reading and sharpen it.  $M=1$ is the
+best RANGE setting on every metric except pooled RMSE $\Delta Q$, and its
+voltage RMSE (0.0325) and angle RMSE ($1.02^\circ$) place it between G1 (0.0300,
+$1.20^\circ$) and G5 (0.0319, $1.30^\circ$) --- that is, \emph{inside} the
+G1--G5 band rather than beyond it.  Its pooled mean and median residuals are
+likewise indistinguishable from G3's (mean $|\Delta P|$ 0.1095 vs.\ 0.1094).
+Adding masters is strictly harmful: $M=4$ roughly doubles every pooled residual
+statistic and triples the angle error, and $M=8$ recovers only part of that.
+
+The collapse diagnostics explain why.  With $M>1$ the masters converge to a
+single shared representation, so the extra tokens add parameters and dilute the
+per-token attention mass (self-loop mass falls from 50\% to 11\%) without
+adding any distinct global channel.  A single master avoids the collapse
+trivially, but then the sidecar reduces to the same one-token global summary
+already tested as G2/G3 --- and it performs like it.  On this evidence,
+persistent master tokens are not a productive direction for GBnetwork, and the
+$M=1$ result should not be read as a positive RANGE finding.
+
+One caveat: all three runs stopped 2--7 epochs short and $M=1$ was still
+improving at the wall clock (validation loss $1.60\times10^{-2}$ at epoch 35
+against $1.69\times10^{-2}$ at 38, without a clear plateau).  A rerun with a
+longer wall clock could move these numbers, but not by the factor that would be
+needed to separate $M=1$ from G2/G3.
+
+\section{Where the residual mass actually is}
+\label{sec:massdiag}
+
+Every table above reduces the residual to a scalar, which cannot distinguish a
+model that is uniformly slightly worse from one that is equal in the bulk and
+catastrophic on a handful of buses.  A dedicated diagnostic (alex array
+4123954/4124031, six tasks, all \texttt{COMPLETED}) re-evaluated the G1--G5 and
+GridSFM v2 checkpoints on the identical 12{,}344-scenario test split, identical
+P/Q masks and a final complex128 recomputation, and broke the residuals down by
+bus type, nominal voltage, $|Y_{ii}|$, degree and transformer adjacency.
+
+The rescore reproduces the published voltage metrics to within $0.8\%$ on all
+six models ($|V|$ within $0.12\%$, worst angle deviation $-0.77\%$ on G3), so
+the breakdowns below describe the same checkpoints as Tables 1--3 and not a
+different evaluation.
+
+\begin{table}[H]
+\centering\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lrrrrrrrr}
+\toprule
+& \multicolumn{4}{c}{$|\Delta P|$} & \multicolumn{4}{c}{$|\Delta Q|$}\\
+\cmidrule(lr){2-5}\cmidrule(lr){6-9}
+Setting & median & RMSE & glob.\ max & \%$>$1 pu & median & RMSE & glob.\ max & \%$>$10 pu\\
+\midrule
+G1 & 0.0455 & 0.302 & 36.1 & 1.03\% & 0.1333 & 2.642 & 172.4 & 0.057\%\\
+G2 & 0.0442 & 0.398 & 37.4 & 2.11\% & 0.1338 & 1.878 & 157.2 & 0.074\%\\
+G3 & \textbf{0.0410} & 0.244 & 18.6 & 1.00\% & \textbf{0.1255} & 1.354 & 141.4 & 0.061\%\\
+G4 & 0.0478 & 0.465 & 304.2 & 1.19\% & 0.1273 & 1.069 & 230.2 & 0.062\%\\
+G5 & 0.0468 & 0.324 & 58.8 & 0.79\% & 0.1315 & 1.539 & 141.9 & 0.061\%\\
+GridSFM & 0.0432 & \textbf{0.141} & \textbf{2.4} & \textbf{0.05\%} & 0.1557 & \textbf{0.458} & \textbf{9.9} & \textbf{0.000\%}\\
+\bottomrule
+\end{tabular}
+\caption{Bulk versus tail on GBnetwork, pu on a 100-MVA base.  ``glob.\ max''
+is the true $\max_{s,i}|\Delta\cdot_{s,i}|$ over all bus--scenario entries, a
+quantity none of the earlier tables reported.  \textbf{PIGNN is not broadly
+worse than GridSFM}: G3's median residual is lower on both channels
+(0.0410 vs.\ 0.0432 for P, 0.1255 vs.\ 0.1557 for Q) and its pooled mean
+$|\Delta Q|$ is within 2\% of GridSFM's (0.271 vs.\ 0.266, Table~3).  The whole
+gap is in the extreme tail: RMSE differs by $1.7$--$3.3\times$ and the global
+maximum by one to two orders of magnitude.}
+\end{table}
+
+\subsection*{The tail is four buses}
+
+Splitting by nominal voltage localizes it almost completely.  The 22-kV bin
+contains $49{,}376$ entries $=4$ buses $\times\,12{,}344$ scenarios --- four
+buses out of 2224, $0.18\%$ of the grid.
+
+\begin{table}[H]
+\centering\footnotesize
+\begin{tabular}{lrrrr}
+\toprule
+Setting & mean $|\Delta Q|$ at 22 kV & \%$>$10 pu there & glob.\ max there & share of total $Q$ mass\\
+\midrule
+G1 & 27.71 & 24.8\% & 172.4 & \textbf{20.3\%}\\
+G2 & 17.23 & 23.4\% & 157.2 & 12.2\%\\
+G3 & 11.80 & 22.3\% & 141.4 & 9.4\%\\
+G4 & 8.55 & 25.0\% & 230.2 & 6.4\%\\
+G5 & 16.02 & 24.8\% & 141.9 & 12.1\%\\
+\textbf{GridSFM} & \textbf{0.217} & \textbf{0.0\%} & \textbf{3.5} & \textbf{0.2\%}\\
+\bottomrule
+\end{tabular}
+\caption{The four 22-kV buses.  ``Share of total $Q$ mass'' is
+$\bar q_{22}n_{22}/(\bar q_{\text{pool}}n_{\text{pool}})$, the fraction of the
+grid's entire pooled $|\Delta Q|$ contributed by these four buses.  For G1 they
+carry a fifth of it.  The same buses cost GridSFM $0.2\%$.  The $P$ channel
+shows the identical pattern more weakly ($1.6$--$5.0\%$ of $P$ mass for
+G1--G5, $0.2\%$ for GridSFM).}
+\end{table}
+
+A paired G3 run with the physics loss changed from log-cosh to MSE
+(\texttt{physics\_loss\_form=mse}, every other flag identical) is queued as
+helma job 797773 to test whether a quadratic penalty suppresses this tail; a
+first attempt on an alex A40 died in epoch~1 with a CUDA out-of-memory at the
+attention logits, which is a GPU-capacity failure and not a property of the
+objective.  Its result is not included here.
+
+\subsection*{It tracks $|Y_{ii}|$, not the grid as a whole}
+
+\begin{table}[H]
+\centering\footnotesize
+\begin{tabular}{lrrrrr}
+\toprule
+$|Y_{ii}|$ bin & entries & G3 mean $|\Delta Q|$ & G3 \%$>$10 pu & GridSFM mean & GridSFM \%$>$10\\
+\midrule
+$10^{0}$--$10^{1}$ & 4{,}073{,}520 & 0.153 & 0.000\% & 0.142 & 0.000\%\\
+$10^{1}$--$10^{2}$ & 7{,}319{,}992 & 0.243 & 0.000\% & 0.205 & 0.000\%\\
+$10^{2}$--$10^{3}$ & 7{,}221{,}240 & \textbf{0.244} & 0.000\% & 0.351 & 0.000\%\\
+$10^{3}$--$10^{4}$ & 2{,}703{,}336 & \textbf{0.280} & 0.000\% & 0.322 & 0.000\%\\
+$10^{4}$--$10^{5}$ & 1{,}234{,}400 & 0.738 & 0.892\% & 0.355 & 0.000\%\\
+$10^{5}$--$10^{6}$ & 148{,}128 & 2.267 & 1.971\% & 0.953 & 0.000\%\\
+\bottomrule
+\end{tabular}
+\caption{$|\Delta Q|$ against the magnitude of the diagonal admittance.  Below
+$|Y_{ii}|=10^{4}$ PIGNN G3 matches or beats GridSFM and never exceeds 10 pu;
+above it, G3 degrades by $3$--$9\times$ while GridSFM does not.  The degree
+breakdown agrees: the single degree-15 bus has G3 mean 6.87 pu with $8.4\%$ of
+entries above 10 pu, against GridSFM's 0.474 pu and $0.0\%$.}
+\end{table}
+
+Two conclusions follow, and both revise the reading in the next section.
+
+First, \textbf{the PIGNN deficit is a stiffness-localized tail, not a
+representation-capacity deficit}.  The failure sits exactly on the
+worst-conditioned nodes, is confined to well under $1\%$ of entries, and leaves
+the bulk distribution competitive or better.  This is the failure mode a
+diagonal equilibration of the residual features is meant to address, and it is
+the clearest evidence so far that the conditioning hypothesis --- rather than
+receptive field or parameter count --- explains the large-grid gap.
+
+Second, \textbf{GridSFM's advantage looks like a bound, not better typical
+accuracy}.  Its \%$>$10 pu is exactly $0.000$ in \emph{every} bin of every
+breakdown --- bus type, voltage level, $|Y_{ii}|$, degree and transformer
+adjacency alike --- while its median $|\Delta Q|$ is the worst of the six
+models.  A model that is uniformly capped and slightly loose in the middle is
+what a clipped magnitude head and a bounded angle residual around a DC prior
+would produce.  The corresponding PIGNN mechanism, the geometric-safe Armijo
+line search, bounds the \emph{step} rather than the \emph{output}, which does
+not prevent a badly-conditioned bus from accumulating error over $K=40$
+iterations.
+
+\section{Notation: three different $R^2$, and the calibration}
+\label{sec:r2notation}
+
+Three distinct coefficients appear in the literature and in this project's
+logs, and earlier revisions of this report used the word ``$R^2$'' for more
+than one of them.  Every table below names which one it is.  Write $v$ for the
+reference $|V|$ at a bus in a scenario, $\hat v$ for the prediction,
+$\bar v_i$ for bus $i$'s mean over scenarios, and fit
+$\hat v = a\,v + b + \varepsilon$ by least squares.
+
+\begin{table}[H]
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{llll}
+\toprule
+Symbol & Definition & Null model it scores $0$ against & Calibration\\
+\midrule
+$R^2_{\mathrm{pool}}$ & Pearson $R^2$ of $\hat v$ on $v$, pooled over
+  & one number for every bus & changes\\
+  & all buses and scenarios & and scenario & \\[2pt]
+$R^2_{\mathrm{bus}}$ & the same after subtracting $\bar v_i$
+  & each bus at its own mean & \textbf{invariant}\\
+  & from $\hat v$ and $v$ alike & & \\[2pt]
+$R^2_{\sigma}$ & $1-\sum(\hat v-v)^2/\sum(v-\bar v_i)^2$
+  & each bus at its own mean & changes\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+$R^2_{\mathrm{pool}}$ is the diagnostic GridSFM's section 6.2 defines, and it
+is the right one for a multi-grid foundation model, which must reproduce a
+static voltage profile it has never seen.  Every campaign here trains one model
+per grid on that grid, where that profile is memorisable from the training
+split; a predictor that emits each bus's training mean and ignores the scenario
+entirely scores $R^2_{\mathrm{pool}} = 0.798$ on GBnetwork.  So
+$R^2_{\mathrm{bus}}$ is the tracking question in this setting, and
+$R^2_{\mathrm{pool}}$ is kept only for comparability with the published
+numbers.
+
+$R^2_{\sigma}$ is what earlier revisions of this report printed.  It is not a
+tracking measure: it charges the model for bias and for amplitude error as
+well.  Writing $\sigma^2=\tfrac{1}{N}\sum(v-\bar v_i)^2$ and
+$\sigma_\varepsilon^2$ for the variance of $\varepsilon$, the mean square error
+splits exactly into three terms,
+\[
+  \mathrm{RMSE}^2 \;=\; \underbrace{b^2}_{\text{bias}}
+  \;+\;\underbrace{(a-1)^2\sigma^2}_{\text{amplitude}}
+  \;+\;\underbrace{\sigma_\varepsilon^2}_{\text{noise}},
+  \qquad\text{so}\qquad
+  R^2_{\sigma} \;=\; 1-\frac{b^2}{\sigma^2}-(a-1)^2-\frac{\sigma_\varepsilon^2}{\sigma^2}.
+\]
+$R^2_{\mathrm{bus}}$ normalises the noise term by the variance of the
+\emph{prediction} rather than of the reference, so it is not a simple
+difference away from $R^2_{\sigma}$; the two answer different questions and
+should not be converted into one another.
+
+Three relations are used below, and each was checked against the measurements
+rather than assumed.  (i) Calibration removes exactly the $b^2/\sigma^2$ term,
+so $R^2_{\sigma,\mathrm{cal}} = 1-(a-1)^2-\sigma_\varepsilon^2/\sigma^2$; over
+the 26 stabilization runs this held to $1.4\times10^{-2}$.  (ii)
+$R^2_{\mathrm{bus}}$ and the slope are unchanged by calibration, since a
+per-bus offset cannot alter a regression on per-bus deviations; measured
+deviation $<10^{-6}$ on all 26.  (iii) $R^2_{\sigma,\mathrm{cal}} \le
+R^2_{\mathrm{bus}}$, with the gap being the amplitude error; observed on all
+26, from $0.0006$ to $1.22$.
+
+\paragraph{Post-hoc per-bus calibration.}  The $b^2/\sigma^2$ term is removable
+without touching the model.  For each bus, take the mean prediction over the
+\emph{training} split, align it to the training reference mean, and subtract
+that fixed offset from every unseen test scenario:
+\[
+  \hat v^{\,\mathrm{cal}}_{i,s} \;=\; \hat v_{i,s}
+  \;-\;\bigl(\overline{\hat v}^{\,\mathrm{train}}_{i}-\bar v^{\,\mathrm{train}}_{i}\bigr),
+\]
+and the circular equivalent for $\theta$.  No test data enters the fit, so this
+is a correction a deployed model could carry.  Because it is fitted on one
+split and applied to another it does not transfer perfectly: across the 26
+stabilization runs the realised improvement in $R^2_{\sigma}$ differs from the
+fitted $b^2/\sigma^2$ by a median of $1.2\%$ and at most $8.4\%$.  Tables that
+report it use the form \emph{raw $\to$ calibrated}.  $R^2_{\mathrm{bus}}$ and the slope are
+mathematically unchanged by it --- a per-bus offset cannot alter a regression
+on per-bus deviations --- which is used below as a consistency check on the
+implementation.
+
+\section{What the metrics were measuring}
+\label{sec:metrology}
+
+Every ranking above rests on $|V|$ RMSE, $\theta$ RMSE and $R^2$.  Three
+follow-up runs on the same checkpoints, split and masks show that each of the
+three was answering a different question from the one it was being read as.
+
+\paragraph{A predictor that ignores the scenario.}  The natural null model here
+is not $V=1.0$ everywhere but ``each bus sits at its own usual voltage'': take
+each bus's mean $|V|$ and circular-mean $\theta$ over the \emph{training} third
+and emit them regardless of loading.  Scored on the same test third (alex job
+4124582) it reproduces the reference spreads exactly --- $|V|$ RMSE
+$2.3412\times10^{-2}$ against a measured
+$\sigma_{|V|}^{\text{per-bus}}=2.3412\times10^{-2}$ pu, $\theta$ RMSE
+$6.846^\circ$ against $6.846^\circ$ --- which is the definitional check that it
+scores $R^2=0$ on both channels.
+
+\begin{table}[H]
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lrrrrrr}
+\toprule
+Setting & $|V|$ RMSE & $\theta$ RMSE & med $|\Delta P|$ & med $|\Delta Q|$ & RMSE $\Delta Q$ & max $|\Delta Q|$\\
+\midrule
+\textbf{per-bus constant} & \textbf{0.02341} & 6.846$^\circ$ & \textbf{0.0033} & \textbf{0.0015} & \textbf{0.088} & \textbf{3.4}\\
+\midrule
+G1 & 0.03002 & 1.197$^\circ$ & 0.0455 & 0.1332 & 2.642 & 172.3\\
+G2 & 0.02727 & \textbf{0.946}$^\circ$ & 0.0441 & 0.1337 & 1.874 & 139.1\\
+G3 & 0.02940 & 1.073$^\circ$ & 0.0410 & 0.1255 & 1.355 & 141.4\\
+G4 & 0.03078 & 1.184$^\circ$ & 0.0478 & 0.1272 & 1.076 & 249.2\\
+G5 & 0.03191 & 1.302$^\circ$ & 0.0468 & 0.1314 & 1.539 & 141.9\\
+GridSFM & 0.03186 & 2.144$^\circ$ & 0.0432 & 0.1557 & 0.458 & 9.9\\
+G3-mse & 0.03517 & 1.425$^\circ$ & 0.0452 & 0.1278 & 4.802 & 215.6\\
+\bottomrule
+\end{tabular}
+\caption{Against a model that has learned nothing about the scenario.  It wins
+on $|V|$ RMSE, on both median residuals, on pooled RMSE $\Delta Q$ and on the
+worst bus in the corpus.  The only column any trained model wins is the bus
+angle.  Residuals in pu on a 100-MVA base.}
+\end{table}
+
+\paragraph{On median residuals against the constant predictor.} On GBnetwork
+$76.8\%$ of the $Q$-scored buses have $Q^{\mathrm{set}}$ exactly zero, and
+$64.6\%$ of $P$-scored buses have $P^{\mathrm{set}}$ exactly zero; the median
+setpoint is $0.0000$~pu on both channels. A median residual therefore lands on
+pure transit nodes, where a predictor that emits a valid AC solution of the
+mean scenario is exact for free --- no injection, no mismatch, in any scenario
+--- while a learned model perturbs the voltage everywhere and gets no such
+gift. Median comparisons \emph{between models} are unaffected, since the
+distortion is common to them; median comparisons \emph{against the constant
+predictor} are not a measure of skill. The mean and the maximum are dominated
+by the buses that carry injection and are the honest comparison there.
+
+\paragraph{The angle column does not mean what it appears to.}  Branch flows
+depend on $\theta_i-\theta_j$, never on the absolute bus angle, so a common
+per-scenario offset inflates per-bus $\theta$ RMSE without moving a single flow.
+Splitting the error accordingly (deg):
+
+\begin{table}[H]
+\centering\footnotesize
+\begin{tabular}{lrrrr}
+\toprule
+Setting & per-bus & of which gauge & de-gauged & \textbf{per-edge $\Delta\theta_{ij}$}\\
+\midrule
+per-bus constant & 6.846 & 4.029 & 5.532 & \textbf{1.000}\\
+G2 & 0.946 & 0.330 & 0.887 & \textbf{0.376}\\
+G3 & 1.073 & 0.483 & 0.958 & 0.403\\
+G5 & 1.302 & 0.837 & 0.997 & 0.425\\
+GridSFM & 2.144 & 1.575 & 1.454 & 0.447\\
+\bottomrule
+\end{tabular}
+\caption{Angle error RMSE.  ``gauge'' is the circular mean of the bus-angle
+error within each scenario.  On per-bus RMSE G2 beats the constant predictor by
+$7.2\times$ and GridSFM by $2.3\times$; on the quantity the flows see those
+margins fall to $2.7\times$ and $1.2\times$.  More than two thirds of GridSFM's
+angle error is gauge, which is the criticism its own paper levels at
+gridfm-graphkit.  The angle ranking in Table~1 and Table~5 is therefore
+substantially a ranking of gauge drift.}
+\end{table}
+
+\paragraph{Two different $R^2$, and only one of them is about tracking.}
+GridSFM's section 6.2 diagnostic is a pooled regression of prediction against
+reference, reported with a slope; its $R^2$ is a Pearson $R^2$ and asks whether
+the model orders scenarios correctly.  The $R^2$ in Tables 2 and 5 of this
+report is $1-(\mathrm{RMSE}/\sigma)^2$, which also charges the model for bias
+and for amplitude error.  They coincide only when the slope is 1 and the bias
+is zero.  Furthermore, pooling over buses is right for GridSFM --- a multi-grid
+foundation model must predict a grid's static profile because it has not seen
+it --- but wrong here, where one model is trained per grid and that profile is
+memorisable from the training split.
+
+\begin{table}[H]
+\centering\footnotesize
+\begin{tabular}{lrrrrr}
+\toprule
+& \multicolumn{2}{c}{pooled} & \multicolumn{2}{c}{per-bus} & \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+Setting & slope & $R^2_{\mathrm{pool}}$ & slope & $R^2_{\mathrm{bus}}$ & $R^2_{\sigma}$\\
+\midrule
+per-bus constant & 0.798 & 0.798 & \textbf{0.000} & \textbf{0.000} & $-0.000$\\
+\midrule
+G1 & 0.587 & 0.681 & 0.487 & 0.621 & $-0.644$\\
+G2 & 0.640 & 0.740 & 0.648 & 0.709 & $-0.357$\\
+G3 & 0.578 & 0.705 & 0.491 & 0.686 & $-0.577$\\
+G4 & 0.554 & 0.676 & 0.510 & 0.652 & $-0.728$\\
+G5 & 0.539 & 0.643 & 0.476 & 0.592 & $-0.857$\\
+GridSFM & 0.575 & 0.631 & \textbf{0.688} & \textbf{0.752} & $-0.852$\\
+G3-mse & 0.629 & 0.611 & 0.316 & 0.513 & $-1.258$\\
+\bottomrule
+\end{tabular}
+\caption{$R^2$ on $|V|$ under the three readings of
+Section~\ref{sec:r2notation}.  The first row is the
+control: a predictor that reproduces each bus's mean and nothing else scores
+$0.798$ pooled --- four fifths of the pooled variance on this grid is the
+static profile, not the scenario.  \textbf{Every model retains
+$R^2=0.59$--$0.75$ after that profile is removed}, so none of them is collapsed
+in the sense the report previously claimed; the negative SSE column is measuring
+something else.}
+\end{table}
+
+\paragraph{What the negative column is measuring: a per-bus offset.}  Writing
+the prediction as $\hat v = a\,v + b + \varepsilon$ with $\varepsilon$
+uncorrelated with $v$,
+\[
+  \mathrm{RMSE}^2 \;=\; \underbrace{b^2}_{\text{bias}}
+  \;+\;\underbrace{(a-1)^2\sigma^2}_{\text{amplitude}}
+  \;+\;\underbrace{\sigma_\varepsilon^2}_{\text{noise}},
+  \qquad \sigma_\varepsilon^2=(1-R^2)\,\sigma_{\hat v}^2 .
+\]
+
+\begin{table}[H]
+\centering\footnotesize
+\begin{tabular}{lrrrr}
+\toprule
+Setting & $|V|$ RMSE & bias & amplitude & noise\\
+\midrule
+per-bus constant & 0.02341 & 0.00006 & 0.02341 & 0.00000\\
+\midrule
+G2 & 0.02727 & \textbf{0.02410} & 0.00825 & 0.00972\\
+G3 & 0.02940 & \textbf{0.02572} & 0.01191 & 0.00779\\
+G5 & 0.03191 & \textbf{0.02796} & 0.01227 & 0.00924\\
+GridSFM & 0.03186 & \textbf{0.02960} & 0.00730 & 0.00926\\
+G3-mse & 0.03517 & \textbf{0.02961} & 0.01602 & 0.00981\\
+\bottomrule
+\end{tabular}
+\caption{Decomposition of the $|V|$ error, pu.  The control row validates it:
+for a constant predictor the bias vanishes, the amplitude term is the full
+$\sigma$ and there is no noise, so $\mathrm{RMSE}=\sigma$ exactly.  For every
+trained model the \emph{bias} term alone exceeds the entire scenario spread
+$\sigma=0.02341$: each bus's predicted mean voltage is systematically wrong by
+more than the whole quantity being predicted.}
+\end{table}
+
+\paragraph{Removing the offset, and what it does not fix.}  This is a claim
+about a correction learnable without the test set, so it was fitted where the
+model's own training data lives --- a per-bus offset measured on the training
+third, subtracted at test time, nothing retrained (alex job 4124803).
+
+\begin{table}[H]
+\centering\footnotesize
+\setlength{\tabcolsep}{2.2pt}
+\begin{tabular}{lrrrrrrr}
+\toprule
+& \multicolumn{3}{c}{$|V|$} & \multicolumn{2}{c}{residual medians} & \multicolumn{2}{c}{}\\
+\cmidrule(lr){2-4}\cmidrule(lr){5-6}\cmidrule(lr){7-8}
+Setting & RMSE & $R^2_{\sigma}$ & (pred.) & $|\Delta P|$ & $|\Delta Q|$ & $\Delta\theta_{ij}$ & max $|\Delta Q|$\\
+\midrule
+G1 & 0.0300$\to$\textbf{0.0150} & $-0.644\to$\textbf{$+0.592$} & $+0.592$ & 0.046$\to$0.027 & 0.133$\to$0.044 & 0.41$\to$0.29 & 172$\to$138\\
+G2 & 0.0273$\to$\textbf{0.0128} & $-0.357\to$\textbf{$+0.703$} & $+0.704$ & 0.044$\to$0.030 & 0.134$\to$0.042 & 0.38$\to$0.27 & 139$\to$\textbf{197}\\
+G3 & 0.0294$\to$\textbf{0.0142} & $-0.577\to$\textbf{$+0.630$} & $+0.630$ & 0.041$\to$0.024 & 0.126$\to$0.037 & 0.40$\to$0.28 & 141$\to$\textbf{160}\\
+G4 & 0.0308$\to$\textbf{0.0144} & $-0.728\to$\textbf{$+0.621$} & $+0.621$ & 0.048$\to$0.026 & 0.127$\to$0.040 & 0.41$\to$0.29 & 249$\to$\textbf{357}\\
+G5 & 0.0319$\to$\textbf{0.0154} & $-0.857\to$\textbf{$+0.569$} & $+0.569$ & 0.047$\to$0.025 & 0.131$\to$0.042 & 0.43$\to$0.30 & 142$\to$88\\
+GridSFM & 0.0319$\to$\textbf{0.0118} & $-0.852\to$\textbf{$+0.746$} & $+0.747$ & 0.043$\to$0.014 & 0.156$\to$0.039 & 0.45$\to$0.23 & 9.9$\to$9.7\\
+G3-mse & 0.0352$\to$\textbf{0.0176} & $-1.258\to$\textbf{$+0.438$} & --- & 0.045$\to$0.019 & 0.128$\to$0.031 & 0.40$\to$0.28 & \textbf{216$\to$56}\\
+\bottomrule
+\end{tabular}
+\caption{Before and after subtracting a per-bus offset fitted on the training
+split.  The ``predicted'' column is what the decomposition above says should
+happen; measurement agrees to within $0.001$ on all six, which is the check
+that the decomposition is the right one.  $|V|$ RMSE improves
+$2.0$--$2.7\times$, every model passes the constant predictor for the first
+time, median $|\Delta Q|$ improves $3.1$--$4.0\times$, and per-edge
+$\Delta\theta_{ij}$ improves about $30\%$.  \textbf{The extreme tail does not
+follow}: three of the six report a \emph{larger} worst-bus $|\Delta Q|$
+afterwards.}
+\end{table}
+
+\paragraph{Log-cosh against MSE in the physics term.}  Section~\ref{sec:massdiag}
+localised the PIGNN deficit to a handful of very large residuals, which makes a
+quadratic penalty the obvious thing to try: MSE weights a residual of $10$ pu a
+hundred times more than one of $1$ pu, where log-cosh weights it about ten
+times.  G3 was therefore rerun with \texttt{physics\_loss\_form=mse} and every
+other flag unchanged (helma job 797773, 40/40 epochs; a first attempt on an
+alex A40 died in epoch 1 with a CUDA out-of-memory, which is a GPU-capacity
+failure and not a property of the objective).
+
+\textbf{It is worse on every axis, and worst exactly where it was meant to
+help.}  Voltage RMSE rises from $0.02940$ to $0.03517$, the angle from
+$1.073^\circ$ to $1.425^\circ$, $R^2_{\mathrm{bus}}$ falls from $0.686$ to
+$0.513$ and the slope from $0.491$ to $0.316$ --- so the quadratic term costs
+tracking as well as accuracy.  The worst bus goes the wrong way by an order of
+magnitude: $\max|\Delta P|$ $18.6 \to 197.8$ pu, $\max|\Delta Q|$
+$141.4 \to 215.6$ pu.  This is the failure mode the choice of log-cosh was
+guarding against: with a squared penalty the few stiff buses of
+Section~\ref{sec:massdiag} dominate the gradient and the fit is spent on them.
+
+The one place it does better is under calibration, and revealingly so.  G3-mse
+carries the largest \emph{amplitude} error of any setting here ($0.01602$ pu
+against $0.00730$--$0.01227$ for the rest) and an ordinary bias, and once the
+bias is removed its pooled $\Delta Q$ collapses --- RMSE $4.802 \to 0.221$, a
+$22\times$ improvement, and $\max|\Delta Q|$ $215.6 \to 56.1$ --- whereas
+calibrating G3 with log-cosh leaves its worst bus slightly \emph{worse}
+($141 \to 160$).  Both end up in the same place: calibrated, G3-mse reaches
+$R^2_{\sigma} = +0.438$ against G3's $+0.630$.  MSE is not a useful
+substitute, but its damage is more of the kind a post-hoc offset can undo.
+
+Three conclusions, and the first two overturn statements made earlier in this
+report.
+
+\textbf{The models are not failing to track the scenario.}  After the static
+profile is removed they still explain 59--75\% of the variance of $|V|$.  What
+they get wrong is each bus's mean level, by more than the spread they are
+predicting, and that miscalibration is what every negative $R^2$ in this report
+and in the four-model report is dominated by.  It is also free to remove: no
+retraining, no architecture change, a $2$--$2.7\times$ reduction in $|V|$ RMSE
+and $3$--$4\times$ in median $|\Delta Q|$.
+
+\textbf{The angle advantage is real but roughly a third of its apparent size},
+and for GridSFM it nearly vanishes: $2.144^\circ$ per bus against $0.447^\circ$
+per edge.  Comparisons on per-bus $\theta$ RMSE across models with different
+gauge behaviour are not meaningful.
+
+\textbf{Neither correction touches the failure in
+Section~\ref{sec:massdiag}.}  The worst-bus $|\Delta Q|$ is unchanged or worse
+after debiasing, and the constant predictor still beats every debiased model on
+median residual by an order of magnitude.  The stiffness-localized tail on the
+four 22-kV buses is a separate defect from the calibration one, and only the
+calibration defect has a free fix.
+
+\section{Interpretation and bottleneck}
+
+The GridSFM architecture offers plausible explanations for its large-grid
+feasibility advantage.
+GridSFM uses seven heterogeneous node types (bus, generator proxy, load,
+shunt, line, transformer and cycle), promotes branches to nodes, includes a
+fundamental cycle basis, and performs global linear attention within each node
+type.  It also supplies DC/Laplacian features, effective-resistance landmarks,
+branch loading features and explicit bus-type encodings.  Its angle head is a
+bounded residual around a DC prior and its magnitude head is clipped to voltage
+limits.  However, the ppNR-v2 run in the four-model report did \emph{not} use
+the released native GridSFM multi-term objective.  Its dispatch used voltage
+MSE plus a shared PPC masked log-cosh residual loss with physics weight
+$10^{-2}$.  Native GridSFM loss components are therefore design references,
+not an explanation directly tested by that run.
+
+The current PIGNN G0 backbone instead performs repeated learned corrections
+over a bus-centric one-hop graph.  Eight local layers provide a large formal
+receptive field, but long-range information must still traverse local
+nonlinearities.  The G2/G3 sidecars add one graph token; they do not reproduce
+GridSFM's node-level same-type global attention.  PIGNN also composes update
+errors over 40 steps, so a correction that improves voltage MSE can increase
+the AC residual.  This is the principal bottleneck, rather than simply an
+insufficient value of $K$.
+
+The breakdown in Section~\ref{sec:massdiag} narrows this list considerably.
+Since PIGNN already matches or beats GridSFM in the bulk and on every
+$|Y_{ii}|$ bin below $10^{4}$, the ingredients that would explain a broad
+representational advantage are not the ones being exercised.  What separates
+the two models is confined to the worst-conditioned $0.2\%$ of buses, and
+GridSFM's uniform absence of any entry above 10 pu points at its output bounds.
+The two candidates worth testing are therefore \emph{bounded terminal
+corrections} --- an output clip, as distinct from PIGNN's Armijo step bound ---
+and \emph{diagonal equilibration of the residual features}, which targets the
+$|Y_{ii}|$ dependence directly.  Same-type global communication and explicit
+branch/cycle states remain plausible but are not supported by this evidence:
+the global-context sidecars G1--G5 span a $2\times$ range in tail mass without
+moving the bulk at all.  A
+two-hop block is a useful intermediate test because it provides a sparse
+mesoscopic shortcut, but it should be evaluated against a parameter-matched
+one-hop control and then combined with RANGE-$M=1$ only if the standalone
+two-hop result is positive.
+
+\section{Metric and campaign caveats}
+
+The historical field names \texttt{dPinf}/\texttt{dQinf} are potentially
+misleading.  In both the four-model driver and the current PIGNN driver, the
+per-scenario bus maximum is accumulated and divided by the scenario count:
+\[
+  \operatorname{case\text{-}max\ mean}(P)
+  =\frac{1}{N_s}\sum_{s=1}^{N_s}\max_{i\in\mathcal M_P}|\Delta P_{s,i}|.
+\]
+The true global maximum $\max_{s,i}|\Delta P_{s,i}|$ was not reported by the
+four-model tables; it is now measured for GBnetwork in
+Section~\ref{sec:massdiag}, and it separates the models far more sharply than
+the mean-of-maxima reducer does (G4 reaches 304 pu on $P$ where its mean
+per-scenario maximum is only 7.3).  Pooled mean, median and quantiles instead reduce the full
+set of valid bus--scenario entries; they must not be called case maxima.  A
+strict head-to-head claim still requires the same split, masks and precision,
+but not because the historical rows used a different maximum reducer.
+
+The GraphKit/GridSFM campaign also predates the later PIGNN signed-log,
+global-context and RANGE experiments.  Its results should therefore be used
+as architectural evidence and motivation, not as a strict controlled
+head-to-head estimate of the latest PIGNN gap.
+
+\section{Recommended next step}
+
+The immediate decision path is:
+\begin{enumerate}
+\item RANGE-$M=1,4,8$ is finished and test-rescored; treat it as closed and do
+      not extend it to further master counts;
+\item compare the two-hop H0--H5 campaign using both mean scenario maxima and
+      the true global P/Q maxima, which Section~\ref{sec:massdiag} shows are the
+      discriminating statistic;
+\item retain G2 as the voltage-oriented global candidate and G3 as the
+      feasibility-oriented candidate;
+\item test the two mechanisms that Section~\ref{sec:massdiag} actually
+      implicates --- a bounded output head, and diagonal
+      ($|Y_{ii}|$-equilibrated) residual features --- on the four 22-kV buses
+      before spending further effort on global-context topology;
+\item if H2 or H5 is positive, run three seeds on the selected GBnetwork
+      candidate before extending to additional grids.
+\end{enumerate}
+
+\end{document}

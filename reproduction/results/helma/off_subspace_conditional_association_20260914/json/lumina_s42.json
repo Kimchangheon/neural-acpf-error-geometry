@@ -1,0 +1,72 @@
+{
+  "protocol": {
+    "model": "LUMINA",
+    "kind": "lumina",
+    "checkpoint": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/ckpt/gb_vsweep2_20260911/gbv06z_control_zerohead_best.pt",
+    "split": "controlled_error_geometry.split_dataset; seed=42 fixed memberships",
+    "calibration": "fit_per_bus_offset on training predictions only; circular angle offset",
+    "basis": "manifold_basis on training NR labels only; separate magnitude/circular-angle bases",
+    "rank": 16,
+    "actual_rank_magnitude": 16,
+    "actual_rank_angle": 16,
+    "pb": "pb_per_scenario; final calibrated complex128 voltage; GENCO structural-zero convention",
+    "partial_spearman": "Pearson correlation of rank residuals after separately regressing ranked q_perp and ranked Mean PB on intercept + ranked scenario error L2",
+    "bootstrap": {
+      "draws": 2000,
+      "seed": 20260914,
+      "unit": "held-out test scenario",
+      "percentile_ci": [
+        0.025,
+        0.975
+      ]
+    },
+    "test_scenarios": 12344,
+    "zero_error_denominator_magnitude": 0,
+    "zero_error_denominator_angle": 0
+  },
+  "training_explained_variance_at_16": {
+    "magnitude": 0.9880053751661676,
+    "angle": 0.9968392019907943
+  },
+  "per_scenario_off_subspace_error_fraction": {
+    "magnitude": {
+      "q25": 0.2307058877870456,
+      "median": 0.270834803814208,
+      "q75": 0.3577887428811752,
+      "mean": 0.3125163637944821,
+      "min": 0.09172471495868507,
+      "max": 0.880963376719475
+    },
+    "angle": {
+      "q25": 0.26727481487698806,
+      "median": 0.31652341735924555,
+      "q75": 0.39674373364843835,
+      "mean": 0.35421403424730685,
+      "min": 0.08398349575260149,
+      "max": 0.9331364827323702
+    }
+  },
+  "conditional_association": {
+    "magnitude": {
+      "partial_spearman_qperp_mean_pb_given_error_l2": 0.8326446418015845,
+      "paired_scenario_bootstrap_95_ci": [
+        0.8255882710906101,
+        0.838748924815388
+      ],
+      "n": 12344
+    },
+    "angle": {
+      "partial_spearman_qperp_mean_pb_given_error_l2": 0.8603130522044946,
+      "paired_scenario_bootstrap_95_ci": [
+        0.8543497269748657,
+        0.8651904003592208
+      ],
+      "n": 12344
+    }
+  },
+  "audit": {
+    "ratio_of_summed_energy_magnitude": 0.2535031929430793,
+    "ratio_of_summed_energy_angle": 0.29640055617861694,
+    "calibrated_mean_pb": 0.22800249778802884
+  }
+}

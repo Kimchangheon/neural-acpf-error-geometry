@@ -1,0 +1,66 @@
+{
+  "protocol": {
+    "split": "random_split seed=42",
+    "rank": 64,
+    "calibration": "train-only per-bus magnitude and circular-angle offsets",
+    "pb": "complex128 GENCO-style per-bus norm, all bus-scenario pairs",
+    "max_pb": "maximum individual bus PB over the test split",
+    "split_seed": 42
+  },
+  "result": {
+    "model": "graphkit",
+    "rank": 64,
+    "n_scenarios": 12336,
+    "calibration_offset_rms_vmag": 0.00041822628729801297,
+    "metrics": {
+      "raw": {
+        "vmag_rmse": 0.0016361791238615462,
+        "angle_rmse_deg": 0.060400913708640196,
+        "mean_pb": 0.010476120025284363,
+        "max_pb": 0.2898369872158776,
+        "within_r2": 0.9939123593370124,
+        "within_slope": 0.9931055650105655
+      },
+      "C": {
+        "vmag_rmse": 0.0015792552716092953,
+        "angle_rmse_deg": 0.05798909683150919,
+        "mean_pb": 0.010177297165707833,
+        "max_pb": 0.2899988650214062,
+        "within_r2": 0.9939123593368513,
+        "within_slope": 0.9931055650109885
+      },
+      "P64": {
+        "vmag_rmse": 0.0015778425336091264,
+        "angle_rmse_deg": 0.06077130373423171,
+        "mean_pb": 0.010822786756953369,
+        "max_pb": 0.29567873766729086,
+        "within_r2": 0.994361750650468,
+        "within_slope": 0.9930602336578027
+      },
+      "CSP64": {
+        "vmag_rmse": 0.0015199858585320599,
+        "angle_rmse_deg": 0.05862951346343309,
+        "mean_pb": 0.010657900177147621,
+        "max_pb": 0.3007725099436956,
+        "within_r2": 0.9943617506507765,
+        "within_slope": 0.9930602336578046
+      },
+      "Pmag64": {
+        "vmag_rmse": 0.0015778425336091264,
+        "angle_rmse_deg": 0.060400913708640196,
+        "mean_pb": 0.010000300928635816,
+        "max_pb": 0.28940179055532017,
+        "within_r2": 0.994361750650468,
+        "within_slope": 0.9930602336578027
+      },
+      "CSPmag64": {
+        "vmag_rmse": 0.0015199858585320599,
+        "angle_rmse_deg": 0.05798909683150919,
+        "mean_pb": 0.009736544140335783,
+        "max_pb": 0.28950354006645257,
+        "within_r2": 0.9943617506507765,
+        "within_slope": 0.9930602336578046
+      }
+    }
+  }
+}

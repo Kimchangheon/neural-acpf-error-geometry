@@ -1,0 +1,60 @@
+### Starting TaskPrologue of job 4222182 on a0425 at Sun Sep 13 00:55:06 CEST 2026
+Running on cores 0-15 with governor schedutil
+Sun Sep 13 00:55:06 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A40                     On  |   00000000:01:00.0 Off |                  Off |
+|  0%   33C    P8             21W /  300W |       0MiB /  49140MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+{
+  "rule": "minimize unweighted mean validation Mean PB over C+NR1 and CSP16+NR1 across the three GraphKit seeds",
+  "candidates": {
+    "0.25": 0.04583060417686787,
+    "0.5": 0.03055463952190965,
+    "0.75": 0.015289095551456798,
+    "1.0": 0.0008341499535796003
+  },
+  "selected_eta": 1.0,
+  "inputs": [
+    "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_graphkit_e120_gbnetwork_a40_20260912/json/graphkit_s41_validation.json",
+    "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_graphkit_e120_gbnetwork_a40_20260912/json/graphkit_s42_validation.json",
+    "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/nr1_graphkit_e120_gbnetwork_a40_20260912/json/graphkit_s43_validation.json"
+  ]
+}=== JOB_STATISTICS ===
+=== current date     : Sun Sep 13 00:55:08 CEST 2026
+= Job-ID             : 4222182 on alex
+= Job-Name           : gk120_nr1_eta_a40
+= Job-Command        : /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/nr1_graphkit_e120_select_eta_alex_a40_20260912.sh
+= Initial workdir    : /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC
+= Queue/Partition    : a40
+= Slurm account      : b313dc with QOS=normal
+= Requested resources:  for 00:15:00
+= Elapsed runtime    : 00:00:24
+= Total RAM usage    : 0.1 GiB of assigned  GiB (%)
+= Node list          : a0425
+= Subm/Elig/Start/End: 2026-09-12T22:33:34 / 2026-09-13T00:54:44 / 2026-09-13T00:54:44 / 2026-09-13T00:55:08
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              88.0G   104.9G   209.7G        N/A     127K     500K   1,000K        N/A    
+    /home/vault           781.8G  1048.6G  2097.2G        N/A      60K     200K     400K        N/A    
+    /home/atuin          4506.8M     0.0K     0.0K        N/A       3                           N/A    
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]

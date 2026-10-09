@@ -1,0 +1,87 @@
+### Starting TaskPrologue of job 4206195 on a0129 at Wed Sep  9 21:27:28 CEST 2026
+Running on cores 112-127 with governor schedutil
+Wed Sep  9 21:27:28 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A40                     On  |   00000000:A1:00.0 Off |                  Off |
+|  0%   55C    P0             67W /  300W |       0MiB /  49140MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+Indexing parquet lazily from /tmp/4206195.alex/GBnetwork.parquet ...
+[Dataset] /tmp/4206195.alex/GBnetwork.parquet
+[Dataset]   parquet S_base = 1.000e+08 VA (= 100 MVA)
+[Dataset]   per-unit S_base matches target (100 MVA); no rebase
+Indexed 37022 valid rows from /tmp/4206195.alex/GBnetwork.parquet across 1852 row groups (removed 0 diverged rows)
+Final combined dataset shape: (37022, streamed rows) | removed 0 diverged rows total
+[Dataset]   share_ybus=True: cached shared Ybus from first row (N=2224, |Y|_pu max=2.048e+05); subsequent rows will skip dense Y reconstruction
+[Dataset]   share_grid=True: cached 21 grid-only tensors from first row (Ybus + Branch_y_* + topology + vn_kv + ...); subsequent rows skip parquet decode + per-unit math for these fields
+[debias] per-bus offset fitted on 12339 training scenarios; rms dvm 2.56888e-02 pu
+[manifold] 12339 train scenarios, 2224 buses; k=1 captures 97.716% of |V| and 97.930% of theta variance
+[shrinkage] scored 25/772 batches
+[shrinkage] scored 50/772 batches
+[shrinkage] scored 75/772 batches
+[shrinkage] scored 100/772 batches
+[shrinkage] scored 125/772 batches
+[shrinkage] scored 150/772 batches
+[shrinkage] scored 175/772 batches
+[shrinkage] scored 200/772 batches
+[shrinkage] scored 225/772 batches
+[shrinkage] scored 250/772 batches
+[shrinkage] scored 275/772 batches
+[shrinkage] scored 300/772 batches
+[shrinkage] scored 325/772 batches
+[shrinkage] scored 350/772 batches
+[shrinkage] scored 375/772 batches
+[shrinkage] scored 400/772 batches
+[shrinkage] scored 425/772 batches
+[shrinkage] scored 450/772 batches
+[shrinkage] scored 475/772 batches
+[shrinkage] scored 500/772 batches
+[shrinkage] scored 525/772 batches
+[shrinkage] scored 550/772 batches
+[shrinkage] scored 575/772 batches
+[shrinkage] scored 600/772 batches
+[shrinkage] scored 625/772 batches
+[shrinkage] scored 650/772 batches
+[shrinkage] scored 675/772 batches
+[shrinkage] scored 700/772 batches
+[shrinkage] scored 725/772 batches
+[shrinkage] scored 750/772 batches
+=== JOB_STATISTICS ===
+=== current date     : Wed Sep  9 22:04:29 CEST 2026
+= Job-ID             : 4206195 on alex
+= Job-Name           : g3_shrink_val
+= Job-Command        : /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/pignn_g3_shrinkage_stage1_alex2_a40_20260909.sh
+= Initial workdir    : /home/hpc/b313dc/b313dc11
+= Queue/Partition    : a40
+= Slurm account      : b313dc with QOS=normal
+= Requested resources:  for 03:00:00
+= Elapsed runtime    : 00:37:12
+= Total RAM usage    : 8.8 GiB of assigned  GiB (%)
+= Node list          : a0129
+= Subm/Elig/Start/End: 2026-09-09T21:23:38 / 2026-09-09T21:23:38 / 2026-09-09T21:27:17 / 2026-09-09T22:04:29
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc             103.7G   104.9G   209.7G        N/A     125K     500K   1,000K        N/A    
+    /home/atuin          4506.8M     0.0K     0.0K        N/A       3                           N/A    
+    /home/vault           726.9G  1048.6G  2097.2G        N/A      60K     200K     400K        N/A    
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA A40, 00000000:A1:00.0, 3291450, 38 %, 15 %, 494 MiB, 2176873 ms

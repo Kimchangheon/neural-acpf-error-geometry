@@ -1,0 +1,159 @@
+### Starting TaskPrologue of job 4225064 on a1621 at Sun Sep 13 10:23:39 CEST 2026
+Running on cores 16-31 with governor schedutil
+Sun Sep 13 10:23:39 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A40                     On  |   00000000:25:00.0 Off |                  Off |
+|  0%   31C    P8             21W /  300W |       0MiB /  49140MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+[protocol] GraphKit E120 seed 42; seed-42 split; train-only calibration/basis; k=16; complex128 PB
+[identity] pure affine projection is checked separately from restore_known operational CSP
+Indexing parquet lazily from /tmp/4225064.alex/GBnetwork.parquet ...
+[Dataset] /tmp/4225064.alex/GBnetwork.parquet
+[Dataset]   parquet S_base = 1.000e+08 VA (= 100 MVA)
+[Dataset]   per-unit S_base matches target (100 MVA); no rebase
+Indexed 37022 valid rows from /tmp/4225064.alex/GBnetwork.parquet across 1852 row groups (removed 0 diverged rows)
+Final combined dataset shape: (37022, streamed rows) | removed 0 diverged rows total
+[Dataset]   share_ybus=True: cached shared Ybus from first row (N=2224, |Y|_pu max=2.048e+05); subsequent rows will skip dense Y reconstruction
+[Dataset]   share_grid=True: cached 21 grid-only tensors from first row (Ybus + Branch_y_* + topology + vn_kv + ...); subsequent rows skip parquet decode + per-unit math for these fields
+[manifold] 12339 train scenarios, 2224 buses; k=16 captures 98.801% of |V| and 99.684% of theta variance
+[graphkit] checkpoint missing=0 unexpected=0
+[debias] per-bus offset fitted on 12339 training scenarios; rms dvm 3.69538e-03 pu
+[diagnostic] 50/772 test batches
+[diagnostic] 100/772 test batches
+[diagnostic] 150/772 test batches
+[diagnostic] 200/772 test batches
+[diagnostic] 250/772 test batches
+[diagnostic] 300/772 test batches
+[diagnostic] 350/772 test batches
+[diagnostic] 400/772 test batches
+[diagnostic] 450/772 test batches
+[diagnostic] 500/772 test batches
+[diagnostic] 550/772 test batches
+[diagnostic] 600/772 test batches
+[diagnostic] 650/772 test batches
+[diagnostic] 700/772 test batches
+[diagnostic] 750/772 test batches
+{
+  "protocol": {
+    "split": "controlled_error_geometry.split_dataset: random_split seed=42; sorted membership order",
+    "basis": "diagnose_residual_distributions.manifold_basis -> manifold_projection.fit_basis; train NR only; circular angle mean/wrap; k=16",
+    "calibration": "diagnose_residual_distributions.fit_per_bus_offset + controlled_error_geometry.calibrated_forward; train only; circular angle offset",
+    "csp": "manifold_projection.project_state then output_intervention_metrics._restore_known_setpoints, matching restore_known paper rows",
+    "pb": "controlled_error_geometry.pb_per_scenario; final complex128 voltage; GENCO structural-zero PB",
+    "oracle_floor": "pure project_state(reference), as requested; operational restore_known oracle PB additionally reported",
+    "no_clipping": true,
+    "known_state_restoration_after_csp": "PV/slack magnitude and slack angle restored from V_start",
+    "rank_requested": 16,
+    "rank_actual_magnitude": 16,
+    "rank_actual_angle": 16,
+    "test_scenarios": 12344
+  },
+  "reference": {
+    "training_explained_variance": {
+      "magnitude": 0.9880053751661676,
+      "angle": 0.9968392019907943
+    },
+    "test_reference_retained_variance": {
+      "magnitude": 0.9878940592596026,
+      "angle": 0.9968251315392486
+    },
+    "oracle_pure_reference_projection": {
+      "vmag_rmse": 0.00257593046740752,
+      "angle_rmse_deg": 0.3857722189492722,
+      "mean_pb": 0.04153755348707348,
+      "max_pb": 5.970846736512022
+    },
+    "oracle_restore_known_reference_projection": {
+      "mean_pb": 0.041537553487073414,
+      "max_pb": 5.970846736512022,
+      "restoration_change_vmag_rmse": 1.0688060938893328e-16,
+      "restoration_change_angle_rmse_deg": 0.0
+    }
+  },
+  "models": {
+    "GridFM-GraphKit": {
+      "off_error_fraction_calibrated": {
+        "magnitude": 0.47690900222943755,
+        "angle": 0.2901134199989051
+      },
+      "removed_error_energy_calibrated": {
+        "magnitude": 560.955580103037,
+        "angle": 310.951852740571
+      },
+      "identity_check": {
+        "magnitude": {
+          "calibrated_error_energy": 1176.2318964009937,
+          "csp_pure_error_energy": 797.4388120012795,
+          "csp_operational_error_energy": 797.4388120012795,
+          "reference_off_subspace_energy": 182.162495703322,
+          "calibrated_error_off_subspace_energy": 560.955580103037,
+          "rhs_reference_off_minus_error_off": -378.79308439971504,
+          "lhs_pure_projection": -378.7930843997142,
+          "lhs_operational_restore_known": -378.7930843997142,
+          "pure_discrepancy": 8.526512829121202e-13,
+          "operational_discrepancy": 8.526512829121202e-13,
+          "pure_relative_discrepancy": 2.25096845224443e-15,
+          "operational_relative_discrepancy": 2.25096845224443e-15,
+          "max_abs_scenario_discrepancy_pure": 7.729927808952652e-15,
+          "max_abs_scenario_discrepancy_operational": 7.729927808952652e-15
+        },
+        "angle": {
+          "calibrated_error_energy": 1071.8285722244236,
+          "csp_pure_error_energy": 2005.4123343837894,
+          "csp_operational_error_energy": 2005.4123343837894,
+          "reference_off_subspace_energy": 1244.535614899944,
+          "calibrated_error_off_subspace_energy": 310.951852740571,
+          "rhs_reference_off_minus_error_off": 933.583762159373,
+          "lhs_pure_projection": 933.5837621593657,
+          "lhs_operational_restore_known": 933.5837621593657,
+          "pure_discrepancy": -7.275957614183426e-12,
+          "operational_discrepancy": -7.275957614183426e-12,
+          "pure_relative_discrepancy": 7.793577726067327e-15,
+          "operational_relative_discrepancy": 7.793577726067327e-15,
+          "max_abs_scenario_discrepancy_pure": 3.191891195797325e-14,
+          "max_abs_scenario_discrepancy_operational": 3.191891195797325e-14
+        }
+      }
+    }
+  }
+}
+=== JOB_STATISTICS ===
+=== current date     : Sun Sep 13 10:39:43 CEST 2026
+= Job-ID             : 4225064 on alex
+= Job-Name           : gk120_csp_posthoc
+= Job-Command        : /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/csp_posthoc_diagnostics_graphkit_e120_helma_20260912.sh
+= Initial workdir    : /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC
+= Queue/Partition    : a40
+= Slurm account      : b313dc with QOS=normal
+= Requested resources:  for 06:00:00
+= Elapsed runtime    : 00:18:09
+= Total RAM usage    : 8.7 GiB of assigned  GiB (%)
+= Node list          : a1621
+= Subm/Elig/Start/End: 2026-09-13T10:21:33 / 2026-09-13T10:21:33 / 2026-09-13T10:21:34 / 2026-09-13T10:39:43
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+!!! /home/hpc             114.6G   104.9G   209.7G  -28994days     127K     500K   1,000K        N/A !!!
+    /home/atuin          4506.8M     0.0K     0.0K        N/A       3                           N/A    
+    /home/vault           781.8G  1048.6G  2097.2G        N/A      60K     200K     400K        N/A    
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA A40, 00000000:25:00.0, 602046, 36 %, 28 %, 2094 MiB, 947133 ms

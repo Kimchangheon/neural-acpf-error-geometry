@@ -1,0 +1,58 @@
+### Starting TaskPrologue of job 4224741 on a0326 at Sun Sep 13 08:23:25 CEST 2026
+Running on cores 48-63 with governor schedutil
+Sun Sep 13 08:23:25 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A40                     On  |   00000000:61:00.0 Off |                  Off |
+|  0%   32C    P8             22W /  300W |       0MiB /  49140MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+[protocol] GraphKit E120 seed 42; seed-42 split; train-only calibration/basis; k=16; complex128 PB
+[identity] pure affine projection is checked separately from restore_known operational CSP
+Indexing parquet lazily from /tmp/4224741.alex/GBnetwork.parquet ...
+[Dataset] /tmp/4224741.alex/GBnetwork.parquet
+[Dataset]   parquet S_base = 1.000e+08 VA (= 100 MVA)
+[Dataset]   per-unit S_base matches target (100 MVA); no rebase
+Indexed 37022 valid rows from /tmp/4224741.alex/GBnetwork.parquet across 1852 row groups (removed 0 diverged rows)
+Final combined dataset shape: (37022, streamed rows) | removed 0 diverged rows total
+[Dataset]   share_ybus=True: cached shared Ybus from first row (N=2224, |Y|_pu max=2.048e+05); subsequent rows will skip dense Y reconstruction
+[Dataset]   share_grid=True: cached 21 grid-only tensors from first row (Ybus + Branch_y_* + topology + vn_kv + ...); subsequent rows skip parquet decode + per-unit math for these fields
+[manifold] 12339 train scenarios, 2224 buses; k=16 captures 98.801% of |V| and 99.684% of theta variance
+=== JOB_STATISTICS ===
+=== current date     : Sun Sep 13 08:26:53 CEST 2026
+= Job-ID             : 4224741 on alex
+= Job-Name           : gk120_csp_posthoc
+= Job-Command        : /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/csp_posthoc_diagnostics_graphkit_e120_helma_20260912.sh
+= Initial workdir    : /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC
+= Queue/Partition    : a40
+= Slurm account      : b313dc with QOS=normal
+= Requested resources:  for 06:00:00
+= Elapsed runtime    : 00:03:29
+= Total RAM usage    : 6.3 GiB of assigned  GiB (%)
+= Node list          : a0326
+= Subm/Elig/Start/End: 2026-09-13T08:23:23 / 2026-09-13T08:23:23 / 2026-09-13T08:23:24 / 2026-09-13T08:26:53
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc             101.2G   104.9G   209.7G        N/A     127K     500K   1,000K        N/A    
+    /home/vault           781.8G  1048.6G  2097.2G        N/A      60K     200K     400K        N/A    
+    /home/atuin          4506.8M     0.0K     0.0K        N/A       3                           N/A    
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA A40, 00000000:61:00.0, 1375934, 0 %, 0 %, 264 MiB, 189539 ms

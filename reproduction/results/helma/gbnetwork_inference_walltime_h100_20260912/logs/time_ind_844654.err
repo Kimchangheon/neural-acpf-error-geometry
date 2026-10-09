@@ -1,0 +1,57 @@
+Traceback (most recent call last):
+  File "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/gbnetwork_inference_walltime_h100_20260912/benchmark_inference_walltime.py", line 234, in <module>
+    main()
+  File "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/gbnetwork_inference_walltime_h100_20260912/benchmark_inference_walltime.py", line 227, in main
+    bs, values = benchmark(args, model, forward, train, test)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/gbnetwork_inference_walltime_h100_20260912/benchmark_inference_walltime.py", line 178, in benchmark
+    sec, ns, alloc, reserved = timed_pass(
+                               ^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/gbnetwork_inference_walltime_h100_20260912/benchmark_inference_walltime.py", line 147, in timed_pass
+    raw = forward(batch)
+          ^^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/gbnetwork_inference_walltime_h100_20260912/controlled_error_geometry.py", line 56, in forward
+    return ext_forward(bb)
+           ^^^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/gbnetwork_inference_walltime_h100_20260912/diagnose_residual_distributions.py", line 430, in <lambda>
+    fwd = lambda bd: mod.lumina_forward(model, bd, dargs, device)   # noqa: E731
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/train_valid_test_lumina.py", line 940, in lumina_forward
+    out = model(
+          ^^^^^^
+  File "/home/hpc/b313dc/b313dc11/conda-envs/gridfm-py312/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/conda-envs/gridfm-py312/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/LUMINA/src/lumina_inference/model/hetero_model.py", line 133, in forward
+    x_dict = conv(x_dict, edge_index_dict)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/conda-envs/gridfm-py312/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/conda-envs/gridfm-py312/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/conda-envs/gridfm-py312/lib/python3.12/site-packages/torch_geometric/nn/conv/hgt_conv.py", line 192, in forward
+    k, v, src_offset = self._construct_src_node_feat(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/conda-envs/gridfm-py312/lib/python3.12/site-packages/torch_geometric/nn/conv/hgt_conv.py", line 152, in _construct_src_node_feat
+    v = self.v_rel(vs, type_vec).view(H, -1, D).transpose(0, 1)
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/conda-envs/gridfm-py312/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/conda-envs/gridfm-py312/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/conda-envs/gridfm-py312/lib/python3.12/site-packages/torch_geometric/nn/dense/linear.py", line 319, in forward
+    out = self.forward_naive(x, type_ptr)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/conda-envs/gridfm-py312/lib/python3.12/site-packages/torch_geometric/nn/dense/linear.py", line 251, in forward_naive
+    out[start:end] = x[start:end] @ self.weight[i]
+                     ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1.52 GiB. GPU 0 has a total capacity of 93.09 GiB of which 1.49 GiB is free. Including non-PyTorch memory, this process has 91.59 GiB memory in use. Of the allocated memory 90.81 GiB is allocated by PyTorch, and 124.88 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+srun: error: h13-15: task 0: Exited with exit code 1
+srun: Terminating StepId=844654.0

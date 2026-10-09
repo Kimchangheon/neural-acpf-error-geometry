@@ -1,0 +1,57 @@
+Traceback (most recent call last):
+  File "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/gbnetwork_inference_walltime_h100_20260912/benchmark_inference_walltime.py", line 234, in <module>
+    main()
+  File "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/gbnetwork_inference_walltime_h100_20260912/benchmark_inference_walltime.py", line 227, in main
+    bs, values = benchmark(args, model, forward, train, test)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/gbnetwork_inference_walltime_h100_20260912/benchmark_inference_walltime.py", line 172, in benchmark
+    warm = forward(first)
+           ^^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/gbnetwork_inference_walltime_h100_20260912/controlled_error_geometry.py", line 59, in <lambda>
+    forward = lambda b: forward_gridsfm(model, b, device,
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/gbnetwork_inference_walltime_h100_20260912/diagnose_residual_distributions.py", line 469, in forward_gridsfm
+    return gridsfm_forward(model, batch, args, device)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/train_valid_test_gridsfm.py", line 494, in gridsfm_forward
+    out = model(gbatch)
+          ^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/conda-envs/gridfm-py312/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/conda-envs/gridfm-py312/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/GridSFM/model/gridsfm/model.py", line 176, in forward
+    x_dict = block(x_dict, edge_index_dict, batch_dict, edge_attr_dict, n_graphs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/conda-envs/gridfm-py312/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/conda-envs/gridfm-py312/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/GridSFM/model/gridsfm/blocks.py", line 226, in forward
+    nt: (x + self.attn[nt](self.attn_ln[nt](x), batch_dict[nt], n_graphs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/conda-envs/gridfm-py312/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/conda-envs/gridfm-py312/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/GridSFM/model/gridsfm/blocks.py", line 165, in forward
+    out = self.W_o(out)
+          ^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/conda-envs/gridfm-py312/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/conda-envs/gridfm-py312/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/conda-envs/gridfm-py312/lib/python3.12/site-packages/torch/nn/modules/linear.py", line 125, in forward
+    return F.linear(input, self.weight, self.bias)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1.17 GiB. GPU 0 has a total capacity of 93.09 GiB of which 1.17 GiB is free. Including non-PyTorch memory, this process has 91.91 GiB memory in use. Of the allocated memory 91.14 GiB is allocated by PyTorch, and 108.29 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+srun: error: h13-15: task 0: Exited with exit code 1
+srun: Terminating StepId=844650.0

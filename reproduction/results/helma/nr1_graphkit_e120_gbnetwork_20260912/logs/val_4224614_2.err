@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/nr1_graphkit_e120_gbnetwork_20260912/nr1_multiprocess_baseline.py", line 104, in <module>
+    if __name__=='__main__': main()
+                             ^^^^^^
+  File "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/nr1_graphkit_e120_gbnetwork_20260912/nr1_multiprocess_baseline.py", line 102, in main
+    cache=_cache(args.model,args.checkpoint,args.stage,args.parquet,args.batch,Path(args.cache_dir),args.lumina_args); score=_score(cache,tuple(args.etas),args.workers)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/nr1_graphkit_e120_gbnetwork_20260912/nr1_multiprocess_baseline.py", line 60, in _cache
+    model,forward=make_model(model_kind,ckpt,parquet,batch,device,lumina_args=lumina_args); off=fit_per_bus_offset(model,forward,train,batch,device)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: make_model() got an unexpected keyword argument 'lumina_args'
+srun: error: a0127: task 0: Exited with exit code 1
+srun: Terminating StepId=4224614.0

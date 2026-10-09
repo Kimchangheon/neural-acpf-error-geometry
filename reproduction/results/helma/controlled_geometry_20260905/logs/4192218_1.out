@@ -1,0 +1,91 @@
+### Starting TaskPrologue of job 4192222 on a0803 at Sun Sep  6 20:43:31 CEST 2026
+Running on cores 32-47 with governor performance
+Sun Sep  6 20:43:31 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A100-SXM4-40GB          On  |   00000000:49:00.0 Off |                    0 |
+| N/A   32C    P0             54W /  400W |       0MiB /  40960MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+Indexing parquet lazily from /home/hpc/b313dc/b313dc11/data_staging/controlled_geometry_20260905/GBnetwork.parquet ...
+[Dataset] /home/hpc/b313dc/b313dc11/data_staging/controlled_geometry_20260905/GBnetwork.parquet
+[Dataset]   parquet S_base = 1.000e+08 VA (= 100 MVA)
+[Dataset]   per-unit S_base matches target (100 MVA); no rebase
+Indexed 37022 valid rows from /home/hpc/b313dc/b313dc11/data_staging/controlled_geometry_20260905/GBnetwork.parquet across 1852 row groups (removed 0 diverged rows)
+Final combined dataset shape: (37022, streamed rows) | removed 0 diverged rows total
+[begin] gridsfm
+[GridSFM] checkpoint missing=0 unexpected=0
+[Dataset]   share_ybus=True: cached shared Ybus from first row (N=2224, |Y|_pu max=2.048e+05); subsequent rows will skip dense Y reconstruction
+[Dataset]   share_grid=True: cached 21 grid-only tensors from first row (Ybus + Branch_y_* + topology + vn_kv + ...); subsequent rows skip parquet decode + per-unit math for these fields
+[debias] per-bus offset fitted on 12339 training scenarios; rms dvm 2.95895e-02 pu
+[manifold] 12339 train scenarios, 2224 buses; k=64 captures 99.471% of |V| and 99.839% of theta variance
+[gridsfm] evaluated batch 25/772
+[gridsfm] evaluated batch 50/772
+[gridsfm] evaluated batch 75/772
+[gridsfm] evaluated batch 100/772
+[gridsfm] evaluated batch 125/772
+[gridsfm] evaluated batch 150/772
+[gridsfm] evaluated batch 175/772
+[gridsfm] evaluated batch 200/772
+[gridsfm] evaluated batch 225/772
+[gridsfm] evaluated batch 250/772
+[gridsfm] evaluated batch 275/772
+[gridsfm] evaluated batch 300/772
+[gridsfm] evaluated batch 325/772
+[gridsfm] evaluated batch 350/772
+[gridsfm] evaluated batch 375/772
+[gridsfm] evaluated batch 400/772
+[gridsfm] evaluated batch 425/772
+[gridsfm] evaluated batch 450/772
+[gridsfm] evaluated batch 475/772
+[gridsfm] evaluated batch 500/772
+[gridsfm] evaluated batch 525/772
+[gridsfm] evaluated batch 550/772
+[gridsfm] evaluated batch 575/772
+[gridsfm] evaluated batch 600/772
+[gridsfm] evaluated batch 625/772
+[gridsfm] evaluated batch 650/772
+[gridsfm] evaluated batch 675/772
+[gridsfm] evaluated batch 700/772
+[gridsfm] evaluated batch 725/772
+[gridsfm] evaluated batch 750/772
+[done] gridsfm
+=== JOB_STATISTICS ===
+=== current date     : Sun Sep  6 21:20:12 CEST 2026
+= Job-ID             : 4192222 on alex as 4192218_1
+= Job-Name           : cgeom_v1
+= Job-Command        : /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/controlled_geometry_stage1_alex_20260906.sh
+= Initial workdir    : /home/hpc/b313dc/b313dc11
+= Queue/Partition    : a100
+= Slurm account      : b313dc with QOS=normal
+= Features           : a100_40
+= Requested resources:  for 06:00:00
+= Elapsed runtime    : 00:37:59
+= Total RAM usage    : 8.6 GiB of assigned  GiB (%)
+= Node list          : a0803
+= Subm/Elig/Start/End: 2026-09-06T20:42:11 / 2026-09-06T20:42:12 / 2026-09-06T20:42:16 / 2026-09-06T21:20:15
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              85.4G   104.9G   209.7G        N/A     125K     500K   1,000K        N/A    
+    /home/vault           726.9G  1048.6G  2097.2G        N/A      60K     200K     400K        N/A    
+    /home/atuin          4506.8M     0.0K     0.0K        N/A       3                           N/A    
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA A100-SXM4-40GB, 00000000:49:00.0, 3055243, 14 %, 6 %, 2554 MiB, 2189678 ms

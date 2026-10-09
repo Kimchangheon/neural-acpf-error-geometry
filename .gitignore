@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+.pytest_cache/
+*.egg-info/
+build/
+dist/
+.ipynb_checkpoints/
+
+# LaTeX build products
+ICASSP2027_manuscript/build/
+ICASSP2027_manuscript/output/
+*.aux
+*.bbl
+*.blg
+*.synctex.gz

@@ -1,0 +1,20 @@
+=== JOB_STATISTICS ===
+=== current date     : Mon Sep  7 15:45:54 CEST 2026
+= Job-ID             : 4196114 on alex as 4196111_1
+= Job-Name           : gb_seedrep
+= Job-Command        : /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/gbnetwork_model_seed_replicates_a40_20260907.sh
+= Initial workdir    : /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC
+= Queue/Partition    : a40
+= Slurm account      : b313dc with QOS=normal
+= Requested resources:  for 1-00:00:00
+= Elapsed runtime    : 00:00:08
+= Total RAM usage    : 0.0 GiB of assigned  GiB (%)
+= Node list          : a1624
+= Subm/Elig/Start/End: 2026-09-07T15:45:23 / 2026-09-07T15:45:23 / 2026-09-07T15:45:33 / 2026-09-07T15:45:41
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              85.4G   104.9G   209.7G        N/A     125K     500K   1,000K        N/A    
+    /home/vault           726.9G  1048.6G  2097.2G        N/A      60K     200K     400K        N/A    
+    /home/atuin          4506.8M     0.0K     0.0K        N/A       3                           N/A    
+======================

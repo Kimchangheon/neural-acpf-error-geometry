@@ -1,0 +1,68 @@
+{
+  "metadata": [
+    [
+      "bus",
+      "generator",
+      "load",
+      "shunt"
+    ],
+    [
+      [
+        "bus",
+        "ac_line",
+        "bus"
+      ],
+      [
+        "bus",
+        "transformer",
+        "bus"
+      ],
+      [
+        "generator",
+        "generator_link",
+        "bus"
+      ],
+      [
+        "bus",
+        "generator_link",
+        "generator"
+      ],
+      [
+        "load",
+        "load_link",
+        "bus"
+      ],
+      [
+        "bus",
+        "load_link",
+        "load"
+      ],
+      [
+        "shunt",
+        "shunt_link",
+        "bus"
+      ],
+      [
+        "bus",
+        "shunt_link",
+        "shunt"
+      ]
+    ]
+  ],
+  "input_channels": {
+    "bus": 7,
+    "generator": 11,
+    "load": 2,
+    "shunt": 2
+  },
+  "config": {
+    "models": {
+      "HGT": {
+        "num_layers": 6,
+        "hidden_channels": 128,
+        "dropout": 0.24398355775520905,
+        "num_heads": 2
+      }
+    }
+  }
+}

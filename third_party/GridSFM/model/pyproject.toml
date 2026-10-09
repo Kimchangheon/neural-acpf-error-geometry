@@ -1,0 +1,68 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gridsfm"
+dynamic = ["version"]
+description = "GridSFM AC-OPF inference package: pretrained neural surrogate for AC Optimal Power Flow on heterogeneous power grids."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [
+    { name = "Microsoft Research", email = "gridsfm@microsoft.com" },
+]
+keywords = [
+    "ac-opf",
+    "optimal-power-flow",
+    "power-systems",
+    "graph-neural-networks",
+    "foundation-model",
+    "pytorch",
+    "pytorch-geometric",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+dependencies = [
+    "torch>=2.6,<2.9",
+    "torch_geometric>=2.5,<3",
+    "numpy>=1.24,<3",
+    "scipy>=1.10,<2",
+    "huggingface_hub>=0.34,<1",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7,<9",
+]
+notebook = [
+    "matplotlib>=3.7,<4",
+    "jupyter>=1,<2",
+]
+
+[project.urls]
+Homepage = "https://github.com/microsoft/GridSFM"
+Documentation = "https://github.com/microsoft/GridSFM/tree/main/model#readme"
+Issues = "https://github.com/microsoft/GridSFM/issues"
+
+[tool.setuptools.dynamic]
+version = {attr = "gridsfm.__version__"}
+
+[tool.setuptools.packages.find]
+include = ["gridsfm*"]
+exclude = ["examples*", "samples*", "checkpoints*", "tests*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

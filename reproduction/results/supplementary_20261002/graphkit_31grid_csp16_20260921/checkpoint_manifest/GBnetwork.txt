@@ -1,0 +1,12 @@
+grid=GBnetwork
+buses=2224
+parquet=GBnetwork_ppcY_backbone_dc_compile_ppNR_ls0.60-1.40_u0clean_sgenpert_pvqvstart_siNR_37022_NR_branchrows_directSI.parquet
+checkpoint=/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/ckpt/pfv2_graphkit_L_v2init/pfv2_graphkit_GBnetwork_b52_init_best.pt
+checkpoint_sha256=7260029f5832d91021a5e0041f727ddddfc392d3929e2a7e738d36a7a5a9c8a8
+batch=52
+recipe=init_recipe both; LR 1e-4; 120 epochs; seed 42
+split=random_split(seed=42; train=0.3333; valid=0.3333; test=remainder)
+calibration=train-only per-bus magnitude/circular-angle offset
+basis=train-only NR magnitude and gauge-aligned angle SVD
+rank=16
+pb=complex128 GENCO structural-zero; all bus-scenario pairs

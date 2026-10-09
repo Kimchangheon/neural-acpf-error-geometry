@@ -1,0 +1,47 @@
+### Starting TaskPrologue of job 4222543 on a0425 at Sun Sep 13 00:38:17 CEST 2026
+Running on cores 80-95 with governor schedutil
+Sun Sep 13 00:38:17 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A40                     On  |   00000000:A1:00.0 Off |                  Off |
+|  0%   32C    P8             22W /  300W |       0MiB /  49140MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+=== JOB_STATISTICS ===
+=== current date     : Sun Sep 13 00:38:42 CEST 2026
+= Job-ID             : 4222543 on alex
+= Job-Name           : lumina_csp_posthoc
+= Job-Command        : /home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/csp_posthoc_diagnostics_lumina_gbv06z_alex_a40_20260913.sh
+= Initial workdir    : /home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC
+= Queue/Partition    : a40
+= Slurm account      : iwi5 with QOS=normal
+= Requested resources:  for 06:00:00
+= Elapsed runtime    : 00:01:02
+= Total RAM usage    : 0.7 GiB of assigned  GiB (%)
+= Node list          : a0425
+= Subm/Elig/Start/End: 2026-09-13T00:37:39 / 2026-09-13T00:37:39 / 2026-09-13T00:37:40 / 2026-09-13T00:38:42
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/woody           470.2G  1000.0G  1500.0G        N/A     467K   5,000K   7,500K        N/A    
+!!! /home/hpc             142.7G   104.9G   209.7G  -28997days     196K     500K   1,000K        N/A !!!
+    /home/vault           368.8G  1048.6G  2097.2G        N/A      70K     200K     400K        N/A    
+    /lustre                 4.0K     0.0K     0.0K        N/A       1       80K     250K        N/A    
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]

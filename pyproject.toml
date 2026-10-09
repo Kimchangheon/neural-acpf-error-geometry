@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "acpf-csp"
+version = "1.0.0"
+description = "Calibrated subspace projection for AC power-flow surrogates"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+dependencies = ["torch>=1.13"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
+[project.urls]
+Paper = "https://github.com/"   # replace with the published DOI or arXiv link
+
+[tool.setuptools]
+# Only the method ships as a package. `reproduction/` is a research archive and
+# is deliberately not importable as a library.
+packages = ["csp"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

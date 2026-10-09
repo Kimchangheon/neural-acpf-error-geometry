@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2026.3.16)  14 SEP 2026 21:59
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2026.3.16)  23 SEP 2026 09:28
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -768,8 +768,8 @@ Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 \Hy@SectionHShift=\skip60
 )
 \c@proposition=\count342
-LaTeX Font Info:    Trying to load font information for OT1+ptm on input line 3
-5.
+LaTeX Font Info:    Trying to load font information for OT1+ptm on input line 4
+1.
  (/usr/local/texlive/2025/texmf-dist/tex/latex/psnfss/ot1ptm.fd
 File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
 )
@@ -780,24 +780,24 @@ File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
 (build/latex/neural_pf_tracking_calibration_error_geometry.aux)
 \openout1 = `neural_pf_tracking_calibration_error_geometry.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 41.
+LaTeX Font Info:    ... okay on input line 41.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 41.
+LaTeX Font Info:    ... okay on input line 41.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 41.
+LaTeX Font Info:    ... okay on input line 41.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 41.
+LaTeX Font Info:    ... okay on input line 41.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 41.
+LaTeX Font Info:    ... okay on input line 41.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 41.
+LaTeX Font Info:    ... okay on input line 41.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 41.
+LaTeX Font Info:    ... okay on input line 41.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 41.
+LaTeX Font Info:    ... okay on input line 41.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 41.
+LaTeX Font Info:    ... okay on input line 41.
 
 (/usr/local/texlive/2025/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
@@ -824,13 +824,13 @@ e
 Package pgfplots notification 'compat/show suggested version=true': document ha
 s been generated with the most recent feature set (\pgfplotsset{compat=1.18}).
 
-LaTeX Info: Redefining \microtypecontext on input line 35.
-Package microtype Info: Applying patch `item' on input line 35.
-Package microtype Info: Applying patch `toc' on input line 35.
-Package microtype Info: Applying patch `eqnum' on input line 35.
-Package microtype Info: Applying patch `footnote' on input line 35.
-Package microtype Info: Applying patch `verbatim' on input line 35.
-LaTeX Info: Redefining \microtypesetup on input line 35.
+LaTeX Info: Redefining \microtypecontext on input line 41.
+Package microtype Info: Applying patch `item' on input line 41.
+Package microtype Info: Applying patch `toc' on input line 41.
+Package microtype Info: Applying patch `eqnum' on input line 41.
+Package microtype Info: Applying patch `footnote' on input line 41.
+Package microtype Info: Applying patch `verbatim' on input line 41.
+LaTeX Info: Redefining \microtypesetup on input line 41.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using default protrusion set `alltext'.
@@ -844,7 +844,7 @@ Package microtype Info: No adjustment of character kerning.
 (/usr/local/texlive/2025/texmf-dist/tex/latex/microtype/mt-ptm.cfg
 File: mt-ptm.cfg 2006/04/20 v1.7 microtype config. file: Times (RS)
 )
-Package hyperref Info: Link coloring OFF on input line 35.
+Package hyperref Info: Link coloring OFF on input line 41.
 
 (build/latex/neural_pf_tracking_calibration_error_geometry.out)
 (build/latex/neural_pf_tracking_calibration_error_geometry.out)
@@ -856,7 +856,7 @@ Package hyperref Info: Link coloring OFF on input line 35.
 File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman 
 (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msa on input line 38.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 44.
 
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/umsa.fd
@@ -865,7 +865,7 @@ File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 (/usr/local/texlive/2025/texmf-dist/tex/latex/microtype/mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 38.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 44.
 
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/umsb.fd
@@ -874,43 +874,55 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 (/usr/local/texlive/2025/texmf-dist/tex/latex/microtype/mt-msb.cfg
 File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 )
-Overfull \hbox (18.82211pt too wide) in paragraph at lines 38--38
+Overfull \hbox (18.82211pt too wide) in paragraph at lines 44--44
  [][] 
  []
 
-<csp_diagram_finished_x2.pdf, id=89, 1055.86462pt x 808.94218pt>
-File: csp_diagram_finished_x2.pdf Graphic file (type pdf)
-<use csp_diagram_finished_x2.pdf>
-Package pdftex.def Info: csp_diagram_finished_x2.pdf  used on input line 99.
-(pdftex.def)             Requested size: 244.6937pt x 187.45995pt.
+<csp_diagram_finished_big.pdf, id=82, 1114.1625pt x 814.00107pt>
+File: csp_diagram_finished_big.pdf Graphic file (type pdf)
+<use csp_diagram_finished_big.pdf>
+Package pdftex.def Info: csp_diagram_finished_big.pdf  used on input line 111.
+(pdftex.def)             Requested size: 244.6937pt x 178.77026pt.
 [1{/usr/local/texlive/2025/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/usr/l
 ocal/texlive/2025/texmf-dist/fonts/enc/dvips/base/8r.enc}
 
 
 
- <./csp_diagram_finished_x2.pdf>] [2]
-<figure1_controlled_error_geometry_axis_labels_fixed.pdf, id=210, 660.76463pt x
- 353.83391pt>
-File: figure1_controlled_error_geometry_axis_labels_fixed.pdf Graphic file (typ
-e pdf)
-<use figure1_controlled_error_geometry_axis_labels_fixed.pdf>
-Package pdftex.def Info: figure1_controlled_error_geometry_axis_labels_fixed.pd
-f  used on input line 548.
-(pdftex.def)             Requested size: 244.6937pt x 131.02988pt.
- [3 <./figure1_controlled_error_geometry_axis_labels_fixed.pdf>]
-<gridsfm_raw_vs_csp16_discrete3.pdf, id=262, 528.775pt x 311.96503pt>
-File: gridsfm_raw_vs_csp16_discrete3.pdf Graphic file (type pdf)
-<use gridsfm_raw_vs_csp16_discrete3.pdf>
-Package pdftex.def Info: gridsfm_raw_vs_csp16_discrete3.pdf  used on input line
- 665.
-(pdftex.def)             Requested size: 244.6937pt x 144.36247pt.
-
-Overfull \hbox (7.6099pt too wide) in paragraph at lines 698--752
- [][] 
+ <./csp_diagram_finished_big.pdf>]
+Underfull \hbox (badness 1137) in paragraph at lines 523--536
+\OT1/ptm/m/n/9 (+20) have higher Mean PB, with par-tial Spear-man cor-re-la-tio
+ns of
  []
 
+
+Underfull \hbox (badness 1418) in paragraph at lines 523--536
+\OT1/ptm/m/n/9 (+20) .659/.635/.594/.833 for mag-ni-tude and .789/.906/.809/.86
+0 for
+ []
+
+[2]
+<figure1_controlled_error_geometry_larger_text_final_v9_recreated_searchable_no
+_type3.pdf, id=225, 816.65097pt x 448.07399pt>
+File: figure1_controlled_error_geometry_larger_text_final_v9_recreated_searchab
+le_no_type3.pdf Graphic file (type pdf)
+<use figure1_controlled_error_geometry_larger_text_final_v9_recreated_searchabl
+e_no_type3.pdf>
+Package pdftex.def Info: figure1_controlled_error_geometry_larger_text_final_v9
+_recreated_searchable_no_type3.pdf  used on input line 574.
+(pdftex.def)             Requested size: 244.6937pt x 134.25229pt.
+ [3 <./figure1_controlled_error_geometry_larger_text_final_v9_recreated_searcha
+ble_no_type3.pdf>]
+<gridsfm_raw_vs_csp16_discrete3_larger_text_v7_searchable_no_type3.pdf, id=248,
+ 528.77548pt x 311.96548pt>
+File: gridsfm_raw_vs_csp16_discrete3_larger_text_v7_searchable_no_type3.pdf Gra
+phic file (type pdf)
+<use gridsfm_raw_vs_csp16_discrete3_larger_text_v7_searchable_no_type3.pdf>
+Package pdftex.def Info: gridsfm_raw_vs_csp16_discrete3_larger_text_v7_searchab
+le_no_type3.pdf  used on input line 732.
+(pdftex.def)             Requested size: 244.6937pt x 144.3627pt.
+
 (build/latex/neural_pf_tracking_calibration_error_geometry.bbl [4 <./gridsfm_ra
-w_vs_csp16_discrete3.pdf>]) [5]
+w_vs_csp16_discrete3_larger_text_v7_searchable_no_type3.pdf>]) [5]
 (build/latex/neural_pf_tracking_calibration_error_geometry.aux)
  ***********
 LaTeX2e <2025-11-01>
@@ -918,38 +930,36 @@ L3 programming layer <2026-01-19>
  ***********
 Package rerunfilecheck Info: File `neural_pf_tracking_calibration_error_geometr
 y.out' has not changed.
-(rerunfilecheck)             Checksum: F182706E7D75BFB28E873D20433A3B22;3037.
+(rerunfilecheck)             Checksum: CD0288F9969B2109FFB98907AFF9647B;2661.
  ) 
 Here is how much of TeX's memory you used:
- 33305 strings out of 467533
- 771384 string characters out of 5419495
- 1315519 words of memory out of 5000000
- 61376 multiletter control sequences out of 15000+600000
- 662014 words of font info for 243 fonts, out of 8000000 for 9000
+ 33293 strings out of 467533
+ 771712 string characters out of 5419495
+ 1314367 words of memory out of 5000000
+ 61370 multiletter control sequences out of 15000+600000
+ 660082 words of font info for 240 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  84i,16n,104p,1042b,580s stack positions out of 10000i,1000n,20000p,200000b,200000s
-</usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx8.pfb>
-</usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx9.pfb></
-usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmex9.pfb
-></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb><
-/usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></u
-sr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb></usr
-/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/lo
-cal/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local
-/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/te
-xlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texl
-ive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texliv
-e/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb></usr/local/texlive/
-2025/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/local/texl
-ive/2025/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2025/t
-exmf-dist/fonts/type1/urw/times/utmbi8a.pfb></usr/local/texlive/2025/texmf-dist
-/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2025/texmf-dist/fonts/typ
-e1/urw/times/utmri8a.pfb>
+</usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx9.pfb>
+</usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmex9.p
+fb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb
+></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb><
+/usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></us
+r/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/l
+ocal/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/loca
+l/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/t
+exlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/tex
+live/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb></usr/local/texli
+ve/2025/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/local/t
+exlive/2025/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/202
+5/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb></usr/local/texlive/2025/texmf-d
+ist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2025/texmf-dist/fonts/
+type1/urw/times/utmri8a.pfb>
 Output written on build/latex/neural_pf_tracking_calibration_error_geometry.pdf
- (5 pages, 2044621 bytes).
+ (5 pages, 2481782 bytes).
 PDF statistics:
- 426 PDF objects out of 1000 (max. 8388607)
- 302 compressed objects within 4 object streams
- 64 named destinations out of 1000 (max. 500000)
- 43660 words of extra memory for PDF output out of 51595 (max. 10000000)
+ 352 PDF objects out of 1000 (max. 8388607)
+ 281 compressed objects within 3 object streams
+ 62 named destinations out of 1000 (max. 500000)
+ 39036 words of extra memory for PDF output out of 42996 (max. 10000000)
 

@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/controlled_geometry_20260905/controlled_error_geometry.py", line 22, in <module>
+    from diagnose_residual_distributions import (
+ModuleNotFoundError: No module named 'diagnose_residual_distributions'
+srun: error: h14-09: task 0: Exited with exit code 1
+srun: Terminating StepId=814579.0

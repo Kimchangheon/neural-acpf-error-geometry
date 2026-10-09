@@ -1,0 +1,139 @@
+### Starting TaskPrologue of job 853578 on h12-01 at Mon Sep 14 15:11:57 CEST 2026
+Running on cores 0-31 with governor performance
+Mon Sep 14 15:11:57 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:06:00.0 Off |                    0 |
+| N/A   36C    P0             71W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+Indexing parquet lazily from /home/hpc/b313dc/b313dc11/data_staging/controlled_geometry_20260905/GBnetwork.parquet ...
+[Dataset] /home/hpc/b313dc/b313dc11/data_staging/controlled_geometry_20260905/GBnetwork.parquet
+[Dataset]   parquet S_base = 1.000e+08 VA (= 100 MVA)
+[Dataset]   per-unit S_base matches target (100 MVA); no rebase
+Indexed 37022 valid rows from /home/hpc/b313dc/b313dc11/data_staging/controlled_geometry_20260905/GBnetwork.parquet across 1852 row groups (removed 0 diverged rows)
+Final combined dataset shape: (37022, streamed rows) | removed 0 diverged rows total
+[Dataset]   share_ybus=True: cached shared Ybus from first row (N=2224, |Y|_pu max=2.048e+05); subsequent rows will skip dense Y reconstruction
+[Dataset]   share_grid=True: cached 21 grid-only tensors from first row (Ybus + Branch_y_* + topology + vn_kv + ...); subsequent rows skip parquet decode + per-unit math for these fields
+[manifold] 12339 train scenarios, 2224 buses; k=16 captures 98.801% of |V| and 99.684% of theta variance
+[model] LUMINA HGT layers=6 hidden=128 heads=2 dropout=0.0
+[model] bus input widened to 13 (+6)
+[init] normal_(0, 0.02) applied to 66 weight matrices
+[init] terminal bus head zeroed (Linear, (2, 128)): flat-voltage start
+[lumina] checkpoint missing=0 unexpected=0
+[debias] per-bus offset fitted on 12339 training scenarios; rms dvm 2.02462e-02 pu
+[LUMINA] 100/772 test batches
+[LUMINA] 200/772 test batches
+[LUMINA] 300/772 test batches
+[LUMINA] 400/772 test batches
+[LUMINA] 500/772 test batches
+[LUMINA] 600/772 test batches
+[LUMINA] 700/772 test batches
+{
+  "protocol": {
+    "model": "LUMINA",
+    "kind": "lumina",
+    "checkpoint": "/home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/ckpt/gb_vsweep2_20260911/gbv06z_control_zerohead_best.pt",
+    "split": "controlled_error_geometry.split_dataset; seed=42 fixed memberships",
+    "calibration": "fit_per_bus_offset on training predictions only; circular angle offset",
+    "basis": "manifold_basis on training NR labels only; separate magnitude/circular-angle bases",
+    "rank": 16,
+    "actual_rank_magnitude": 16,
+    "actual_rank_angle": 16,
+    "pb": "pb_per_scenario; final calibrated complex128 voltage; GENCO structural-zero convention",
+    "partial_spearman": "Pearson correlation of rank residuals after separately regressing ranked q_perp and ranked Mean PB on intercept + ranked scenario error L2",
+    "bootstrap": {
+      "draws": 2000,
+      "seed": 20260914,
+      "unit": "held-out test scenario",
+      "percentile_ci": [
+        0.025,
+        0.975
+      ]
+    },
+    "test_scenarios": 12344,
+    "zero_error_denominator_magnitude": 0,
+    "zero_error_denominator_angle": 0
+  },
+  "training_explained_variance_at_16": {
+    "magnitude": 0.9880053751661676,
+    "angle": 0.9968392019907943
+  },
+  "per_scenario_off_subspace_error_fraction": {
+    "magnitude": {
+      "q25": 0.2307058877870456,
+      "median": 0.270834803814208,
+      "q75": 0.3577887428811752,
+      "mean": 0.3125163637944821,
+      "min": 0.09172471495868507,
+      "max": 0.880963376719475
+    },
+    "angle": {
+      "q25": 0.26727481487698806,
+      "median": 0.31652341735924555,
+      "q75": 0.39674373364843835,
+      "mean": 0.35421403424730685,
+      "min": 0.08398349575260149,
+      "max": 0.9331364827323702
+    }
+  },
+  "conditional_association": {
+    "magnitude": {
+      "partial_spearman_qperp_mean_pb_given_error_l2": 0.8326446418015845,
+      "paired_scenario_bootstrap_95_ci": [
+        0.8255882710906101,
+        0.838748924815388
+      ],
+      "n": 12344
+    },
+    "angle": {
+      "partial_spearman_qperp_mean_pb_given_error_l2": 0.8603130522044946,
+      "paired_scenario_bootstrap_95_ci": [
+        0.8543497269748657,
+        0.8651904003592208
+      ],
+      "n": 12344
+    }
+  },
+  "audit": {
+    "ratio_of_summed_energy_magnitude": 0.2535031929430793,
+    "ratio_of_summed_energy_angle": 0.29640055617861694,
+    "calibrated_mean_pb": 0.22800249778802884
+  }
+}
+=== JOB_STATISTICS ===
+=== current date     : Mon Sep 14 15:20:32 CEST 2026
+= Job-ID             : 853578 on helma as 853578_3
+= Job-Name           : offgeom_s42
+= Job-Command        : /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/off_subspace_conditional_association_4model_seed42_helma_20260914.sh
+= Initial workdir    : /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC
+= Queue/Partition    : h100
+= Slurm account      : b313dc with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 06:00:00
+= Elapsed runtime    : 00:08:41
+= Total RAM usage    : 7.8 GiB of assigned 175 GiB (4.5%)
+= Node list          : h12-01
+= Subm/Elig/Start/End: 2026-09-14T15:11:51 / 2026-09-14T15:11:51 / 2026-09-14T15:11:51 / 2026-09-14T15:20:32
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+!!! /home/hpc             170.8G   104.9G   209.7G  -28994days     128K     500K   1,000K        N/A !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:06:00.0, 3206388, 4 %, 2 %, 1414 MiB, 489584 ms

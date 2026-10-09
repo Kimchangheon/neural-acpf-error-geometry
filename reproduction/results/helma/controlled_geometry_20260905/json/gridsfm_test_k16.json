@@ -1,0 +1,144 @@
+{
+  "protocol": {
+    "split": "random_split seed=42, 1/3 train/valid/test",
+    "phase": "test",
+    "ranks": [
+      16
+    ],
+    "alphas": [
+      0.0,
+      0.25,
+      0.5,
+      0.75,
+      1.0
+    ],
+    "pb": "GENCO-style complex128, all bus-scenario pairs"
+  },
+  "models": {
+    "gridsfm": {
+      "model": "gridsfm",
+      "n_scenarios": 12344,
+      "rank": {
+        "16": {
+          "csp": {
+            "mean_pb": 0.050086739562029116,
+            "relative_pb_to_calibrated": 0.5783551731860535,
+            "vmag_rmse": 0.008571959517497972
+          },
+          "off": {
+            "0.0": {
+              "mean_pb": 0.041241229590286456,
+              "relative_pb": 0.47621543527617116,
+              "delta_pb": -0.04536081338291005,
+              "fraction_scenarios_pb_decreases": 1.0,
+              "paired_bootstrap_ci_delta_pb": [
+                -0.045686147020524474,
+                -0.04506515683924992
+              ]
+            },
+            "0.25": {
+              "mean_pb": 0.05012825084185603,
+              "relative_pb": 0.5788345069107759,
+              "delta_pb": -0.036473792131340485,
+              "fraction_scenarios_pb_decreases": 1.0,
+              "paired_bootstrap_ci_delta_pb": [
+                -0.036746718665066985,
+                -0.03621865718352459
+              ]
+            },
+            "0.5": {
+              "mean_pb": 0.06501890473776192,
+              "relative_pb": 0.750777955179249,
+              "delta_pb": -0.02158313823543459,
+              "fraction_scenarios_pb_decreases": 1.0,
+              "paired_bootstrap_ci_delta_pb": [
+                -0.021754245774510437,
+                -0.02141298060112175
+              ]
+            },
+            "0.75": {
+              "mean_pb": 0.07750773158162716,
+              "relative_pb": 0.8949873342551046,
+              "delta_pb": -0.009094311391569345,
+              "fraction_scenarios_pb_decreases": 1.0,
+              "paired_bootstrap_ci_delta_pb": [
+                -0.009170385634682423,
+                -0.009018745629592189
+              ]
+            },
+            "1.0": {
+              "mean_pb": 0.08660204297319651,
+              "relative_pb": 1.0,
+              "delta_pb": 0.0,
+              "fraction_scenarios_pb_decreases": 0.0,
+              "paired_bootstrap_ci_delta_pb": [
+                0.0,
+                0.0
+              ]
+            }
+          },
+          "in": {
+            "0.0": {
+              "mean_pb": 0.11394408607841927,
+              "relative_pb": 1.3157205322937378,
+              "delta_pb": 0.02734204310522276,
+              "fraction_scenarios_pb_decreases": 0.0,
+              "paired_bootstrap_ci_delta_pb": [
+                0.027056767601415208,
+                0.027633048575407267
+              ]
+            },
+            "0.25": {
+              "mean_pb": 0.1103546342864001,
+              "relative_pb": 1.2742728750701073,
+              "delta_pb": 0.023752591313203578,
+              "fraction_scenarios_pb_decreases": 0.0,
+              "paired_bootstrap_ci_delta_pb": [
+                0.023510792630959607,
+                0.024002734376577958
+              ]
+            },
+            "0.5": {
+              "mean_pb": 0.10315304596843865,
+              "relative_pb": 1.19111561837363,
+              "delta_pb": 0.01655100299524214,
+              "fraction_scenarios_pb_decreases": 0.0,
+              "paired_bootstrap_ci_delta_pb": [
+                0.016389815818144794,
+                0.016715341035445516
+              ]
+            },
+            "0.75": {
+              "mean_pb": 0.09468611750550898,
+              "relative_pb": 1.0933473882921503,
+              "delta_pb": 0.008084074532312463,
+              "fraction_scenarios_pb_decreases": 0.0,
+              "paired_bootstrap_ci_delta_pb": [
+                0.008009349517491781,
+                0.008160427478018071
+              ]
+            },
+            "1.0": {
+              "mean_pb": 0.08660204297319651,
+              "relative_pb": 1.0,
+              "delta_pb": 0.0,
+              "fraction_scenarios_pb_decreases": 0.0,
+              "paired_bootstrap_ci_delta_pb": [
+                0.0,
+                0.0
+              ]
+            }
+          },
+          "max_abs_fixed_norm_error": 4.440892098500626e-16,
+          "zero_denominator_scenarios": 0,
+          "max_abs_alpha1_pb_reproduction_error": 0.0
+        }
+      },
+      "calibrated": {
+        "mean_pb": 0.08660204297319651,
+        "vmag_rmse": 0.01178867450641032
+      },
+      "calibration_offset_rms_vmag": 0.02958951163336779
+    }
+  }
+}

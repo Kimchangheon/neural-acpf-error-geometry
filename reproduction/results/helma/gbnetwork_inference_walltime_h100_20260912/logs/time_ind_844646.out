@@ -1,0 +1,67 @@
+### Starting TaskPrologue of job 844646 on h13-15 at Sun Sep 13 12:01:17 AM CEST 2026
+Running on cores 64-95 with governor performance
+Sun Sep 13 00:01:17 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.91.07              Driver Version: 595.91.07      CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:A6:00.0 Off |                    0 |
+| N/A   35C    P0             68W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+Indexing parquet lazily from /home/hpc/b313dc/b313dc11/data_staging/controlled_geometry_20260905/GBnetwork.parquet ...
+[Dataset] /home/hpc/b313dc/b313dc11/data_staging/controlled_geometry_20260905/GBnetwork.parquet
+[Dataset]   parquet S_base = 1.000e+08 VA (= 100 MVA)
+[Dataset]   per-unit S_base matches target (100 MVA); no rebase
+Indexed 37022 valid rows from /home/hpc/b313dc/b313dc11/data_staging/controlled_geometry_20260905/GBnetwork.parquet across 1852 row groups (removed 0 diverged rows)
+Final combined dataset shape: (37022, streamed rows) | removed 0 diverged rows total
+[Dataset]   share_ybus=True: cached shared Ybus from first row (N=2224, |Y|_pu max=2.048e+05); subsequent rows will skip dense Y reconstruction
+[Dataset]   share_grid=True: cached 21 grid-only tensors from first row (Ybus + Branch_y_* + topology + vn_kv + ...); subsequent rows skip parquet decode + per-unit math for these fields
+[debias] per-bus offset fitted on 12339 training scenarios; rms dvm 2.56887e-02 pu
+[manifold] 12339 train scenarios, 2224 buses; k=16 captures 98.801% of |V| and 99.684% of theta variance
+[time] mode=Raw repeat=0 seconds=282.203212
+[time] mode=Raw repeat=1 seconds=278.639230
+[time] mode=Raw repeat=2 seconds=276.540563
+[time] mode=C repeat=0 seconds=275.014092
+[time] mode=C repeat=1 seconds=277.813633
+[time] mode=C repeat=2 seconds=282.996489
+[time] mode=P16 repeat=0 seconds=281.297896
+[time] mode=P16 repeat=1 seconds=284.398172
+[time] mode=P16 repeat=2 seconds=279.688336
+[time] mode=CSP16 repeat=0 seconds=275.070752
+[time] mode=CSP16 repeat=1 seconds=276.900598
+[time] mode=CSP16 repeat=2 seconds=278.220211
+=== JOB_STATISTICS ===
+=== current date     : Sun Sep 13 01:41:45 CEST 2026
+= Job-ID             : 844646 on helma
+= Job-Name           : gb_inf_walltime
+= Job-Command        : /home/hpc/b313dc/b313dc11/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/benchmark_gbnetwork_inference_independent_h100_20260913.sh
+= Initial workdir    : /home/hpc/b313dc/b313dc11
+= Queue/Partition    : h100
+= Slurm account      : b313dc with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 08:00:00
+= Elapsed runtime    : 01:40:32
+= Total RAM usage    : 40.7 GiB of assigned 175 GiB (23.3%)
+= Node list          : h13-15
+= Subm/Elig/Start/End: 2026-09-13T00:00:52 / 2026-09-13T00:00:52 / 2026-09-13T00:01:13 / 2026-09-13T01:41:45
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              91.2G   104.9G   209.7G        N/A     127K     500K   1,000K        N/A    
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:A6:00.0, 22461, 47 %, 17 %, 95304 MiB, 6008983 ms

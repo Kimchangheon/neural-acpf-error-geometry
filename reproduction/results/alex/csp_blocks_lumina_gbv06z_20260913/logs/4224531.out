@@ -1,0 +1,93 @@
+### Starting TaskPrologue of job 4224531 on a0129 at Sun Sep 13 07:52:24 CEST 2026
+Running on cores 32-47 with governor schedutil
+Sun Sep 13 07:52:24 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A40                     On  |   00000000:25:00.0 Off |                  Off |
+|  0%   51C    P8             23W /  300W |       0MiB /  49140MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+Indexing parquet lazily from /home/vault/iwi5/iwi5295h/PIGNN-Attn-LS/ScenarioSynthesis_PPC/out/GBnetwork_ppcY_backbone_dc_compile_ppNR_ls0.60-1.40_u0clean_sgenpert_pvqvstart_siNR_37022_NR_branchrows_directSI.parquet ...
+[Dataset] /home/vault/iwi5/iwi5295h/PIGNN-Attn-LS/ScenarioSynthesis_PPC/out/GBnetwork_ppcY_backbone_dc_compile_ppNR_ls0.60-1.40_u0clean_sgenpert_pvqvstart_siNR_37022_NR_branchrows_directSI.parquet
+[Dataset]   parquet S_base = 1.000e+08 VA (= 100 MVA)
+[Dataset]   per-unit S_base matches target (100 MVA); no rebase
+Indexed 37022 valid rows from /home/vault/iwi5/iwi5295h/PIGNN-Attn-LS/ScenarioSynthesis_PPC/out/GBnetwork_ppcY_backbone_dc_compile_ppNR_ls0.60-1.40_u0clean_sgenpert_pvqvstart_siNR_37022_NR_branchrows_directSI.parquet across 1852 row groups (removed 0 diverged rows)
+Final combined dataset shape: (37022, streamed rows) | removed 0 diverged rows total
+[model] LUMINA HGT layers=6 hidden=128 heads=2 dropout=0.0
+[model] bus input widened to 13 (+6)
+[init] normal_(0, 0.02) applied to 66 weight matrices
+[init] terminal bus head zeroed (Linear, (2, 128)): flat-voltage start
+[lumina] checkpoint missing=0 unexpected=0
+[Dataset]   share_ybus=True: cached shared Ybus from first row (N=2224, |Y|_pu max=2.048e+05); subsequent rows will skip dense Y reconstruction
+[Dataset]   share_grid=True: cached 21 grid-only tensors from first row (Ybus + Branch_y_* + topology + vn_kv + ...); subsequent rows skip parquet decode + per-unit math for these fields
+[debias] per-bus offset fitted on 12339 training scenarios; rms dvm 2.02462e-02 pu
+[manifold] 12339 train scenarios, 2224 buses; k=16 captures 98.801% of |V| and 99.684% of theta variance
+[lumina] 25/772 test batches
+[lumina] 50/772 test batches
+[lumina] 75/772 test batches
+[lumina] 100/772 test batches
+[lumina] 125/772 test batches
+[lumina] 150/772 test batches
+[lumina] 175/772 test batches
+[lumina] 200/772 test batches
+[lumina] 225/772 test batches
+[lumina] 250/772 test batches
+[lumina] 275/772 test batches
+[lumina] 300/772 test batches
+[lumina] 325/772 test batches
+[lumina] 350/772 test batches
+[lumina] 375/772 test batches
+[lumina] 400/772 test batches
+[lumina] 425/772 test batches
+[lumina] 450/772 test batches
+[lumina] 475/772 test batches
+[lumina] 500/772 test batches
+[lumina] 525/772 test batches
+[lumina] 550/772 test batches
+[lumina] 575/772 test batches
+[lumina] 600/772 test batches
+[lumina] 625/772 test batches
+[lumina] 650/772 test batches
+[lumina] 675/772 test batches
+[lumina] 700/772 test batches
+[lumina] 725/772 test batches
+[lumina] 750/772 test batches
+=== JOB_STATISTICS ===
+=== current date     : Sun Sep 13 08:09:51 CEST 2026
+= Job-ID             : 4224531 on alex
+= Job-Name           : lumina_csp_blocks
+= Job-Command        : /home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/sbatch/csp_projection_block_ablation_lumina_gbv06z_alex_a40_20260913.sh
+= Initial workdir    : /home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC
+= Queue/Partition    : a40
+= Slurm account      : iwi5 with QOS=normal
+= Requested resources:  for 06:00:00
+= Elapsed runtime    : 00:17:28
+= Total RAM usage    : 7.0 GiB of assigned  GiB (%)
+= Node list          : a0129
+= Subm/Elig/Start/End: 2026-09-13T07:52:08 / 2026-09-13T07:52:08 / 2026-09-13T07:52:23 / 2026-09-13T08:09:51
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+!!! /home/hpc             142.8G   104.9G   209.7G  -28997days     196K     500K   1,000K        N/A !!!
+    /home/woody           470.2G  1000.0G  1500.0G        N/A     467K   5,000K   7,500K        N/A    
+    /home/vault           368.8G  1048.6G  2097.2G        N/A      70K     200K     400K        N/A    
+    /lustre                 4.0K     0.0K     0.0K        N/A       1       80K     250K        N/A    
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA A40, 00000000:25:00.0, 166412, 5 %, 4 %, 1022 MiB, 1021449 ms

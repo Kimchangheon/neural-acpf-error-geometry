@@ -1,0 +1,296 @@
+### Starting TaskPrologue of job 4212402 on a0129 at Thu Sep 10 20:55:50 CEST 2026
+Running on cores 48-63 with governor schedutil
+Thu Sep 10 20:55:50 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A40                     On  |   00000000:61:00.0 Off |                  Off |
+|  0%   44C    P8             24W /  300W |       0MiB /  49140MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+Indexing parquet lazily from /home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/gbcorr_csp_posthoc_20260910/data/control.parquet ...
+[Dataset] /home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/gbcorr_csp_posthoc_20260910/data/control.parquet
+[Dataset]   parquet S_base = 1.000e+08 VA (= 100 MVA)
+[Dataset]   per-unit S_base matches target (100 MVA); no rebase
+Indexed 3832 valid rows from /home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/gbcorr_csp_posthoc_20260910/data/control.parquet across 196 row groups (removed 0 diverged rows)
+Final combined dataset shape: (3832, streamed rows) | removed 0 diverged rows total
+Indexing parquet lazily from /home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/gbcorr_csp_posthoc_20260910/data/gbcorr.parquet ...
+[Dataset] /home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/gbcorr_csp_posthoc_20260910/data/gbcorr.parquet
+[Dataset]   parquet S_base = 1.000e+08 VA (= 100 MVA)
+[Dataset]   per-unit S_base matches target (100 MVA); no rebase
+Indexed 2733 valid rows from /home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/results/gbcorr_csp_posthoc_20260910/data/gbcorr.parquet across 139 row groups (removed 0 diverged rows)
+Final combined dataset shape: (2733, streamed rows) | removed 0 diverged rows total
+[Dataset]   share_ybus=True: cached shared Ybus from first row (N=2224, |Y|_pu max=2.048e+05); subsequent rows will skip dense Y reconstruction
+[Dataset]   share_grid=True: cached 21 grid-only tensors from first row (Ybus + Branch_y_* + topology + vn_kv + ...); subsequent rows skip parquet decode + per-unit math for these fields
+[manifold] 1277 train scenarios, 2224 buses; k=16 captures 98.819% of |V| and 99.683% of theta variance
+[Dataset]   share_ybus=True: cached shared Ybus from first row (N=2224, |Y|_pu max=2.048e+05); subsequent rows will skip dense Y reconstruction
+[Dataset]   share_grid=True: cached 21 grid-only tensors from first row (Ybus + Branch_y_* + topology + vn_kv + ...); subsequent rows skip parquet decode + per-unit math for these fields
+[manifold] 910 train scenarios, 2224 buses; k=16 captures 98.645% of |V| and 99.871% of theta variance
+[debias] per-bus offset fitted on 1277 training scenarios; rms dvm 2.56363e-02 pu
+[debias] per-bus offset fitted on 910 training scenarios; rms dvm 2.79310e-02 pu
+[manifold] 1277 train scenarios, 2224 buses; k=16 captures 98.819% of |V| and 99.683% of theta variance
+[manifold] 1277 train scenarios, 2224 buses; k=16 captures 98.819% of |V| and 99.683% of theta variance
+[manifold] 910 train scenarios, 2224 buses; k=16 captures 98.645% of |V| and 99.871% of theta variance
+[manifold] 910 train scenarios, 2224 buses; k=16 captures 98.645% of |V| and 99.871% of theta variance
+{
+  "protocol": {
+    "control_train_test": [
+      1277,
+      1278
+    ],
+    "gbcorr_train_test": [
+      910,
+      913
+    ],
+    "rank_requested": 16,
+    "rank_actual": {
+      "control": [
+        16,
+        16
+      ],
+      "gbcorr": [
+        16,
+        16
+      ]
+    },
+    "T": "control calibration + control basis",
+    "R": "GBcorr calibration + GBcorr basis",
+    "restoration": "existing restore_known applied after every projection"
+  },
+  "reference": {
+    "control": {
+      "test_retained_variance": {
+        "magnitude": 0.9354886985220126,
+        "angle": 0.9946702291056327
+      },
+      "reference_off_energy": {
+        "magnitude": 76.27668676695576,
+        "angle": 407.4392066620235
+      },
+      "oracle": {
+        "vmag_rmse": 0.0061290495152667105,
+        "angle_rmse_deg": 0.8116172351677089,
+        "mean_pb": 0.08677647260554237,
+        "max_pb": 7.548194428807408
+      }
+    },
+    "gbcorr": {
+      "test_retained_variance": {
+        "magnitude": 0.9853425569411093,
+        "angle": 0.9986425524109347
+      },
+      "reference_off_energy": {
+        "magnitude": 15.641303704893861,
+        "angle": 95.48874102717967
+      },
+      "oracle": {
+        "vmag_rmse": 0.0027754518294453995,
+        "angle_rmse_deg": 0.3929125817404843,
+        "mean_pb": 0.043807387038928815,
+        "max_pb": 3.327315347050534
+      }
+    }
+  },
+  "cells": {
+    "control_cal__control_basis": {
+      "vmag_rmse": 0.019549925800892765,
+      "angle_rmse_deg": 1.5539706690220854,
+      "within_r2": 0.4757122383981276,
+      "within_slope": 0.41005243171204964,
+      "mean_pb": 0.09992360720264228,
+      "max_pb": 6.533155566091864,
+      "cal_error_energy": {
+        "magnitude": 864.6509633662621,
+        "angle": 1131.7397648658887
+      },
+      "csp_error_energy": {
+        "magnitude": 776.0608718000336,
+        "angle": 1493.6399814956967
+      },
+      "error_off_energy": {
+        "magnitude": 754463.3842693368,
+        "angle": 193.7224793168171
+      },
+      "identity": {
+        "magnitude": {
+          "reference_off": 76.27668676695576,
+          "error_off": 754463.3842693368,
+          "rhs": -754387.1075825698,
+          "lhs": -88.59009156622847,
+          "relative_discrepancy": 0.999882566800684,
+          "off_error_fraction": 872.564093761091
+        },
+        "angle": {
+          "reference_off": 407.4392066620235,
+          "error_off": 193.7224793168171,
+          "rhs": 213.71672734520638,
+          "lhs": 361.900216629808,
+          "relative_discrepancy": 0.4094595208164251,
+          "off_error_fraction": 0.1711722830025092
+        }
+      }
+    },
+    "gbcorr_cal__control_basis": {
+      "vmag_rmse": 0.016739470010747114,
+      "angle_rmse_deg": 1.5167469812888914,
+      "within_r2": 0.4754750492919569,
+      "within_slope": 0.4086855866151377,
+      "mean_pb": 0.0944399383301118,
+      "max_pb": 6.616836553535589,
+      "cal_error_energy": {
+        "magnitude": 644.5568200673316,
+        "angle": 1058.3735350673876
+      },
+      "csp_error_energy": {
+        "magnitude": 568.9694756150203,
+        "angle": 1422.9399548950475
+      },
+      "error_off_energy": {
+        "magnitude": 753678.5393640933,
+        "angle": 183.77455348205604
+      },
+      "identity": {
+        "magnitude": {
+          "reference_off": 76.27668676695576,
+          "error_off": 753678.5393640933,
+          "rhs": -753602.2626773263,
+          "lhs": -75.5873444523113,
+          "relative_discrepancy": 0.9998996986232714,
+          "off_error_fraction": 1169.2972844277137
+        },
+        "angle": {
+          "reference_off": 407.4392066620235,
+          "error_off": 183.77455348205604,
+          "rhs": 223.66465317996744,
+          "lhs": 364.56641982765996,
+          "relative_discrepancy": 0.38649134693837256,
+          "off_error_fraction": 0.17363865156582448
+        }
+      }
+    },
+    "control_cal__gbcorr_basis": {
+      "vmag_rmse": 0.019171347762528473,
+      "angle_rmse_deg": 1.3832497647871973,
+      "within_r2": 0.507179066195363,
+      "within_slope": 0.4329927310052839,
+      "mean_pb": 0.0739642829143915,
+      "max_pb": 5.167676399864006,
+      "cal_error_energy": {
+        "magnitude": 864.6509633662621,
+        "angle": 1131.7397648658887
+      },
+      "csp_error_energy": {
+        "magnitude": 746.2955480889814,
+        "angle": 1183.4815877647254
+      },
+      "error_off_energy": {
+        "magnitude": 727772.9742798434,
+        "angle": 201.8028713662222
+      },
+      "identity": {
+        "magnitude": {
+          "reference_off": 15.641303704893861,
+          "error_off": 727772.9742798434,
+          "rhs": -727757.3329761385,
+          "lhs": -118.35541527728071,
+          "relative_discrepancy": 0.9998373696699238,
+          "off_error_fraction": 841.695672721482
+        },
+        "angle": {
+          "reference_off": 95.48874102717967,
+          "error_off": 201.8028713662222,
+          "rhs": -106.31413033904253,
+          "lhs": 51.741822898836745,
+          "relative_discrepancy": 1.4866881075340483,
+          "off_error_fraction": 0.17831207988890968
+        }
+      }
+    },
+    "gbcorr_cal__gbcorr_basis": {
+      "vmag_rmse": 0.01625996883270049,
+      "angle_rmse_deg": 1.3411137452774389,
+      "within_r2": 0.5070990199034584,
+      "within_slope": 0.4315910492842219,
+      "mean_pb": 0.06838752416797504,
+      "max_pb": 4.839982257740479,
+      "cal_error_energy": {
+        "magnitude": 644.5568200673316,
+        "angle": 1058.3735350673876
+      },
+      "csp_error_energy": {
+        "magnitude": 536.840136406252,
+        "angle": 1112.478234951652
+      },
+      "error_off_energy": {
+        "magnitude": 726329.473861419,
+        "angle": 192.0617464632412
+      },
+      "identity": {
+        "magnitude": {
+          "reference_off": 15.641303704893861,
+          "error_off": 726329.473861419,
+          "rhs": -726313.8325577141,
+          "lhs": -107.71668366107963,
+          "relative_discrepancy": 0.9998516940214648,
+          "off_error_fraction": 1126.8664782501955
+        },
+        "angle": {
+          "reference_off": 95.48874102717967,
+          "error_off": 192.0617464632412,
+          "rhs": -96.57300543606154,
+          "lhs": 54.10469988426439,
+          "relative_discrepancy": 1.5602466200566336,
+          "off_error_fraction": 0.18146877269660042
+        }
+      }
+    }
+  },
+  "training_explained_variance": {
+    "control": {
+      "magnitude": 0.9881906934801193,
+      "angle": 0.9968334112080167
+    },
+    "gbcorr": {
+      "magnitude": 0.9864482467621724,
+      "angle": 0.9987065904597708
+    }
+  }
+}
+=== JOB_STATISTICS ===
+=== current date     : Thu Sep 10 21:06:29 CEST 2026
+= Job-ID             : 4212402 on alex
+= Job-Name           : gbcorr_csp_audit
+= Job-Command        : /home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/gbcorr_csp_posthoc_20260910/sbatch/gbcorr_csp_posthoc_alex2_20260910.sh
+= Initial workdir    : /home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/gbcorr_csp_posthoc_20260910
+= Queue/Partition    : a40
+= Slurm account      : iwi5 with QOS=normal
+= Requested resources:  for 06:00:00
+= Elapsed runtime    : 00:10:40
+= Total RAM usage    : 3.5 GiB of assigned  GiB (%)
+= Node list          : a0129
+= Subm/Elig/Start/End: 2026-09-10T20:13:53 / 2026-09-10T20:13:53 / 2026-09-10T20:55:48 / 2026-09-10T21:06:28
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+!!! /home/hpc             110.5G   104.9G   209.7G  -28997days     196K     500K   1,000K        N/A !!!
+    /home/woody           470.2G  1000.0G  1500.0G        N/A     467K   5,000K   7,500K        N/A    
+    /home/vault           368.8G  1048.6G  2097.2G        N/A      70K     200K     400K        N/A    
+    /lustre                 4.0K     0.0K     0.0K        N/A       1       80K     250K        N/A    
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA A40, 00000000:61:00.0, 4050495, 24 %, 7 %, 420 MiB, 607997 ms

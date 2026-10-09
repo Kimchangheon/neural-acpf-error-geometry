@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/overlays/nr1_lumina_gbv06z_20260913/nr1_multiprocess_baseline.py", line 18, in <module>
+    from output_intervention_metrics import _restore_known_setpoints
+ImportError: cannot import name '_restore_known_setpoints' from 'output_intervention_metrics' (/home/hpc/iwi5/iwi5295h/PIGNN-Attn-LS/PIGNN-Attn-LS-PPC/output_intervention_metrics.py)
+srun: error: a0228: task 0: Exited with exit code 1
+srun: Terminating StepId=4222537.0

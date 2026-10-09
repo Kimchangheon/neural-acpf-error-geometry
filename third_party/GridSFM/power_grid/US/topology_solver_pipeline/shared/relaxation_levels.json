@@ -1,0 +1,69 @@
+{
+  "levels": [
+    {
+      "label": "L0",
+      "name": "Strict",
+      "description": "Model as-is from pipeline",
+      "angle_deg": null,
+      "thermal_factor": null,
+      "load_cap_ratio": null
+    },
+    {
+      "label": "L1",
+      "name": "Widen angles",
+      "description": "Branch angles widened to ±60°",
+      "angle_deg": 60.0,
+      "thermal_factor": null,
+      "load_cap_ratio": null
+    },
+    {
+      "label": "L2",
+      "name": "Thermal headroom",
+      "description": "Branch ratings ×1.2, angles ±60°",
+      "angle_deg": 60.0,
+      "thermal_factor": 1.2,
+      "load_cap_ratio": null
+    },
+    {
+      "label": "L3",
+      "name": "Aggressive",
+      "description": "Branch ratings ×1.5, angles ±90°, pmin ×0.5",
+      "angle_deg": 90.0,
+      "thermal_factor": 1.5,
+      "load_cap_ratio": null,
+      "pmin_factor": 0.5
+    },
+    {
+      "label": "L4",
+      "name": "Load shedding",
+      "description": "Cap load at 70%, ratings ×1.5, angles ±90°, pmin = 0",
+      "angle_deg": 90.0,
+      "thermal_factor": 1.5,
+      "load_cap_ratio": 0.70,
+      "pmin_factor": 0.0
+    },
+    {
+      "label": "L5",
+      "name": "Full relaxation",
+      "description": "Remove thermal limits, angles ±90°, V [0.85,1.15], Q ×2.0, load cap 70%, pmin = 0",
+      "angle_deg": 90.0,
+      "thermal_factor": null,
+      "load_cap_ratio": 0.70,
+      "pmin_factor": 0.0,
+      "vmin": 0.85,
+      "vmax": 1.15,
+      "q_factor": 2.0
+    },
+    {
+      "label": "AC1",
+      "name": "Voltage + Q relax",
+      "description": "Voltage [0.90,1.10], Q limits ×1.5 (AC-OPF only)",
+      "angle_deg": null,
+      "thermal_factor": null,
+      "load_cap_ratio": null,
+      "vmin": 0.90,
+      "vmax": 1.10,
+      "q_factor": 1.5
+    }
+  ]
+}

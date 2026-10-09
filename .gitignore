@@ -14,3 +14,17 @@ ICASSP2027_manuscript/output/
 *.bbl
 *.blg
 *.synctex.gz
+
+# Manuscript, reviews, references and other non-code material (kept locally only)
+ICASSP2027_manuscript/
+paper/
+Reviews/
+references/
+GridFM_Poster/
+.idea/
+main.py
+*.pdf
+!reproduction/**/*.pdf
+
+# macOS AppleDouble files
+._*

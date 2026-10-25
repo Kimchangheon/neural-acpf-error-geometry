@@ -151,6 +151,7 @@ def converged(root: Path, out: Path, summ: dict):
     base = root / "graphkit_31grid_ranks_20260922"
     sr = root / "supp_rescore_20261002"
     lines_drift, lines_ch, missing, drift = [], [], [], {}
+    lines_rank, rank_sum = [], {}
     for g in CONV:
         if g in KRON:
             # Kron-reduced model (exact reduction of the 328 pass-through
@@ -191,6 +192,31 @@ def converged(root: Path, out: Path, summ: dict):
             lines_ch.append(rf"{first} & {k} & " + " & ".join(cells) +
                             rf" & {m[f'CSP{k}']['vmag_rmse'] / m['raw']['vmag_rmse']:.2f} \\")
         lines_ch.append(r"\addlinespace[1pt]")
+        # Full rank sweep, same layout as the GBnetwork table: change vs C (%).
+        for k in RANKS:
+            first = (tex(g) + (r"$^\ast$" if g in KRON else "")) if k == 16 else ""
+            if k >= nbus:
+                lines_rank.append(rf"{first} & {k} & \multicolumn{{7}}{{c}}{{$k\ge N$: $P_k$ is the identity, CSP$\equiv C$}} \\")
+                continue
+            m, fk = mc[k], fc[k]
+            rp, cp = m["raw"]["mean_pb"], m["C"]["mean_pb"]
+            vals = {s: m[f"{s}{k}"]["mean_pb"] for s in ("CSP", "CSPmag", "CSPang")}
+            best = min(vals, key=vals.get)
+            rank_sum.setdefault(k, dict(active=0, csp_beats_c=0, any_beats_c=0))
+            rank_sum[k]["active"] += 1
+            rank_sum[k]["csp_beats_c"] += vals["CSP"] < cp
+            rank_sum[k]["any_beats_c"] += min(vals.values()) < cp
+            cells = []
+            for s in ("CSP", "CSPmag", "CSPang"):
+                c = f"{100 * (vals[s] / cp - 1):+.1f}"
+                cells.append(rf"\textbf{{{c}}}" if s == best and vals[s] < cp else c)
+            k3 = lambda x: f"{1e3 * x:.3g}"  # noqa: E731
+            lines_rank.append(rf"{first} & {k} & {k3(rp)} & {k3(cp)} & " + " & ".join(cells) +
+                              rf" & {k3(fk[f'P{k}_truth']['mean_pb'])} & {k3(fk[f'Pmag{k}_truth']['mean_pb'])} \\")
+        lines_rank.append(r"\midrule")
+    if lines_rank:
+        (out / "tab_converged_ranks.tex").write_text("\n".join(lines_rank[:-1]) + "\n\\bottomrule\n")
+        summ["converged_rank_counts"] = rank_sum
     if lines_drift:
         (out / "tab_converged_drift.tex").write_text("\n".join(lines_drift[:-1]) + "\n\\bottomrule\n")
         (out / "tab_converged_channels.tex").write_text("\n".join(lines_ch[:-1]) + "\n\\bottomrule\n")
